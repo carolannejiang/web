@@ -1,56 +1,221 @@
 <!DOCTYPE html>
-<html lang="en-US">
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Carolanne Jiang</title>
-  <meta property="og:site_name" content="Carolanne Jiang">
-  <meta property="og:title" content="Carolanne Jiang">
-  <meta property="og:description" content="my art stuff">
-  <meta property="og:type" content="website">
-  <link rel="icon" type="image/x-icon" href="https://assets.squarespace.com/universal/default-favicon.ico">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carolanne</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; overflow: hidden; }
-    body { font-family: 'Work Sans', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    .page-section { position: relative; width: 100%; height: 100vh; overflow: hidden; }
-    .background-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; z-index: 0; }
-    .content-grid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
-    .content-grid a { text-decoration: none; transition: opacity 0.3s ease; }
-    .content-grid a:hover { opacity: 0.7; }
-    .block-comic { position: absolute; top: 28%; left: 8%; }
-    .block-comic h4 { font-family: 'Work Sans', sans-serif; font-size: clamp(1rem, 1.5vw, 1.35rem); font-weight: 700; letter-spacing: 0.01em; text-transform: lowercase; }
-    .block-comic a { color: rgb(238, 163, 247); }
-    .block-paintings { position: absolute; top: 38%; left: 27%; }
-    .block-paintings h2 { font-family: 'Work Sans', sans-serif; font-size: clamp(2rem, 3.5vw, 3.2rem); font-weight: 700; letter-spacing: 0.01em; text-transform: lowercase; }
-    .block-paintings a { color: rgb(2, 8, 44); }
-    .block-3d { position: absolute; bottom: 22%; left: 8%; }
-    .block-3d h3 { font-family: 'Work Sans', sans-serif; font-size: clamp(1.1rem, 1.6vw, 1.5rem); font-weight: 700; letter-spacing: 0.01em; text-transform: lowercase; }
-    .block-3d a { color: rgb(193, 16, 69); }
-    .block-pleinair { position: absolute; bottom: 8%; left: 50%; transform: translateX(-50%); }
-    .block-pleinair h3 { font-family: 'Work Sans', sans-serif; font-size: clamp(1.1rem, 1.6vw, 1.5rem); font-weight: 400; letter-spacing: 0.01em; }
-    .block-pleinair a { color: #ffffff; }
-    @media (max-width: 767px) {
-      .block-comic { top: 20%; left: 6vw; }
-      .block-paintings { top: 35%; left: 10vw; }
-      .block-paintings h2 { font-size: 2rem; }
-      .block-3d { bottom: 30%; left: 6vw; }
-      .block-pleinair { bottom: 6%; }
-}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #ffffff;
+      font-family: 'Source Serif Pro', Georgia, serif;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .page {
+      max-width: 700px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 0 60px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Corner brackets */
+    .corner {
+      position: fixed;
+      width: 28px;
+      height: 28px;
+    }
+
+    .corner-tl {
+      top: 28px;
+      left: 28px;
+      border-left: 2px solid #999;
+      border-bottom: 2px solid #999;
+    }
+
+    .corner-tr {
+      top: 28px;
+      right: 28px;
+      border-right: 2px solid #999;
+      border-bottom: 2px solid #999;
+    }
+
+    /* Main content */
+    .intro {
+      margin-top: 100px;
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: #1a1a1a;
+      max-width: 560px;
+    }
+
+    .intro a {
+      color: #9b6b6b;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .intro a:hover {
+      color: #7a4a4a;
+    }
+
+    /* Navigation */
+    nav {
+      margin-top: 60px;
+    }
+
+    nav p.nav-label {
+      font-size: 1.05rem;
+      color: #1a1a1a;
+      margin-bottom: 10px;
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    nav ul li {
+      margin-bottom: 2px;
+    }
+
+    nav ul li a {
+      font-size: 1.05rem;
+      color: #1a1a1a;
+      text-decoration: none;
+      line-height: 1.9;
+      display: inline-block;
+    }
+
+    nav ul li a:hover {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* Collapsible nav items */
+    .nav-item summary {
+      font-size: 1.05rem;
+      color: #1a1a1a;
+      cursor: pointer;
+      line-height: 1.9;
+      list-style: none;
+    }
+
+    .nav-item summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .nav-item summary::before {
+      content: '+ ';
+      font-weight: normal;
+    }
+
+    .nav-item[open] summary::before {
+      content: '– ';
+    }
+
+    .nav-item summary:hover {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .nav-content {
+      padding: 6px 0 10px 18px;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: #444;
+    }
+
+    .nav-content a {
+      color: #9b6b6b;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .nav-content a:hover {
+      color: #7a4a4a;
+    }
+
+    /* Footer quote */
+    .footer-quote {
+      margin-top: auto;
+      padding-bottom: 60px;
+      padding-top: 80px;
+      font-size: 0.78rem;
+      color: #aaa;
+      font-style: normal;
+      letter-spacing: 0.01em;
+    }
+
   </style>
 </head>
 <body>
-  <section class="page-section">
-    <img class="background-image" src="https://images.squarespace-cdn.com/content/v1/660a366af698a851e4922f5f/31c6fcfd-c07e-4927-8ae9-3e4b45b5cf76/_R002908.jpg" alt="Background photograph" srcset="https://images.squarespace-cdn.com/content/v1/660a366af698a851e4922f5f/31c6fcfd-c07e-4927-8ae9-3e4b45b5cf76/_R002908.jpg 500w, https://images.squarespace-cdn.com/content/v1/660a366af698a851e4922f5f/31c6fcfd-c07e-4927-8ae9-3e4b45b5cf76/_R002908.jpg 1000w, https://images.squarespace-cdn.com/content/v1/660a366af698a851e4922f5f/31c6fcfd-c07e-4927-8ae9-3e4b45b5cf76/_R002908.jpg 1500w, https://images.squarespace-cdn.com/content/v1/660a366af698a851e4922f5f/31c6fcfd-c07e-4927-8ae9-3e4b45b5cf76/_R002908.jpg 2500w" sizes="100vw" fetchpriority="high" loading="eager" decoding="async">
-    <div class="content-grid">
-      <div class="block-comic"><h4><a href="comic.html">a little comic project</a></h4></div>
-      <div class="block-paintings"><h2><a href="paintings.html">paintings</a></h2></div>
-      <div class="block-3d"><h3><a href="3d.html">3d</a></h3></div>
-      <div class="block-pleinair"><h3><a href="pleinair.html">Pleinair &amp; Other memories</a></h3></div>
-</div>
-  </section>
+
+  <!-- Corner brackets -->
+  <div class="corner corner-tl"></div>
+  <div class="corner corner-tr"></div>
+
+  <div class="page">
+
+    <p class="intro">
+      Hi! I'm Carolanne, an undergraduate student at the University of
+      Chicago. I am interested in AI Safety, philosophy, citizen science, and
+      doing good the most effectively.
+    </p>
+
+    <nav>
+      <p class="nav-label"><strong>Navigation:</strong></p>
+
+      <details class="nav-item">
+        <summary>What am I working on?</summary>
+        <div class="nav-content">
+          Currently I am on leave from university, working as the organizer of <a href="https://manifest.is">Manifest</a>—a festival/conference on prediction markets &amp; forecasting.
+          <br>Sometimes I blog <a href="https://substack.com/@carolannejiang">here</a>, and in another world I might have been a <a href="art.html">painter</a>.
+        </div>
+      </details>
+
+      <details class="nav-item">
+        <summary>Contacts</summary>
+        <div class="nav-content">
+          ctjiang@uchicago.edu
+          <br><a href="https://savvycal.com/carolanne">Chat with me about anything</a>
+        </div>
+      </details>
+
+      <details class="nav-item">
+        <summary>Feedback</summary>
+        <div class="nav-content">
+          If you see any way I could be doing better, please help me by leaving <a href="https://www.admonymous.co/carolanne-jiang">feedback</a>
+        </div>
+      </details>
+    </nav>
+
+    <div class="footer-quote">
+      <a href="short-talk.html" style="color: #aaa; text-decoration: underline; text-underline-offset: 3px;">Short Talk on Major and Minor</a>
+      &nbsp;&middot;&nbsp;
+      <a href="on-education.html" style="color: #aaa; text-decoration: underline; text-underline-offset: 3px;">On Education</a>
+      &nbsp;&middot;&nbsp;
+      <a href="https://www.brasstacks.blog/solution-production/" style="color: #aaa; text-decoration: underline; text-underline-offset: 3px;">Solution Production</a>
+    </div>
+
+  </div>
+
 </body>
 </html>
