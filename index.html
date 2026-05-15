@@ -221,14 +221,14 @@
       (function () {
         const captions = {
           'default': '',
-          'webster-23-03': "Emma Webster\nThe Rehearsal (Harvest Moon) (2023)\n60 x 84 in\nOil on linen",
+          'hockney-23-03': "David Hockney\nfrom The Moon Room Series, 2020\niPad painting printed on paper, mounted on Dibond\nEdition of 15\n70 × 100 cm\n© David Hockney",
           'webster-03-04': '',
           'hockney-13-15': "David Hockney\nA Year in Normandie (detail), 2020–2021\nComposite iPad painting, printed on paper"
         };
         const forced = new URLSearchParams(location.search).get('slot');
         const h = new Date().getHours();
         let key = 'default';
-        if (h >= 23 || h < 3) key = 'webster-23-03';
+        if (h >= 23 || h < 3) key = 'hockney-23-03';
         else if (h >= 3 && h < 4) key = 'webster-03-04';
         else if (h >= 13 && h < 15) key = 'hockney-13-15';
         if (forced && captions.hasOwnProperty(forced)) key = forced;
