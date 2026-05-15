@@ -243,7 +243,8 @@
           'webster-03-04': '',
           'hockney-13-15': "David Hockney\nA Year in Normandie (detail), 2020–2021\nComposite iPad painting, printed on paper",
           'hockney-15-16': "David Hockney\nA Year in Normandie (detail), 2020–2021\nComposite iPad painting, printed on paper\n© David Hockney",
-          'lihei-20-23': "Li Hei Di\nGapes at the vanity of toil, 2025\nOil on canvas\n74-13/16\" × 66-15/16\" (190 cm × 170 cm)\n© Li Hei Di"
+          'lihei-20-23': "Li Hei Di\nGapes at the vanity of toil, 2025\nOil on canvas\n74-13/16\" × 66-15/16\" (190 cm × 170 cm)\n© Li Hei Di",
+          'martin-08-11': "Agnes Martin\nUntitled, 1998\nLithograph on Gilclear Light paper\n4 7/10 × 4 7/10 in | 12 × 12 cm\nEdition of 75"
         };
         const forced = new URLSearchParams(location.search).get('slot');
         const h = new Date().getHours();
@@ -252,6 +253,7 @@
         else if (h >= 3 && h < 4) key = 'webster-03-04';
         else if (h >= 13 && h < 15) key = 'hockney-13-15';
         else if (h >= 15 && h < 16) key = 'hockney-15-16';
+        else if (h >= 8 && h < 11) key = 'martin-08-11';
         else if (h >= 20 && h < 23) key = 'lihei-20-23';
         if (forced && captions.hasOwnProperty(forced)) key = forced;
         document.getElementById('hero-img').src = 'images/hero/' + key + '.jpg';
