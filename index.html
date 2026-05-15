@@ -62,11 +62,35 @@
       margin: 6vh 0 0;
       max-width: 460px;
       width: 100%;
+      position: relative;
     }
     .hero img {
       width: 100%;
       height: auto;
       display: block;
+    }
+    .hero-caption {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 50%;
+      padding: 14px 16px;
+      background: rgba(0, 0, 0, 0.55);
+      color: #fff;
+      font-size: 0.72rem;
+      line-height: 1.45;
+      letter-spacing: 0.01em;
+      white-space: pre-line;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .hero:hover .hero-caption:not(:empty) {
+      opacity: 1;
     }
     .intro {
       margin-top: 24px;
@@ -191,13 +215,21 @@
 
     <div class="hero">
       <img id="hero-img" src="images/hero/default.jpg" alt="">
+      <div class="hero-caption" id="hero-caption"></div>
     </div>
     <script>
       (function () {
+        const captions = {
+          'default': '',
+          'webster-23-03': "Emma Webster\nThe Rehearsal (Harvest Moon) (2023)\n60 x 84 in\nOil on linen",
+          'webster-03-06': ''
+        };
         const h = new Date().getHours();
-        const img = document.getElementById('hero-img');
-        if (h >= 23 || h < 3) img.src = 'images/hero/webster-23-03.jpg';
-        else if (h >= 3 && h < 6) img.src = 'images/hero/webster-03-06.jpg';
+        let key = 'default';
+        if (h >= 23 || h < 3) key = 'webster-23-03';
+        else if (h >= 3 && h < 6) key = 'webster-03-06';
+        document.getElementById('hero-img').src = 'images/hero/' + key + '.jpg';
+        document.getElementById('hero-caption').textContent = captions[key];
       })();
     </script>
 
