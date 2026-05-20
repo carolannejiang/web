@@ -4,11 +4,40 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Carolanne</title>
+  <meta name="description" content="Carolanne Jiang — undergraduate at the University of Chicago studying philosophy, currently organizing Manifest, a festival on prediction markets and forecasting.">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <script>
+    (function () {
+      var h = new Date().getHours();
+      var key;
+      if (h >= 3 && h < 4) key = 'webster-03-04';
+      else if (h >= 8 && h < 11) key = 'martin-08-11';
+      else if (h >= 13 && h < 15) key = 'hockney-13-15';
+      else if (h >= 15 && h < 16) key = 'hockney-15-16';
+      else if (h >= 16 && h < 19) key = 'bennett-16-19';
+      else if (h >= 19 && h < 21) key = 'lihei-19-21';
+      else key = 'default';
+      try {
+        var params = new URLSearchParams(location.search);
+        var forced = params.get('slot');
+        if (forced) key = forced;
+      } catch (e) {}
+      window.__heroKey = key;
+      var link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = 'images/hero/' + key + '.webp';
+      link.type = 'image/webp';
+      link.setAttribute('fetchpriority', 'high');
+      document.head.appendChild(link);
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></noscript>
   <style>
     * {
       margin: 0;
@@ -58,11 +87,19 @@
     }
 
     /* Main content */
-    .hero {
+    .hero-frame {
       margin: 6vh 0 0;
-      max-width: 460px;
       width: 100%;
+      max-width: 460px;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero {
       position: relative;
+      width: 100%;
+      max-width: 460px;
     }
     .hero img {
       width: 100%;
@@ -109,6 +146,35 @@
     .hero:hover .hero-clock {
       opacity: 1;
     }
+    .hero-nav {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: 0;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+      color: #595959;
+      font-family: inherit;
+      font-size: 1.6rem;
+      line-height: 1;
+      transition: color 0.2s ease;
+      z-index: 3;
+    }
+    .hero-nav:hover {
+      color: #1a1a1a;
+    }
+    .hero-nav:focus-visible {
+      outline: 2px solid #1a1a1a;
+      outline-offset: 2px;
+    }
+    .hero-prev { left: -36px; }
+    .hero-next { right: -36px; }
     .intro {
       margin-top: 24px;
       font-size: 0.82rem;
@@ -118,13 +184,13 @@
     }
 
     .intro a {
-      color: #888;
+      color: #595959;
       text-decoration: underline;
       text-underline-offset: 3px;
     }
 
     .intro a:hover {
-      color: #555;
+      color: #2a2a2a;
     }
 
     /* Navigation */
@@ -200,13 +266,13 @@
     }
 
     .nav-content a {
-      color: #888;
+      color: #595959;
       text-decoration: underline;
       text-underline-offset: 3px;
     }
 
     .nav-content a:hover {
-      color: #555;
+      color: #2a2a2a;
     }
 
     /* Footer quote */
@@ -215,19 +281,23 @@
       padding-bottom: 60px;
       padding-top: 80px;
       font-size: 0.7rem;
-      color: #aaa;
+      color: #595959;
       font-style: normal;
       letter-spacing: 0.01em;
     }
+    .footer-quote a { color: #595959; }
 
     @media (max-width: 600px) {
-      .page { padding: 0 24px; }
+      .page { padding: 0 36px; }
       .corner { width: 18px; height: 18px; }
       .corner-tl { top: 14px; left: 14px; }
       .corner-tr { top: 14px; right: 14px; }
-      .hero { margin-top: 8vh; }
+      .hero-frame { margin-top: 8vh; }
       .hero-caption { width: 70%; padding: 10px 12px; font-size: 0.68rem; }
       .hero-clock { font-size: 0.68rem; top: 6px; left: 8px; }
+      .hero-nav { width: 24px; font-size: 1.4rem; }
+      .hero-prev { left: -28px; }
+      .hero-next { right: -28px; }
       .footer-quote { padding-top: 60px; padding-bottom: 40px; }
     }
 
@@ -239,51 +309,77 @@
   <div class="corner corner-tl"></div>
   <div class="corner corner-tr"></div>
 
-  <div class="page">
+  <main class="page">
 
-    <div class="hero">
-      <div class="hero-clock" id="hero-clock"></div>
-      <img id="hero-img" src="images/hero/default.jpg" alt="">
-      <div class="hero-caption" id="hero-caption"></div>
+    <div class="hero-frame">
+      <div class="hero">
+        <div class="hero-clock" id="hero-clock"></div>
+        <picture>
+          <source id="hero-source" type="image/webp" srcset="images/hero/default.webp">
+          <img id="hero-img" src="images/hero/default.jpg" alt="" width="920" height="471" fetchpriority="high" decoding="async">
+        </picture>
+        <div class="hero-caption" id="hero-caption"></div>
+        <button class="hero-nav hero-prev" id="hero-prev" type="button" aria-label="Previous image">&lsaquo;</button>
+        <button class="hero-nav hero-next" id="hero-next" type="button" aria-label="Next image">&rsaquo;</button>
+      </div>
     </div>
     <script>
       (function () {
         const captions = {
           'default': "Agnes Martin\nUntitled, 1959\nOil and graphite on canvas\n12 1/8 x 23 7/8 in (30.8 x 60.6 cm)",
-          'hockney-23-03': "David Hockney\nfrom The Moon Room Series, 2020\niPad painting printed on paper, mounted on Dibond\nEdition of 15\n70 × 100 cm\n© David Hockney",
           'webster-03-04': "Emma Webster\nThe Rehearsal (Harvest Moon) (2023)\n60 x 84 in\nOil on linen",
-          'lee-04-05': "Sarah Lee\nThe Night Stars Fell, 2022\nOil on canvas\n55 x 50 in",
           'hockney-13-15': "David Hockney\nA Year in Normandie (detail), 2020–2021\nComposite iPad painting, printed on paper",
           'hockney-15-16': "David Hockney\nA Year in Normandie (detail), 2020–2021\nComposite iPad painting, printed on paper\n© David Hockney",
           'lihei-19-21': "Li Hei Di\nGapes at the vanity of toil (section), 2025\nOil on canvas\n74-13/16\" × 66-15/16\" (190 cm × 170 cm)\n© Li Hei Di",
           'martin-08-11': "Agnes Martin\nUntitled, 1998\nLithograph on Gilclear Light paper\n4 7/10 × 4 7/10 in | 12 × 12 cm\nEdition of 75",
           'bennett-16-19': "Amy Bennett\nNight Gardening, 2022\nOil on panel\n16 x 20 in"
         };
-        const widthOverrides = { 'lee-04-05': 450 };
-
-        function pickKey(h) {
-          if (h >= 23 || h < 3) return 'hockney-23-03';
-          if (h >= 3 && h < 4) return 'webster-03-04';
-          if (h >= 4 && h < 5) return 'lee-04-05';
-          if (h >= 8 && h < 11) return 'martin-08-11';
-          if (h >= 13 && h < 15) return 'hockney-13-15';
-          if (h >= 15 && h < 16) return 'hockney-15-16';
-          if (h >= 16 && h < 19) return 'bennett-16-19';
-          if (h >= 19 && h < 21) return 'lihei-19-21';
-          return 'default';
-        }
+        const dimensions = {
+          'default': [920, 471],
+          'webster-03-04': [920, 656],
+          'hockney-13-15': [920, 517],
+          'hockney-15-16': [920, 510],
+          'lihei-19-21': [920, 640],
+          'martin-08-11': [920, 920],
+          'bennett-16-19': [920, 731]
+        };
+        const order = [
+          'default',
+          'martin-08-11',
+          'hockney-13-15',
+          'hockney-15-16',
+          'bennett-16-19',
+          'lihei-19-21',
+          'webster-03-04'
+        ];
 
         function applySlot(key) {
-          document.getElementById('hero-img').src = 'images/hero/' + key + '.jpg';
+          if (!captions.hasOwnProperty(key)) key = 'default';
+          const img = document.getElementById('hero-img');
+          const src = document.getElementById('hero-source');
+          src.srcset = 'images/hero/' + key + '.webp';
+          img.src = 'images/hero/' + key + '.jpg';
+          const dim = dimensions[key];
+          if (dim) {
+            img.width = dim[0];
+            img.height = dim[1];
+          }
           document.getElementById('hero-caption').textContent = captions[key] || '';
-          document.querySelector('.hero').style.maxWidth = (widthOverrides[key] || 460) + 'px';
         }
 
-        const forced = new URLSearchParams(location.search).get('slot');
-        const initialH = new Date().getHours();
-        let key = pickKey(initialH);
-        if (forced && captions.hasOwnProperty(forced)) key = forced;
-        applySlot(key);
+        let currentKey = window.__heroKey || 'default';
+        if (!captions.hasOwnProperty(currentKey)) currentKey = 'default';
+        applySlot(currentKey);
+
+        function step(delta) {
+          let idx = order.indexOf(currentKey);
+          if (idx === -1) idx = 0;
+          idx = (idx + delta + order.length) % order.length;
+          currentKey = order[idx];
+          applySlot(currentKey);
+        }
+        document.getElementById('hero-prev').addEventListener('click', function () { step(-1); });
+        document.getElementById('hero-next').addEventListener('click', function () { step(1); });
 
         const clockEl = document.getElementById('hero-clock');
         function tick() {
@@ -313,7 +409,7 @@
         <summary>What am I working on?</summary>
         <div class="nav-content">
           Currently I am organizing <a href="https://manifest.is">Manifest</a>—a festival / conference on prediction markets &amp; forecasting.
-          <br>Sometimes I blog <a href="https://substack.com/@carolannejiang">here</a>, and in <a href="art.html">another world</a> I might have been a painter.
+          <br>Sometimes I write <a href="https://substack.com/@carolannejiang">here</a>, and in <a href="art.html">another world</a> I might have been a painter.
         </div>
       </details>
 
@@ -328,14 +424,12 @@
     </nav>
 
     <div class="footer-quote">
-      <a href="short-talk.html" style="color: #888; text-decoration: underline; text-underline-offset: 3px;">Short Talk on Major and Minor</a>
+      <a href="on-education.html" style="text-decoration: underline; text-underline-offset: 3px;">On Education</a>
       &nbsp;&middot;&nbsp;
-      <a href="on-education.html" style="color: #888; text-decoration: underline; text-underline-offset: 3px;">On Education</a>
-      &nbsp;&middot;&nbsp;
-      <a href="https://www.brasstacks.blog/solution-production/" style="color: #888; text-decoration: underline; text-underline-offset: 3px;">Solution Production</a>
+      <a href="https://www.brasstacks.blog/solution-production/" style="text-decoration: underline; text-underline-offset: 3px;">Solution Production</a>
     </div>
 
-  </div>
+  </main>
 
 </body>
 </html>
