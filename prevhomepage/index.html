@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carolanne</title>
+  <meta name="description" content="Carolanne Jiang — undergraduate at the University of Chicago studying philosophy, currently organizing Manifest, a festival on prediction markets and forecasting.">
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <script>
+    (function () {
+      var h = new Date().getHours();
+      var key;
+      if (h >= 3 && h < 4) key = 'webster-03-04';
+      else if (h >= 8 && h < 11) key = 'martin-08-11';
+      else if (h >= 13 && h < 15) key = 'hockney-13-15';
+      else if (h >= 15 && h < 16) key = 'hockney-15-16';
+      else if (h >= 16 && h < 19) key = 'bennett-16-19';
+      else if (h >= 19 && h < 21) key = 'lihei-19-21';
+      else key = 'default';
+      try {
+        var params = new URLSearchParams(location.search);
+        var forced = params.get('slot');
+        if (forced) key = forced;
+      } catch (e) {}
+      window.__heroKey = key;
+      var link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = '../images/hero/' + key + '.webp';
+      link.type = 'image/webp';
+      link.setAttribute('fetchpriority', 'high');
+      document.head.appendChild(link);
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></noscript>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #ffffff;
+      font-family: 'Libre Baskerville', Georgia, serif;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .page {
+      max-width: 700px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 0 60px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .side-menu {
+      position: fixed;
+      left: 28px;
+      top: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+      align-items: flex-end;
+      text-align: right;
+      padding-right: 12px;
+      border-right: 1px solid #c9c4bc;
+      z-index: 10;
+    }
+
+    .side-menu a {
+      font-size: 0.76rem;
+      line-height: 1.4;
+      color: #595959;
+      text-decoration: none;
+      letter-spacing: 0.02em;
+    }
+
+    .side-menu a:hover {
+      color: #1a1a1a;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .hero-frame {
+      margin: 6vh 0 0;
+      width: 100%;
+      max-width: 460px;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero {
+      position: relative;
+      width: 100%;
+      max-width: 460px;
+    }
+
+    .hero img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .hero-caption {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 50%;
+      padding: 14px 16px;
+      background: rgba(0, 0, 0, 0.55);
+      color: #fff;
+      font-size: 0.72rem;
+      line-height: 1.45;
+      letter-spacing: 0.01em;
+      white-space: pre-line;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .hero:hover .hero-caption:not(:empty) {
+      opacity: 1;
+    }
+
+    .hero-clock {
+      position: absolute;
+      top: 8px;
+      left: 10px;
+      color: #fff;
+      font-size: 0.72rem;
+      letter-spacing: 0.02em;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .hero:hover .hero-clock {
+      opacity: 1;
+    }
+
+    .hero-nav {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: 0;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+      color: #595959;
+      font-family: inherit;
+      font-size: 1.6rem;
+      line-height: 1;
+      transition: color 0.2s ease;
+      z-index: 3;
+    }
+
+    .hero-nav:hover {
+      color: #1a1a1a;
+    }
+
+    .hero-nav:focus-visible {
+      outline: 2px solid #1a1a1a;
+      outline-offset: 2px;
+    }
+
+    .hero-prev { left: -36px; }
+    .hero-next { right: -36px; }
+
+    .intro {
+      margin-top: 24px;
+      font-size: 0.82rem;
+      line-height: 1.75;
+      color: #1a1a1a;
+      max-width: 460px;
+    }
+
+    .intro a {
+      color: #595959;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .intro a:hover {
+      color: #2a2a2a;
+    }
+
+    nav {
+      margin-top: 60px;
+    }
+
+    nav p.nav-label {
+      font-size: 0.82rem;
+      color: #1a1a1a;
+      margin-bottom: 10px;
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    nav ul li {
+      margin-bottom: 2px;
+    }
+
+    nav ul li a {
+      font-size: 0.82rem;
+      color: #1a1a1a;
+      text-decoration: none;
+      line-height: 1.9;
+      display: inline-block;
+    }
+
+    nav ul li a:hover {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .nav-item summary {
+      font-size: 0.82rem;
+      color: #1a1a1a;
+      cursor: pointer;
+      line-height: 1.9;
+      list-style: none;
+    }
+
+    .nav-item summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .nav-item summary::before {
+      content: '';
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      margin-right: 8px;
+      vertical-align: -4px;
+      background: url('../images/ui/expand-plus.png') no-repeat center / contain;
+    }
+
+    .nav-item[open] summary::before {
+      background-image: url('../images/ui/expand-minus.png');
+    }
+
+    .nav-item summary:hover {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .nav-content {
+      padding: 6px 0 10px 0;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: #444;
+    }
+
+    .nav-content a {
+      color: #595959;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .nav-content a:hover {
+      color: #2a2a2a;
+    }
+
+    .footer-quote {
+      margin-top: auto;
+      padding-bottom: 60px;
+      padding-top: 80px;
+      font-size: 0.7rem;
+      color: #595959;
+      font-style: normal;
+      letter-spacing: 0.01em;
+    }
+
+    .footer-quote a { color: #595959; }
+
+    @media (max-width: 600px) {
+      .side-menu {
+        position: static;
+        top: auto;
+        bottom: auto;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 18px;
+        padding: 20px 36px 0;
+        border-right: 0;
+      }
+
+      .page { padding: 0 36px; }
+      .hero-frame { margin-top: 8vh; }
+      .hero-caption { width: 70%; padding: 10px 12px; font-size: 0.68rem; }
+      .hero-clock { font-size: 0.68rem; top: 6px; left: 8px; }
+      .hero-nav { width: 24px; font-size: 1.4rem; }
+      .hero-prev { left: -28px; }
+      .hero-next { right: -28px; }
+      .footer-quote { padding-top: 60px; padding-bottom: 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="side-menu" aria-label="Contact links">
+    <a href="mailto:carolannejiang@gmail.com">email</a>
+    <a href="https://www.linkedin.com/in/carolanne-j-87a0b329a/" target="_blank" rel="noreferrer">linkedin</a>
+  </div>
+
+  <main class="page">
+
+    <div class="hero-frame">
+      <div class="hero">
+        <div class="hero-clock" id="hero-clock"></div>
+        <picture>
+          <source id="hero-source" type="image/webp" srcset="../images/hero/default.webp">
+          <img id="hero-img" src="../images/hero/default.jpg" alt="" width="920" height="471" fetchpriority="high" decoding="async">
+        </picture>
+        <div class="hero-caption" id="hero-caption"></div>
+        <button class="hero-nav hero-prev" id="hero-prev" type="button" aria-label="Previous image">&lsaquo;</button>
+        <button class="hero-nav hero-next" id="hero-next" type="button" aria-label="Next image">&rsaquo;</button>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const captions = {
+          'default': "Agnes Martin\nUntitled, 1959\nOil and graphite on canvas\n12 1/8 x 23 7/8 in (30.8 x 60.6 cm)",
+          'webster-03-04': "Emma Webster\nThe Rehearsal (Harvest Moon) (2023)\n60 x 84 in\nOil on linen",
+          'hockney-13-15': "David Hockney\nA Year in Normandie (detail), 2020–2021\nComposite iPad painting, printed on paper",
+          'hockney-15-16': "David Hockney\nA Year in Normandie (detail), 2020–2021\nComposite iPad painting, printed on paper\n© David Hockney",
+          'lihei-19-21': "Li Hei Di\nGapes at the vanity of toil (section), 2025\nOil on canvas\n74-13/16\" × 66-15/16\" (190 cm × 170 cm)\n© Li Hei Di",
+          'martin-08-11': "Agnes Martin\nUntitled, 1998\nLithograph on Gilclear Light paper\n4 7/10 × 4 7/10 in | 12 × 12 cm\nEdition of 75",
+          'bennett-16-19': "Amy Bennett\nNight Gardening, 2022\nOil on panel\n16 x 20 in"
+        };
+        const dimensions = {
+          'default': [920, 471],
+          'webster-03-04': [920, 656],
+          'hockney-13-15': [920, 517],
+          'hockney-15-16': [920, 510],
+          'lihei-19-21': [920, 640],
+          'martin-08-11': [920, 920],
+          'bennett-16-19': [920, 731]
+        };
+        const order = [
+          'default',
+          'martin-08-11',
+          'hockney-13-15',
+          'hockney-15-16',
+          'bennett-16-19',
+          'lihei-19-21',
+          'webster-03-04'
+        ];
+
+        function applySlot(key) {
+          if (!captions.hasOwnProperty(key)) key = 'default';
+          const img = document.getElementById('hero-img');
+          const src = document.getElementById('hero-source');
+          src.srcset = '../images/hero/' + key + '.webp';
+          img.src = '../images/hero/' + key + '.jpg';
+          const dim = dimensions[key];
+          if (dim) {
+            img.width = dim[0];
+            img.height = dim[1];
+          }
+          document.getElementById('hero-caption').textContent = captions[key] || '';
+        }
+
+        let currentKey = window.__heroKey || 'default';
+        if (!captions.hasOwnProperty(currentKey)) currentKey = 'default';
+        applySlot(currentKey);
+
+        function step(delta) {
+          let idx = order.indexOf(currentKey);
+          if (idx === -1) idx = 0;
+          idx = (idx + delta + order.length) % order.length;
+          currentKey = order[idx];
+          applySlot(currentKey);
+        }
+
+        document.getElementById('hero-prev').addEventListener('click', function () { step(-1); });
+        document.getElementById('hero-next').addEventListener('click', function () { step(1); });
+
+        const clockEl = document.getElementById('hero-clock');
+        function tick() {
+          const d = new Date();
+          let hh = d.getHours();
+          const ampm = hh >= 12 ? 'PM' : 'AM';
+          hh = hh % 12 || 12;
+          const mm = String(d.getMinutes()).padStart(2, '0');
+          const ss = String(d.getSeconds()).padStart(2, '0');
+          clockEl.textContent = String(hh).padStart(2, '0') + ':' + mm + ':' + ss + ' ' + ampm;
+        }
+
+        tick();
+        setInterval(tick, 1000);
+      })();
+    </script>
+
+    <p class="intro">
+      Hi! I'm Carolanne, an undergraduate student studying philosophy<br>
+      at the University of Chicago.
+    </p>
+
+    <nav>
+      <p class="nav-label"><strong>Navigation:</strong></p>
+
+      <details class="nav-item">
+        <summary>What am I working on?</summary>
+        <div class="nav-content">
+          Currently I am organizing <a href="https://manifest.is">Manifest</a>—a festival / conference on prediction markets &amp; forecasting.
+        </div>
+      </details>
+
+      <details class="nav-item">
+        <summary>Contacts</summary>
+        <div class="nav-content">
+          carolannejiang@gmail.com
+          <br><a href="https://savvycal.com/carolanne">Chat with me about anything</a>
+        </div>
+      </details>
+    </nav>
+
+    <div class="footer-quote">
+      <a href="../on-education.html" style="text-decoration: underline; text-underline-offset: 3px;">On Education</a>
+      &nbsp;&middot;&nbsp;
+      <a href="https://www.brasstacks.blog/solution-production/" style="text-decoration: underline; text-underline-offset: 3px;">Solution Production</a>
+    </div>
+
+  </main>
+
+</body>
+</html>
