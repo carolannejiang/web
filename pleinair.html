@@ -41,74 +41,16 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 60px;
+      gap: 80px;
       padding: 20px 24px 80px;
-      user-select: none;
     }
-    .slideshow {
+    .gallery {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 14px;
+      gap: 24px;
       width: 100%;
-    }
-    .stage-wrap {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-    }
-    .nav-arrow {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 1.8rem;
-      color: #999;
-      padding: 4px 10px;
-      line-height: 1;
-      font-family: inherit;
-      transition: color 0.2s;
-      user-select: none;
-    }
-    .nav-arrow:hover { color: #111; }
-    .stage {
-      position: relative;
-      width: 100%;
-      max-width: 500px;
-      aspect-ratio: 3 / 2;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-    .stage picture { display: contents; }
-    .stage img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-    .stage img.active { opacity: 1; }
-    .counter {
-      font-size: 0.85rem;
-      color: #777;
-      letter-spacing: 0.05em;
-    }
-    .caption {
-      font-size: 0.9rem;
-      color: #555;
-      text-align: center;
-      letter-spacing: 0.02em;
-      min-height: 1.2em;
-    }
-    .slideshow-title {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #111;
-      text-align: center;
-      letter-spacing: 0.02em;
+      max-width: 560px;
     }
     .description {
       font-size: 0.9rem;
@@ -117,9 +59,28 @@
       letter-spacing: 0.02em;
       max-width: 500px;
       line-height: 1.55;
+      margin-bottom: 8px;
+    }
+    figure {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    figure img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    figcaption {
+      font-size: 0.85rem;
+      color: #777;
+      text-align: center;
+      letter-spacing: 0.05em;
     }
     @media (max-width: 600px) {
-      .container { gap: 40px; padding: 12px 16px 40px; }
+      .container { gap: 56px; padding: 12px 16px 40px; }
     }
   </style>
 </head>
@@ -127,89 +88,55 @@
   <a href="art.html" class="back-link">← back</a>
   <main class="container">
 
-    <div class="slideshow">
-      <div class="stage-wrap"><button class="nav-arrow prev" aria-label="previous">‹</button><div class="stage">
-        <picture><source srcset="images/pleinair/_R002058.webp" type="image/webp"><img src="images/pleinair/_R002058.jpg" width="1500" height="999" alt="" class="active" data-caption="Karl-Marx-Straße, Berlin, 2025"></picture>
-        <picture><source srcset="images/pleinair/IMG_0871.webp" type="image/webp"><img src="images/pleinair/IMG_0871.jpg" width="1500" height="2000" alt="" loading="lazy" data-caption="Treptower Park, Berlin, 2025"></picture>
-        <picture><source srcset="images/pleinair/IMG_1884.webp" type="image/webp"><img src="images/pleinair/IMG_1884.jpg" width="1500" height="2000" alt="" loading="lazy" data-caption="Karl-Marx-Straße, Berlin, 2025"></picture>
-        <picture><source srcset="images/pleinair/IMG_2429.webp" type="image/webp"><img src="images/pleinair/IMG_2429.jpg" width="1500" height="2000" alt="" loading="lazy" data-caption="Prague 1, 2025"></picture>
-        <picture><source srcset="images/pleinair/IMG_2529.webp" type="image/webp"><img src="images/pleinair/IMG_2529.jpg" width="1500" height="2000" alt="" loading="lazy" data-caption="Natural History Museum, Vienna, 2025"></picture>
-        <picture><source srcset="images/pleinair/IMG_2535.webp" type="image/webp"><img src="images/pleinair/IMG_2535.jpg" width="1500" height="2000" alt="" loading="lazy" data-caption="Natural History Museum, Vienna, 2025"></picture>
-        <picture><source srcset="images/pleinair/IMG_2582.webp" type="image/webp"><img src="images/pleinair/IMG_2582.jpg" width="1500" height="2000" alt="" loading="lazy" data-caption="Bratislava, 2025"></picture>
-      </div><button class="nav-arrow next" aria-label="next">›</button></div>
-      <div class="caption">Karl-Marx-Straße, Berlin, 2025</div>
-      <div class="counter">1 / 7</div>
-      <div class="description">These were painted during the summer of 2025. I also made an arrangement consisting of hair ties and clips, that allows me to carry ~5 wet oil paintings while traveling.</div>
-    </div>
+    <section class="gallery">
+      <p class="description">These were painted during the summer of 2025. I also made an arrangement consisting of hair ties and clips, that allows me to carry ~5 wet oil paintings while traveling.</p>
+      <figure><picture><source srcset="images/pleinair/_R002058.webp" type="image/webp"><img src="images/pleinair/_R002058.jpg" width="1500" height="999" alt="Karl-Marx-Straße, Berlin, 2025" fetchpriority="high"></picture><figcaption>Karl-Marx-Straße, Berlin, 2025</figcaption></figure>
+      <figure><picture><source srcset="images/pleinair/IMG_0871.webp" type="image/webp"><img src="images/pleinair/IMG_0871.jpg" width="1500" height="2000" alt="Treptower Park, Berlin, 2025" loading="lazy"></picture><figcaption>Treptower Park, Berlin, 2025</figcaption></figure>
+      <figure><picture><source srcset="images/pleinair/IMG_1884.webp" type="image/webp"><img src="images/pleinair/IMG_1884.jpg" width="1500" height="2000" alt="Karl-Marx-Straße, Berlin, 2025" loading="lazy"></picture><figcaption>Karl-Marx-Straße, Berlin, 2025</figcaption></figure>
+      <figure><picture><source srcset="images/pleinair/IMG_2429.webp" type="image/webp"><img src="images/pleinair/IMG_2429.jpg" width="1500" height="2000" alt="Prague 1, 2025" loading="lazy"></picture><figcaption>Prague 1, 2025</figcaption></figure>
+      <figure><picture><source srcset="images/pleinair/IMG_2529.webp" type="image/webp"><img src="images/pleinair/IMG_2529.jpg" width="1500" height="2000" alt="Natural History Museum, Vienna, 2025" loading="lazy"></picture><figcaption>Natural History Museum, Vienna, 2025</figcaption></figure>
+      <figure><picture><source srcset="images/pleinair/IMG_2535.webp" type="image/webp"><img src="images/pleinair/IMG_2535.jpg" width="1500" height="2000" alt="Natural History Museum, Vienna, 2025" loading="lazy"></picture><figcaption>Natural History Museum, Vienna, 2025</figcaption></figure>
+      <figure><picture><source srcset="images/pleinair/IMG_2582.webp" type="image/webp"><img src="images/pleinair/IMG_2582.jpg" width="1500" height="2000" alt="Bratislava, 2025" loading="lazy"></picture><figcaption>Bratislava, 2025</figcaption></figure>
+    </section>
 
-    <div class="slideshow">
-      <div class="stage-wrap"><button class="nav-arrow prev" aria-label="previous">‹</button><div class="stage">
-        <picture><source srcset="images/memories/m1.webp" type="image/webp"><img src="images/memories/m1.jpg" width="1500" height="1183" alt="" class="active" loading="lazy" data-caption="Florence, 2023"></picture>
-        <picture><source srcset="images/memories/m2.webp" type="image/webp"><img src="images/memories/m2.jpg" width="1500" height="1497" alt="" loading="lazy" data-caption="Florence, 2023"></picture>
-        <picture><source srcset="images/memories/m3.webp" type="image/webp"><img src="images/memories/m3.jpg" width="1500" height="1128" alt="" loading="lazy" data-caption="Florence, 2023"></picture>
-        <picture><source srcset="images/memories/m4.webp" type="image/webp"><img src="images/memories/m4.jpg" width="1500" height="1498" alt="" loading="lazy" data-caption="Florence, 2023"></picture>
-        <picture><source srcset="images/memories/m5.webp" type="image/webp"><img src="images/memories/m5.jpg" width="1500" height="2000" alt="" loading="lazy" data-caption="Florence, 2023"></picture>
-        <picture><source srcset="images/memories/m6.webp" type="image/webp"><img src="images/memories/m6.jpg" width="1500" height="1125" alt="" loading="lazy" data-caption="Florence, 2023"></picture>
-        <picture><source srcset="images/memories/m7.webp" type="image/webp"><img src="images/memories/m7.jpg" width="1500" height="2000" alt="" loading="lazy" data-caption="Florence, 2023"></picture>
-        <picture><source srcset="images/memories/m8.webp" type="image/webp"><img src="images/memories/m8.jpg" width="1500" height="1197" alt="" loading="lazy" data-caption="Florence, 2023"></picture>
-        <picture><source srcset="images/memories/m9.webp" type="image/webp"><img src="images/memories/m9.jpg" width="1500" height="1500" alt="" loading="lazy" data-caption="Florence, 2023"></picture>
-      </div><button class="nav-arrow next" aria-label="next">›</button></div>
-      <div class="caption">Florence, 2023</div>
-      <div class="counter">1 / 9</div>
-      <div class="description">Summer of 2023, most of these are acrylic on panel.</div>
-    </div>
+    <section class="gallery">
+      <p class="description">Florence, 2023. Summer of 2023, most of these are acrylic on panel.</p>
+      <figure><picture><source srcset="images/memories/m1.webp" type="image/webp"><img src="images/memories/m1.jpg" width="1500" height="1183" alt="Florence, 2023" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/memories/m2.webp" type="image/webp"><img src="images/memories/m2.jpg" width="1500" height="1497" alt="Florence, 2023" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/memories/m3.webp" type="image/webp"><img src="images/memories/m3.jpg" width="1500" height="1128" alt="Florence, 2023" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/memories/m4.webp" type="image/webp"><img src="images/memories/m4.jpg" width="1500" height="1498" alt="Florence, 2023" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/memories/m5.webp" type="image/webp"><img src="images/memories/m5.jpg" width="1500" height="2000" alt="Florence, 2023" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/memories/m6.webp" type="image/webp"><img src="images/memories/m6.jpg" width="1500" height="1125" alt="Florence, 2023" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/memories/m7.webp" type="image/webp"><img src="images/memories/m7.jpg" width="1500" height="2000" alt="Florence, 2023" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/memories/m8.webp" type="image/webp"><img src="images/memories/m8.jpg" width="1500" height="1197" alt="Florence, 2023" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/memories/m9.webp" type="image/webp"><img src="images/memories/m9.jpg" width="1500" height="1500" alt="Florence, 2023" loading="lazy"></picture></figure>
+    </section>
 
-    <div class="slideshow">
-      <div class="stage-wrap"><button class="nav-arrow prev" aria-label="previous">‹</button><div class="stage">
-        <picture><source srcset="images/students/s01.webp" type="image/webp"><img src="images/students/s01.jpg" width="1500" height="1191" alt="" class="active" loading="lazy" data-caption="Paintings from various students"></picture>
-        <picture><source srcset="images/students/s02.webp" type="image/webp"><img src="images/students/s02.jpg" width="1500" height="1156" alt="" loading="lazy" data-caption="Paintings from various students"></picture>
-        <picture><source srcset="images/students/s03.webp" type="image/webp"><img src="images/students/s03.jpg" width="1500" height="1173" alt="" loading="lazy" data-caption="Paintings from various students"></picture>
-        <picture><source srcset="images/students/s04.webp" type="image/webp"><img src="images/students/s04.jpg" width="1500" height="1159" alt="" loading="lazy" data-caption="Paintings from various students"></picture>
-        <picture><source srcset="images/students/s05.webp" type="image/webp"><img src="images/students/s05.jpg" width="1500" height="1117" alt="" loading="lazy" data-caption="Paintings from various students"></picture>
-        <picture><source srcset="images/students/s06.webp" type="image/webp"><img src="images/students/s06.jpg" width="1500" height="1986" alt="" loading="lazy" data-caption="Paintings from various students"></picture>
-        <picture><source srcset="images/students/s07.webp" type="image/webp"><img src="images/students/s07.jpg" width="1500" height="1157" alt="" loading="lazy" data-caption="Paintings from various students"></picture>
-        <picture><source srcset="images/students/s08.webp" type="image/webp"><img src="images/students/s08.jpg" width="1500" height="1172" alt="" loading="lazy" data-caption="Paintings from various students"></picture>
-        <picture><source srcset="images/students/s09.webp" type="image/webp"><img src="images/students/s09.jpg" width="1500" height="1163" alt="" loading="lazy" data-caption="Paintings from various students"></picture>
-        <picture><source srcset="images/students/s10.webp" type="image/webp"><img src="images/students/s10.jpg" width="1500" height="1206" alt="" loading="lazy" data-caption="Paintings from various students"></picture>
-        <picture><source srcset="images/students/s11.webp" type="image/webp"><img src="images/students/s11.jpg" width="1500" height="1200" alt="" loading="lazy" data-caption="Paintings from various students"></picture>
-        <picture><source srcset="images/students/s12.webp" type="image/webp"><img src="images/students/s12.jpg" width="1500" height="1908" alt="" loading="lazy" data-caption="Paintings from various students"></picture>
-        <picture><source srcset="images/students/s13.webp" type="image/webp"><img src="images/students/s13.jpg" width="1500" height="1186" alt="" loading="lazy" data-caption="Paintings from various students"></picture>
-        <picture><source srcset="images/students/s14.webp" type="image/webp"><img src="images/students/s14.jpg" width="1500" height="1184" alt="" loading="lazy" data-caption="Paintings from various students"></picture>
-        <picture><source srcset="images/students/s15.webp" type="image/webp"><img src="images/students/s15.jpg" width="1500" height="1185" alt="" loading="lazy" data-caption="Paintings from various students"></picture>
-        <picture><source srcset="images/students/s16.webp" type="image/webp"><img src="images/students/s16.jpg" width="1500" height="1178" alt="" loading="lazy" data-caption="Paintings from various students"></picture>
-        <picture><source srcset="images/students/s17.webp" type="image/webp"><img src="images/students/s17.jpg" width="1500" height="1179" alt="" loading="lazy" data-caption="Paintings from various students"></picture>
-        <picture><source srcset="images/students/s18.webp" type="image/webp"><img src="images/students/s18.jpg" width="1500" height="1932" alt="" loading="lazy" data-caption="Paintings from various students"></picture>
-        <picture><source srcset="images/students/s19.webp" type="image/webp"><img src="images/students/s19.jpg" width="1500" height="1080" alt="" loading="lazy" data-caption="Paintings from various students"></picture>
-        <picture><source srcset="images/students/s20.webp" type="image/webp"><img src="images/students/s20.jpg" width="1500" height="1128" alt="" loading="lazy" data-caption="Paintings from various students"></picture>
-        <picture><source srcset="images/students/s21.webp" type="image/webp"><img src="images/students/s21.jpg" width="1500" height="1866" alt="" loading="lazy" data-caption="Paintings from various students"></picture>
-      </div><button class="nav-arrow next" aria-label="next">›</button></div>
-      <div class="caption">Paintings from various students</div>
-      <div class="counter">1 / 21</div>
-      <div class="description">Between 2023 to 2025, I taught observational acrylic painting lessons at my local senior center. Here are some pieces from my students that I am particularly fond of. Nearly all of them had no prior experience.</div>
-    </div>
+    <section class="gallery">
+      <p class="description">Paintings from various students. Between 2023 to 2025, I taught observational acrylic painting lessons at my local senior center. Here are some pieces from my students that I am particularly fond of. Nearly all of them had no prior experience.</p>
+      <figure><picture><source srcset="images/students/s01.webp" type="image/webp"><img src="images/students/s01.jpg" width="1500" height="1191" alt="Painting by a student" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/students/s02.webp" type="image/webp"><img src="images/students/s02.jpg" width="1500" height="1156" alt="Painting by a student" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/students/s03.webp" type="image/webp"><img src="images/students/s03.jpg" width="1500" height="1173" alt="Painting by a student" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/students/s04.webp" type="image/webp"><img src="images/students/s04.jpg" width="1500" height="1159" alt="Painting by a student" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/students/s05.webp" type="image/webp"><img src="images/students/s05.jpg" width="1500" height="1117" alt="Painting by a student" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/students/s06.webp" type="image/webp"><img src="images/students/s06.jpg" width="1500" height="1986" alt="Painting by a student" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/students/s07.webp" type="image/webp"><img src="images/students/s07.jpg" width="1500" height="1157" alt="Painting by a student" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/students/s08.webp" type="image/webp"><img src="images/students/s08.jpg" width="1500" height="1172" alt="Painting by a student" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/students/s09.webp" type="image/webp"><img src="images/students/s09.jpg" width="1500" height="1163" alt="Painting by a student" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/students/s10.webp" type="image/webp"><img src="images/students/s10.jpg" width="1500" height="1206" alt="Painting by a student" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/students/s11.webp" type="image/webp"><img src="images/students/s11.jpg" width="1500" height="1200" alt="Painting by a student" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/students/s12.webp" type="image/webp"><img src="images/students/s12.jpg" width="1500" height="1908" alt="Painting by a student" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/students/s13.webp" type="image/webp"><img src="images/students/s13.jpg" width="1500" height="1186" alt="Painting by a student" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/students/s14.webp" type="image/webp"><img src="images/students/s14.jpg" width="1500" height="1184" alt="Painting by a student" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/students/s15.webp" type="image/webp"><img src="images/students/s15.jpg" width="1500" height="1185" alt="Painting by a student" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/students/s16.webp" type="image/webp"><img src="images/students/s16.jpg" width="1500" height="1178" alt="Painting by a student" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/students/s17.webp" type="image/webp"><img src="images/students/s17.jpg" width="1500" height="1179" alt="Painting by a student" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/students/s18.webp" type="image/webp"><img src="images/students/s18.jpg" width="1500" height="1932" alt="Painting by a student" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/students/s19.webp" type="image/webp"><img src="images/students/s19.jpg" width="1500" height="1080" alt="Painting by a student" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/students/s20.webp" type="image/webp"><img src="images/students/s20.jpg" width="1500" height="1128" alt="Painting by a student" loading="lazy"></picture></figure>
+      <figure><picture><source srcset="images/students/s21.webp" type="image/webp"><img src="images/students/s21.jpg" width="1500" height="1866" alt="Painting by a student" loading="lazy"></picture></figure>
+    </section>
 
   </main>
-  <script>
-    document.querySelectorAll('.slideshow').forEach((show) => {
-      const stage = show.querySelector('.stage');
-      const counter = show.querySelector('.counter');
-      const caption = show.querySelector('.caption');
-      const prev = show.querySelector('.nav-arrow.prev');
-      const next = show.querySelector('.nav-arrow.next');
-      const slides = stage.querySelectorAll('img');
-      if (!slides.length) return;
-      let i = 0;
-      const update = (idx) => {
-        slides[i].classList.remove('active');
-        i = (idx + slides.length) % slides.length;
-        slides[i].classList.add('active');
-        counter.textContent = (i + 1) + ' / ' + slides.length;
-        caption.textContent = slides[i].dataset.caption || '';
-      };
-      stage.addEventListener('click', () => update(i + 1));
-      prev.addEventListener('click', () => update(i - 1));
-      next.addEventListener('click', () => update(i + 1));
-    });
-  </script>
 </body>
 </html>
