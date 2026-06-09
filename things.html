@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Carolanne</title>
-  <meta name="description" content="Carolanne Jiang — undergraduate at the University of Chicago studying philosophy, currently organizing Manifest, a festival on prediction markets and forecasting.">
+  <title>Carolanne — a few things I've done</title>
+  <meta name="description" content="A short timeline of things Carolanne Jiang has done — studies at the University of Chicago, German at the Humboldt Institute, and graduating from the Walnut Hill School for the Arts.">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -66,41 +66,24 @@
       color: #1a1a1a;
     }
 
-    .intro {
-      margin: 112px auto 0;
+    .timeline {
+      margin: 112px auto 80px;
+      max-width: 460px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .entry {
       font-size: 0.82rem;
       line-height: 1.75;
       color: #1a1a1a;
-      max-width: 460px;
     }
 
-    .intro a {
-      color: #595959;
-      text-decoration: underline;
-      text-underline-offset: 3px;
-    }
-
-    .intro a:hover {
-      color: #2a2a2a;
-    }
-
-    .contacts {
-      margin: 28px auto 0;
-      font-size: 0.82rem;
-      line-height: 1.7;
-      color: #444;
-      max-width: 460px;
-      width: 100%;
-    }
-
-    .contacts a {
-      color: #595959;
-      text-decoration: underline;
-      text-underline-offset: 3px;
-    }
-
-    .contacts a:hover {
-      color: #2a2a2a;
+    .entry .period {
+      font-weight: 700;
+      margin-bottom: 4px;
     }
 
     @media (max-width: 600px) {
@@ -111,28 +94,38 @@
         bottom: 20px;
       }
       .page { padding: 0 36px; }
-      .intro { margin-top: 72px; }
+      .timeline { margin-top: 72px; }
     }
 
   </style>
 </head>
 <body>
 
-  <div class="side-menu" aria-label="Contact links">
+  <div class="side-menu" aria-label="Site links">
+    <a href="index.html">home</a>
     <a href="mailto:carolannejiang@gmail.com">email</a>
     <a href="https://www.linkedin.com/in/carolanne-j-87a0b329a/" target="_blank" rel="noreferrer">linkedin</a>
   </div>
 
   <main class="page">
 
-    <p class="intro">
-      Hi! I'm Carolanne and this is my website.
-      <br><br>Currently I am organizing <a href="https://manifest.is">Manifest</a>, a festival / conference on prediction markets &amp; forecasting. Ordinarily I am an undergraduate student at the University of Chicago, where I study philosophy.
-      <br><br>In another world I might have been a painter. You can see some of my work <a href="art.html">here</a>. <a href="things.html">Here</a> are some other information about me.
-    </p>
+    <div class="timeline">
 
-    <div class="contacts">
-      <div><a href="https://savvycal.com/carolanne">Chat with me about anything</a></div>
+      <div class="entry">
+        <div class="period">Q4 2025</div>
+        Studied at the University of Chicago, taking the first-year humanities and writing and social sciences Core sequences, along with formal logic, German, and a course on modernism with Agnes Callard.
+      </div>
+
+      <div class="entry">
+        <div class="period">Q3 2025</div>
+        Studied German at the Humboldt Institute in Berlin, passing the A2 examination after 10 weeks of study with no prior experience.
+      </div>
+
+      <div class="entry">
+        <div class="period">Q2 2025</div>
+        Graduated from the Walnut Hill School for the Arts as a visual art student and the representative of my department. Handled logistics for gallery openings of ~600 attendees and contributed to a range of graphic design, operations, and communications work.
+      </div>
+
     </div>
 
   </main>
