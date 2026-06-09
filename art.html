@@ -1,66 +1,131 @@
 <!DOCTYPE html>
-<html lang="en-US">
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Carolanne Jiang</title>
-  <meta name="description" content="Art by Carolanne Jiang — comics, paintings, 3D work, and plein air sketches.">
+  <meta name="description" content="Art by Carolanne Jiang — painting, sculpture, ceramics, a comic project, and plein air sketches.">
   <meta property="og:site_name" content="Carolanne Jiang">
   <meta property="og:title" content="Carolanne Jiang">
   <meta property="og:description" content="my art stuff">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.carolannejiang.com/art.html">
   <meta property="og:image" content="https://images.squarespace-cdn.com/content/v1/660a366af698a851e4922f5f/31c6fcfd-c07e-4927-8ae9-3e4b45b5cf76/_R002908.jpg?format=1500w">
-  <link rel="icon" type="image/x-icon" href="https://assets.squarespace.com/universal/default-favicon.ico">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;700&display=swap">
-  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></noscript>
   <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; overflow: hidden; }
-    body { font-family: 'Work Sans', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    .page-section { position: relative; width: 100%; height: 100vh; overflow: hidden; }
-    .background-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; z-index: 0; }
-    .content-grid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
-    .content-grid a { text-decoration: none; transition: opacity 0.3s ease; }
-    .content-grid a:hover { opacity: 0.7; }
-    .block-home { position: absolute; top: 8%; left: 8%; }
-    .block-home h5 { font-family: 'Work Sans', sans-serif; font-size: clamp(0.9rem, 1.2vw, 1.1rem); font-weight: 500; letter-spacing: 0.04em; text-transform: lowercase; }
-    .block-home a { color: #ffffff; }
-    .block-comic { position: absolute; top: 28%; left: 8%; }
-    .block-comic h4 { font-family: 'Work Sans', sans-serif; font-size: clamp(1rem, 1.5vw, 1.35rem); font-weight: 700; letter-spacing: 0.01em; text-transform: lowercase; }
-    .block-comic a { color: rgb(238, 163, 247); }
-    .block-paintings { position: absolute; top: 38%; left: 27%; }
-    .block-paintings h2 { font-family: 'Work Sans', sans-serif; font-size: clamp(2rem, 3.5vw, 3.2rem); font-weight: 700; letter-spacing: 0.01em; text-transform: lowercase; }
-    .block-paintings a { color: rgb(2, 8, 44); }
-    .block-3d { position: absolute; top: 54%; left: 27%; }
-    .block-3d h3 { font-family: 'Work Sans', sans-serif; font-size: clamp(1.1rem, 1.6vw, 1.5rem); font-weight: 700; letter-spacing: 0.01em; text-transform: lowercase; }
-    .block-3d a { color: rgb(193, 16, 69); }
-    .block-pleinair { position: absolute; bottom: 8%; left: 50%; transform: translateX(-50%); }
-    .block-pleinair h3 { font-family: 'Work Sans', sans-serif; font-size: clamp(1.1rem, 1.6vw, 1.5rem); font-weight: 400; letter-spacing: 0.01em; }
-    .block-pleinair a { color: #ffffff; }
-    @media (max-width: 767px) {
-      .block-home { top: 8%; left: 6vw; }
-      .block-comic { top: 20%; left: 6vw; }
-      .block-paintings { top: 35%; left: 10vw; }
-      .block-paintings h2 { font-size: 2rem; }
-      .block-3d { top: 50%; left: 10vw; }
-      .block-pleinair { bottom: 6%; }
-}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #ffffff;
+      font-family: 'Libre Baskerville', Georgia, serif;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .page {
+      max-width: 700px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 0 60px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .side-menu {
+      position: fixed;
+      left: 28px;
+      top: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 14px;
+      text-align: right;
+      padding-right: 12px;
+      border-right: 1px solid #c9c4bc;
+    }
+
+    .side-menu a {
+      font-size: 0.76rem;
+      line-height: 1.4;
+      color: #595959;
+      text-decoration: none;
+      letter-spacing: 0.02em;
+    }
+
+    .side-menu a:hover {
+      color: #1a1a1a;
+    }
+
+    .art-links {
+      margin: 112px auto 0;
+      max-width: 460px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .art-links a {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #1a1a1a;
+      text-decoration: none;
+      text-underline-offset: 3px;
+    }
+
+    .art-links a:hover {
+      text-decoration: underline;
+      color: #595959;
+    }
+
+    @media (max-width: 600px) {
+      .side-menu {
+        left: auto;
+        right: 20px;
+        top: auto;
+        bottom: 20px;
+      }
+      .page { padding: 0 36px; }
+      .art-links { margin-top: 72px; }
+    }
+
   </style>
 </head>
 <body>
-  <section class="page-section">
-    <img class="background-image" src="https://images.squarespace-cdn.com/content/v1/660a366af698a851e4922f5f/31c6fcfd-c07e-4927-8ae9-3e4b45b5cf76/_R002908.jpg?format=1500w" alt="Background photograph" srcset="https://images.squarespace-cdn.com/content/v1/660a366af698a851e4922f5f/31c6fcfd-c07e-4927-8ae9-3e4b45b5cf76/_R002908.jpg?format=750w 750w, https://images.squarespace-cdn.com/content/v1/660a366af698a851e4922f5f/31c6fcfd-c07e-4927-8ae9-3e4b45b5cf76/_R002908.jpg?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/660a366af698a851e4922f5f/31c6fcfd-c07e-4927-8ae9-3e4b45b5cf76/_R002908.jpg?format=2500w 2500w" sizes="100vw" fetchpriority="high" loading="eager" decoding="async">
-    <div class="content-grid">
-      <div class="block-home"><h5><a href="index.html">← back home</a></h5></div>
-      <div class="block-comic"><h4><a href="comic.html">a little comic project</a></h4></div>
-      <div class="block-paintings"><h2><a href="paintings.html">paintings</a></h2></div>
-      <div class="block-3d"><h3><a href="3d.html">3d</a></h3></div>
-      <div class="block-pleinair"><h3><a href="pleinair.html">Pleinair &amp; Other memories</a></h3></div>
-</div>
-  </section>
+
+  <div class="side-menu" aria-label="Site links">
+    <a href="index.html">home</a>
+    <a href="mailto:carolannejiang@gmail.com">email</a>
+    <a href="https://www.linkedin.com/in/carolanne-j-87a0b329a/" target="_blank" rel="noreferrer">linkedin</a>
+  </div>
+
+  <main class="page">
+
+    <nav class="art-links" aria-label="Artwork">
+      <a href="paintings.html">Painting</a>
+      <a href="3d.html">Sculpture</a>
+      <a href="3d.html">Ceramics</a>
+      <a href="comic.html">a comic project</a>
+      <a href="pleinair.html">Plein Air &amp; Other memories</a>
+    </nav>
+
+  </main>
+
 </body>
 </html>
