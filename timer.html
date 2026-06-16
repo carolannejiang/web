@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light dark" />
+<title>Timer</title>
+<meta name="description" content="A simple timer that counts down in green and turns into a red count-up stopwatch when time is up." />
+<link rel="icon" href="/favicon.ico" type="image/x-icon" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    color-scheme: light dark;
+    --green-rgb: 52, 199, 89;     /* systemGreen  */
+    --red-rgb:   255, 59, 48;     /* systemRed    */
+    --bg:        #ffffff;
+    --fill:      #f2f2f7;         /* systemGray6  */
+    --label:     #1d1d1f;
+    --secondary: rgba(60, 60, 67, 0.6);
+    --track:     rgba(60, 60, 67, 0.14);
+    --gray-fill: rgba(120, 120, 128, 0.14);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --green-rgb: 48, 209, 88;
+      --red-rgb:   255, 69, 58;
+      --bg:        #000000;
+      --fill:      #1c1c1e;
+      --label:     #f5f5f7;
+      --secondary: rgba(235, 235, 245, 0.6);
+      --track:     rgba(235, 235, 245, 0.14);
+      --gray-fill: rgba(120, 120, 128, 0.24);
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: var(--bg);
+    color: var(--label);
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+  }
+
+  .app {
+    --accent-rgb: var(--green-rgb);
+    width: 100%;
+    max-width: 460px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 38px;
+    text-align: center;
+  }
+  .app.mode-over { --accent-rgb: var(--red-rgb); }
+
+  /* ---- Clock ---- */
+  .clock-wrap {
+    position: relative;
+    width: clamp(280px, 80vw, 380px);
+    aspect-ratio: 1 / 1;
+  }
+  .clock-wrap.pulse { animation: pulse 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  @keyframes pulse {
+    0%   { transform: scale(1); }
+    45%  { transform: scale(1.045); }
+    100% { transform: scale(1); }
+  }
+  .clock-wrap svg { width: 100%; height: 100%; display: block; }
+
+  .track { fill: none; stroke: var(--track); stroke-width: 8; }
+  .prog {
+    fill: none;
+    stroke: rgb(var(--accent-rgb));
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke 0.45s ease;
+  }
+
+  .clock-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    pointer-events: none;
+  }
+  .clock-label {
+    font-size: 0.74rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--secondary);
+    font-weight: 600;
+  }
+  .clock-time {
+    font-size: clamp(3.6rem, 19vw, 5.8rem);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: rgb(var(--accent-rgb));
+    font-variant-numeric: tabular-nums;
+    transition: color 0.45s ease;
+  }
+  .clock-time.long { font-size: clamp(2.2rem, 12vw, 3.5rem); }
+
+  /* ---- Inputs (iOS filled fields) ---- */
+  .inputs {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 16px;
+  }
+  .field { display: flex; flex-direction: column; align-items: center; gap: 9px; }
+  .field input {
+    width: 90px;
+    padding: 14px 0;
+    font-size: 1.9rem;
+    font-weight: 500;
+    text-align: center;
+    color: var(--label);
+    background: var(--fill);
+    border: none;
+    border-radius: 16px;
+    font-variant-numeric: tabular-nums;
+    -moz-appearance: textfield;
+    transition: box-shadow 0.15s ease;
+  }
+  .field input::-webkit-outer-spin-button,
+  .field input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .field input:focus { outline: none; box-shadow: 0 0 0 4px rgba(var(--accent-rgb), 0.28); }
+  .field span {
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    color: var(--secondary);
+    font-weight: 500;
+  }
+
+  /* ---- Controls (iOS tinted capsules) ---- */
+  .controls { display: flex; align-items: center; gap: 14px; }
+  .controls button {
+    font: inherit;
+    font-size: 1.02rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    border-radius: 980px;
+    padding: 15px 36px;
+    transition: background 0.45s ease, opacity 0.15s, transform 0.08s ease;
+  }
+  .controls button:active { transform: scale(0.96); }
+  #primary {
+    background: rgba(var(--accent-rgb), 0.16);
+    color: rgb(var(--accent-rgb));
+    min-width: 132px;
+  }
+  #primary:hover { background: rgba(var(--accent-rgb), 0.24); }
+  #reset {
+    background: var(--gray-fill);
+    color: var(--label);
+  }
+  #reset:hover { opacity: 0.75; }
+  #sound {
+    font: inherit;
+    font-size: 1.1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 980px;
+    line-height: 1;
+    opacity: 0.5;
+    transition: opacity 0.15s, transform 0.08s ease;
+  }
+  #sound:hover { opacity: 0.9; }
+  #sound:active { transform: scale(0.9); }
+
+  /* Hide the time inputs once a run has started */
+  .app.running .inputs,
+  .app.mode-over .inputs { display: none; }
+</style>
+</head>
+<body>
+
+  <main class="app mode-idle" role="application" aria-label="Timer and stopwatch">
+
+    <div class="clock-wrap" id="clockWrap">
+      <svg viewBox="0 0 240 240" aria-hidden="true">
+        <circle class="track" cx="120" cy="120" r="100" />
+        <circle class="prog" id="prog" cx="120" cy="120" r="100"
+                transform="rotate(-90 120 120)" />
+      </svg>
+      <div class="clock-center">
+        <div class="clock-label" id="label">Ready</div>
+        <div class="clock-time" id="time" aria-live="polite">5:00</div>
+      </div>
+    </div>
+
+    <div class="inputs" aria-label="Set timer duration">
+      <label class="field"><input id="h" type="number" inputmode="numeric" min="0" max="99" value="0" aria-label="hours"><span>hours</span></label>
+      <label class="field"><input id="m" type="number" inputmode="numeric" min="0" max="59" value="5" aria-label="minutes"><span>min</span></label>
+      <label class="field"><input id="s" type="number" inputmode="numeric" min="0" max="59" value="0" aria-label="seconds"><span>sec</span></label>
+    </div>
+
+    <div class="controls">
+      <button id="primary">Start</button>
+      <button id="reset">Reset</button>
+      <button id="sound" title="Toggle sound" aria-label="Toggle sound">🔔</button>
+    </div>
+
+  </main>
+
+<script>
+(function () {
+  "use strict";
+
+  var R = 100;
+  var C = 2 * Math.PI * R;
+
+  var els = {
+    app:     document.querySelector(".app"),
+    wrap:    document.getElementById("clockWrap"),
+    prog:    document.getElementById("prog"),
+    label:   document.getElementById("label"),
+    time:    document.getElementById("time"),
+    h:       document.getElementById("h"),
+    m:       document.getElementById("m"),
+    s:       document.getElementById("s"),
+    inputs:  document.querySelector(".inputs"),
+    primary: document.getElementById("primary"),
+    reset:   document.getElementById("reset"),
+    sound:   document.getElementById("sound")
+  };
+
+  els.prog.style.strokeDasharray = C;
+
+  // ---- State ----
+  var mode = "idle";       // "idle" | "timer" | "overtime"
+  var running = false;
+  var totalMs = 0;
+  var endTime = 0;
+  var remainingMs = 0;
+  var overtimeBase = 0;
+  var overtimeMs = 0;
+  var rafId = null;
+  var soundOn = true;
+  var audio = null;
+  var BASE_TITLE = "Timer";
+
+  function now() { return performance.now(); }
+
+  function clampInt(v, lo, hi) {
+    var n = parseInt(v, 10);
+    if (isNaN(n)) n = 0;
+    return Math.min(hi, Math.max(lo, n));
+  }
+
+  function readInputs() {
+    var h = clampInt(els.h.value, 0, 99);
+    var m = clampInt(els.m.value, 0, 59);
+    var s = clampInt(els.s.value, 0, 59);
+    return ((h * 3600) + (m * 60) + s) * 1000;
+  }
+
+  function pad(n) { return n < 10 ? "0" + n : "" + n; }
+
+  // Round up for countdown so the last full second reads 0:01 then 0:00.
+  function fmtDown(ms) {
+    var t = Math.ceil(Math.max(0, ms) / 1000);
+    var h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
+    return h > 0 ? h + ":" + pad(m) + ":" + pad(s) : m + ":" + pad(s);
+  }
+  // Round down for the count-up stopwatch.
+  function fmtUp(ms) {
+    var t = Math.floor(Math.max(0, ms) / 1000);
+    var h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
+    return h > 0 ? h + ":" + pad(m) + ":" + pad(s) : m + ":" + pad(s);
+  }
+
+  // Shrink the digits when an hours segment is present so they stay inside the ring.
+  function setTime(str) {
+    els.time.textContent = str;
+    els.time.classList.toggle("long", (str.match(/:/g) || []).length > 1);
+  }
+
+  function setRing(fraction) {
+    fraction = Math.min(1, Math.max(0, fraction));
+    els.prog.style.strokeDashoffset = C * (1 - fraction);
+  }
+
+  // ---- Audio cue ----
+  function ensureAudio() {
+    if (!audio) {
+      var Ctx = window.AudioContext || window.webkitAudioContext;
+      if (Ctx) audio = new Ctx();
+    }
+    if (audio && audio.state === "suspended") audio.resume();
+  }
+  function beep() {
+    if (!soundOn || !audio) return;
+    var t0 = audio.currentTime;
+    [0, 0.18, 0.36].forEach(function (offset) {
+      var osc = audio.createOscillator();
+      var gain = audio.createGain();
+      osc.type = "sine";
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.0001, t0 + offset);
+      gain.gain.exponentialRampToValueAtTime(0.25, t0 + offset + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + offset + 0.14);
+      osc.connect(gain).connect(audio.destination);
+      osc.start(t0 + offset);
+      osc.stop(t0 + offset + 0.15);
+    });
+  }
+
+  // ---- UI sync ----
+  function updateUI() {
+    els.app.classList.toggle("mode-over", mode === "overtime");
+    els.app.classList.toggle("mode-idle", mode === "idle");
+    els.app.classList.toggle("running", running);
+
+    els.primary.textContent = running ? "Pause" : (mode === "idle" ? "Start" : "Resume");
+    els.label.textContent =
+      mode === "timer" ? "Remaining" : mode === "overtime" ? "Overtime" : "Ready";
+  }
+
+  function renderIdle() {
+    setRing(1);
+    setTime(fmtDown(readInputs()));
+    document.title = BASE_TITLE;
+  }
+
+  function renderTimer(remaining) {
+    setTime(fmtDown(remaining));
+    setRing(totalMs > 0 ? remaining / totalMs : 0);
+    document.title = fmtDown(remaining) + " · Timer";
+  }
+
+  function renderOver(ot) {
+    setTime("+" + fmtUp(ot));
+    setRing((ot % 60000) / 60000);
+    document.title = "+" + fmtUp(ot) + " · Over";
+  }
+
+  function onTimeUp() {
+    beep();
+    els.wrap.classList.remove("pulse");
+    void els.wrap.offsetWidth; // reflow to restart animation
+    els.wrap.classList.add("pulse");
+  }
+
+  // ---- Loop ----
+  function loop() {
+    var t = now();
+    if (mode === "timer") {
+      var remaining = endTime - t;
+      if (remaining <= 0) {
+        mode = "overtime";
+        overtimeBase = endTime;
+        updateUI();
+        onTimeUp();
+        renderOver(t - overtimeBase);
+      } else {
+        renderTimer(remaining);
+      }
+    } else if (mode === "overtime") {
+      renderOver(t - overtimeBase);
+    }
+    if (running) rafId = requestAnimationFrame(loop);
+  }
+
+  // ---- Actions ----
+  function startOrResume() {
+    if (mode === "idle") {
+      var t = readInputs();
+      if (t <= 0) { nudgeInputs(); return; }
+      totalMs = t;
+      remainingMs = t;
+      mode = "timer";
+      ensureAudio();
+    }
+    running = true;
+    if (mode === "timer") endTime = now() + remainingMs;
+    else if (mode === "overtime") overtimeBase = now() - overtimeMs;
+    updateUI();
+    cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(loop);
+  }
+
+  function pause() {
+    running = false;
+    cancelAnimationFrame(rafId);
+    if (mode === "timer") remainingMs = Math.max(0, endTime - now());
+    else if (mode === "overtime") overtimeMs = now() - overtimeBase;
+    updateUI();
+  }
+
+  function toggle() {
+    if (running) pause();
+    else startOrResume();
+  }
+
+  function reset() {
+    running = false;
+    cancelAnimationFrame(rafId);
+    mode = "idle";
+    remainingMs = 0;
+    overtimeMs = 0;
+    updateUI();
+    renderIdle();
+  }
+
+  function nudgeInputs() {
+    els.inputs.animate(
+      [{ transform: "translateX(0)" }, { transform: "translateX(-5px)" },
+       { transform: "translateX(5px)" }, { transform: "translateX(0)" }],
+      { duration: 220 }
+    );
+    els.m.focus();
+  }
+
+  // ---- Events ----
+  els.primary.addEventListener("click", toggle);
+  els.reset.addEventListener("click", reset);
+
+  [els.h, els.m, els.s].forEach(function (input) {
+    input.addEventListener("input", function () { if (mode === "idle") renderIdle(); });
+    input.addEventListener("blur", function () {
+      var max = input === els.h ? 99 : 59;
+      input.value = clampInt(input.value, 0, max);
+      if (mode === "idle") renderIdle();
+    });
+  });
+
+  els.sound.addEventListener("click", function () {
+    soundOn = !soundOn;
+    els.sound.textContent = soundOn ? "🔔" : "🔕";
+    if (soundOn) ensureAudio();
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.target.tagName === "INPUT") {
+      if (e.key === "Enter") { e.preventDefault(); e.target.blur(); if (mode === "idle") startOrResume(); }
+      return;
+    }
+    if (e.code === "Space") { e.preventDefault(); toggle(); }
+    else if (e.key === "r" || e.key === "R") { reset(); }
+  });
+
+  // ---- Init ----
+  updateUI();
+  renderIdle();
+})();
+</script>
+</body>
+</html>
