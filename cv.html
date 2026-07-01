@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Carolanne Jiang</title>
-  <meta name="description" content="Art by Carolanne Jiang — painting, sculpture, ceramics, a comic project, and plein air sketches.">
+  <title>Carolanne Jiang — CV</title>
+  <meta name="description" content="Curriculum vitae of Carolanne Jiang — philosophy undergraduate at the University of Chicago, co-organizer of Manifest, and former visual art student.">
+  <meta property="og:type" content="profile">
   <meta property="og:site_name" content="Carolanne Jiang">
-  <meta property="og:title" content="Carolanne Jiang">
-  <meta property="og:description" content="my art stuff">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://www.carolannejiang.com/art.html">
-  <meta property="og:image" content="https://images.squarespace-cdn.com/content/v1/660a366af698a851e4922f5f/31c6fcfd-c07e-4927-8ae9-3e4b45b5cf76/_R002908.jpg?format=1500w">
+  <meta property="og:title" content="Carolanne Jiang — CV">
+  <meta property="og:description" content="Philosophy undergraduate at the University of Chicago, co-organizer of Manifest, and former visual art student.">
+  <meta property="og:url" content="https://www.carolannejiang.com/cv.html">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -72,39 +71,68 @@
       color: #1a1a1a;
     }
 
-    .art-hero {
-      margin: 72px auto 0;
-      max-width: 460px;
+    .cv {
+      margin: 112px auto 96px;
+      max-width: 520px;
       width: 100%;
     }
 
-    .art-hero img {
-      width: 100%;
-      height: auto;
-      display: block;
-      border-radius: 4px;
+    .cv-header { margin-bottom: 8px; }
+
+    .cv-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
     }
 
-    .art-links {
-      margin: 34px auto 0;
-      max-width: 460px;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    .art-links a {
-      font-size: 0.95rem;
-      line-height: 1.5;
+    .cv-tagline {
+      font-size: 0.82rem;
+      line-height: 1.75;
       color: #1a1a1a;
-      text-decoration: none;
+      margin-top: 12px;
+    }
+
+    .cv-contact {
+      font-size: 0.78rem;
+      color: #595959;
+      margin-top: 12px;
+    }
+
+    .cv-contact a {
+      color: #595959;
+      text-decoration: underline;
       text-underline-offset: 3px;
     }
 
-    .art-links a:hover {
-      text-decoration: underline;
-      color: #595959;
+    .cv-contact a:hover { color: #1a1a1a; }
+
+    .section { margin-top: 40px; }
+
+    .section-title {
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #a9a29a;
+      margin-bottom: 18px;
+    }
+
+    .entry {
+      font-size: 0.82rem;
+      line-height: 1.7;
+      margin-bottom: 22px;
+    }
+
+    .entry:last-child { margin-bottom: 0; }
+
+    .entry-head { font-weight: 700; }
+
+    .entry-meta { color: #7a7a7a; }
+
+    .entry-desc { margin-top: 3px; }
+
+    .inline-list {
+      font-size: 0.82rem;
+      line-height: 1.85;
     }
 
     @media (max-width: 600px) {
@@ -115,10 +143,8 @@
         bottom: 20px;
       }
       .page { padding: 0 36px; }
-      .art-hero { margin-top: 56px; }
-      .art-links { margin-top: 28px; }
+      .cv { margin-top: 72px; }
     }
-
   </style>
 </head>
 <body>
@@ -131,16 +157,15 @@
 
   <main class="page">
 
-    <figure class="art-hero">
-      <img src="images/art-gallery.jpg" alt="Carolanne Jiang with her paintings and sculptures at a gallery exhibition">
-    </figure>
+    <div class="cv">
 
-    <nav class="art-links" aria-label="Artwork">
-      <a href="paintings.html">Painting</a>
-      <a href="3d.html">Sculptures &amp; Ceramics</a>
-      <a href="comic.html">a comic project</a>
-      <a href="pleinair.html">Plein Air &amp; Other memories</a>
-    </nav>
+      <header class="cv-header">
+        <div class="cv-name">Carolanne Jiang</div>
+        <div class="cv-tagline">Undergraduate in philosophy at the University of Chicago. Co-organizer of Manifest, a festival on prediction markets &amp; forecasting. Previously a visual art student at Walnut Hill.</div>
+        <div class="cv-contact"><a href="mailto:carolannejiang@gmail.com">carolannejiang@gmail.com</a> &middot; <a href="https://www.linkedin.com/in/carolanne-j-87a0b329a/" target="_blank" rel="noreferrer">LinkedIn</a></div>
+      </header>
+
+    </div>
 
   </main>
 
