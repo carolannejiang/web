@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Carolanne Jiang</title>
-  <meta name="description" content="Art by Carolanne Jiang — painting, sculpture, ceramics, a comic project, and plein air sketches.">
-  <meta property="og:site_name" content="Carolanne Jiang">
-  <meta property="og:title" content="Carolanne Jiang">
-  <meta property="og:description" content="my art stuff">
+  <title>Carolanne Jiang — Writing</title>
+  <meta name="description" content="Essays and notes by Carolanne Jiang.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://www.carolannejiang.com/art.html">
-  <meta property="og:image" content="https://images.squarespace-cdn.com/content/v1/660a366af698a851e4922f5f/31c6fcfd-c07e-4927-8ae9-3e4b45b5cf76/_R002908.jpg?format=1500w">
+  <meta property="og:site_name" content="Carolanne Jiang">
+  <meta property="og:title" content="Carolanne Jiang — Writing">
+  <meta property="og:description" content="Essays and notes by Carolanne Jiang.">
+  <meta property="og:url" content="https://www.carolannejiang.com/writing.html">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -72,40 +71,44 @@
       color: #1a1a1a;
     }
 
-    .art-hero {
-      margin: 72px auto 0;
-      max-width: 460px;
+    .writing {
+      margin: 112px auto 96px;
+      max-width: 480px;
       width: 100%;
     }
 
-    .art-hero img {
-      width: 100%;
-      height: auto;
-      display: block;
-      border-radius: 4px;
+    .writing-title {
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #a9a29a;
+      margin-bottom: 28px;
     }
 
-    .art-links {
-      margin: 34px auto 0;
-      max-width: 460px;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
+    .entry {
+      font-size: 0.82rem;
+      line-height: 1.7;
+      margin-bottom: 26px;
     }
 
-    .art-links a {
-      font-size: 0.95rem;
-      line-height: 1.5;
+    .entry:last-child { margin-bottom: 0; }
+
+    .entry-title {
+      font-weight: 700;
       color: #1a1a1a;
-      text-decoration: none;
+      text-decoration: underline;
       text-underline-offset: 3px;
+      text-decoration-color: #c9c4bc;
     }
 
-    .art-links a:hover {
-      text-decoration: underline;
-      color: #595959;
+    .entry-title:hover { text-decoration-color: #1a1a1a; }
+
+    .entry-meta {
+      color: #7a7a7a;
+      margin-top: 2px;
     }
+
+    .entry-desc { margin-top: 4px; }
 
     @media (max-width: 600px) {
       .side-menu {
@@ -115,10 +118,8 @@
         bottom: 20px;
       }
       .page { padding: 0 36px; }
-      .art-hero { margin-top: 56px; }
-      .art-links { margin-top: 28px; }
+      .writing { margin-top: 72px; }
     }
-
   </style>
 </head>
 <body>
@@ -131,16 +132,17 @@
 
   <main class="page">
 
-    <figure class="art-hero">
-      <img src="images/art-gallery.jpg" alt="Carolanne Jiang with her paintings and sculptures at a gallery exhibition">
-    </figure>
+    <div class="writing">
 
-    <nav class="art-links" aria-label="Artwork">
-      <a href="paintings.html">Painting</a>
-      <a href="3d.html">Sculptures &amp; Ceramics</a>
-      <a href="comic.html">a comic project</a>
-      <a href="pleinair.html">Plein Air &amp; Other memories</a>
-    </nav>
+      <div class="writing-title">Writing</div>
+
+      <div class="entry">
+        <a class="entry-title" href="manifest.html">everything I&rsquo;ve learned from running Manifest</a>
+        <div class="entry-meta">2026</div>
+        <div class="entry-desc">Reflections and lessons from co-organizing Manifest &mdash; general learnings, notes on running an event, and gratitudes.</div>
+      </div>
+
+    </div>
 
   </main>
 
