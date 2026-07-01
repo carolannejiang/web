@@ -1,0 +1,14 @@
+{
+  "name": "notion-sync",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Sync a Notion page into a custom-styled static HTML page.",
+  "scripts": {
+    "dump": "node fetch-notion.mjs",
+    "build": "node build-manifest.mjs"
+  },
+  "dependencies": {
+    "@notionhq/client": "^2.2.15"
+  }
+}

@@ -1,0 +1,6 @@
+# Notion sync tooling
+node_modules/
+scripts/node_modules/
+.env
+scripts/.env
+notion-dump.json
