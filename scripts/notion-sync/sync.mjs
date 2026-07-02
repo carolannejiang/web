@@ -402,6 +402,18 @@ async function main() {
   for (const item of items) {
     if (item.published === false) continue; // Published checkbox unchecked
 
+    // TEMP DIAGNOSTIC: show what blocks actually live inside this row/page.
+    try {
+      const dbg = await notion.blocks.children.list({ block_id: item.id, page_size: 50 });
+      const types = dbg.results.map((b) => b.type);
+      console.log(
+        `DEBUG entry title="${item.title}" id=${item.id} ` +
+          `childBlockTypes=[${types.join(", ") || "(none)"}]`
+      );
+    } catch (e) {
+      console.log(`DEBUG could not list children of ${item.id}: ${e.code || e.message}`);
+    }
+
     let title = (item.title || "").trim();
 
     // If the row/page has no title of its own, borrow it from the first page it
