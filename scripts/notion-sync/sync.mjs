@@ -92,6 +92,24 @@ async function videoTransformer(block) {
   return `\n\n@@HTML:${payload}@@\n\n`;
 }
 
+// Notion now supports heading_4, but notion-to-md's switch only knows
+// heading_1/2/3 and would render heading_4 as plain text (losing the heading).
+// Emit proper markdown; inline any children (rare toggleable-heading case).
+async function heading4Transformer(block) {
+  const text = plainText(block.heading_4?.rich_text || []);
+  let childMd = "";
+  if (block.has_children) {
+    try {
+      const inner = makeConverter();
+      const c = inner.toMarkdownString(untoggle(await inner.pageToMarkdown(block.id))).parent || "";
+      if (c.trim()) childMd = `\n\n${c}`;
+    } catch {
+      /* ignore */
+    }
+  }
+  return `\n\n#### ${text}${childMd}\n\n`;
+}
+
 // A NotionToMarkdown configured with our custom block handling. We follow
 // nested/linked pages ourselves (see pageToMarkdown), so child_page/
 // link_to_page render nothing here; table_of_contents flags the left menu.
@@ -106,6 +124,7 @@ function makeConverter() {
   inst.setCustomTransformer("toggle", toggleTransformer);
   inst.setCustomTransformer("video", videoTransformer);
   inst.setCustomTransformer("embed", videoTransformer);
+  inst.setCustomTransformer("heading_4", heading4Transformer);
   return inst;
 }
 
@@ -550,16 +569,15 @@ function wrapFigures(html) {
   });
 }
 
-// Shift Notion headings down one level (h1/h2/h3 → h2/h3/h4, reserving h1 for
-// the page title, as manifest.html does), give them stable ids, and collect a
-// table of contents.
+// Give headings (h2/h3/h4, as Notion's heading_2/3/4 map directly) stable ids
+// and a class, and collect a table of contents.
 function addTocAndIds(html) {
   const toc = [];
   const used = new Set();
-  const out = html.replace(/<h([123])>([\s\S]*?)<\/h\1>/gi, (m, lvl, inner) => {
+  const out = html.replace(/<h([234])>([\s\S]*?)<\/h\1>/gi, (m, lvl, inner) => {
     const text = inner.replace(/<[^>]+>/g, "").trim();
     if (!text) return m;
-    const level = Number(lvl) + 1; // h1→h2, h2→h3, h3→h4
+    const level = Number(lvl);
     let id = slugify(text) || "section";
     const base = id;
     let n = 2;
@@ -575,7 +593,7 @@ function tocItemsHtml(toc) {
   if (!toc.length) return "";
   return toc
     .map((t) => {
-      const indent = t.level - 2; // h2→0, h3→1, h4→2
+      const indent = Math.min(t.level - 2, 1); // h2→0, h3/h4→1 (like manifest)
       return `      <div class="table_of_contents-item table_of_contents-indent-${indent}"><a class="table_of_contents-link" href="#${t.id}">${escapeHtml(t.text)}</a></div>`;
     })
     .join("\n");
@@ -719,24 +737,6 @@ async function safeDelete(slug) {
 async function main() {
   const items = await fetchEntries(PARENT_PAGE_ID);
   const style = await siteStyle();
-
-  // TEMP DIAGNOSTIC: dump block structure of the first entry.
-  async function dumpBlocks(id, depth = 0) {
-    const res = await notion.blocks.children.list({ block_id: id, page_size: 100 });
-    for (const b of res.results) {
-      const t = b[b.type] || {};
-      const text = (t.rich_text || t.text || []).map((x) => x.plain_text).join("").slice(0, 45);
-      console.log(
-        `${"  ".repeat(depth)}${b.type}${t.is_toggleable ? "[TOGGLEABLE]" : ""}${b.has_children ? "[kids]" : ""} "${text}"`
-      );
-      if (b.has_children && depth < 2) await dumpBlocks(b.id, depth + 1);
-    }
-  }
-  if (items[0]) {
-    console.log("=== BLOCK DUMP ===");
-    await dumpBlocks(items[0].id);
-    console.log("=== END DUMP ===");
-  }
 
   const seen = new Set();
   const entries = [];
