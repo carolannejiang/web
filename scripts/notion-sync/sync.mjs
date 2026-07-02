@@ -52,6 +52,15 @@ const n2m = new NotionToMarkdown({ notionClient: notion });
 n2m.setCustomTransformer("child_page", async () => "");
 n2m.setCustomTransformer("link_to_page", async () => "");
 
+// If the Notion page has a Table-of-Contents block we show the left menu; the
+// block itself is dropped from the body (we render our own sidebar version).
+// Reset before rendering each essay.
+let tocSeen = false;
+n2m.setCustomTransformer("table_of_contents", async () => {
+  tocSeen = true;
+  return "";
+});
+
 // ---------- helpers ----------
 
 function escapeHtml(str = "") {
@@ -187,6 +196,66 @@ async function localizeImages(html, slug) {
     }
   }
   return out;
+}
+
+// ---------- link titles ----------
+
+function decodeEntities(s) {
+  return s
+    .replace(/&amp;/g, "&")
+    .replace(/&(#39|#x27|apos);/gi, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&#8217;|&rsquo;/gi, "’")
+    .replace(/&nbsp;/gi, " ");
+}
+
+// Fetch a page and return its title (og:title preferred, else <title>).
+async function fetchLinkTitle(url) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 8000);
+  try {
+    const res = await fetch(url, {
+      signal: ctrl.signal,
+      redirect: "follow",
+      headers: { "user-agent": "Mozilla/5.0 (compatible; cmykhub-site-sync)" },
+    });
+    if (!res.ok) return null;
+    const html = await res.text();
+    const og =
+      html.match(/<meta[^>]+property=["']og:title["'][^>]*content=["']([^"']+)["']/i) ||
+      html.match(/<meta[^>]+content=["']([^"']+)["'][^>]*property=["']og:title["']/i);
+    let title = og?.[1] || html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || "";
+    title = decodeEntities(title).replace(/\s+/g, " ").trim();
+    return title || null;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Replace links whose visible text is just the raw URL with the linked page's
+// title. Links you gave custom text to are left exactly as-is.
+async function nameBareLinks(html) {
+  const anchorRe = /<a href="([^"]+)">([\s\S]*?)<\/a>/g;
+  const bareUrls = new Set();
+  for (const [, href, text] of html.matchAll(anchorRe)) {
+    if (/^https?:\/\//i.test(text.replace(/<[^>]+>/g, "").trim())) bareUrls.add(href);
+  }
+  if (!bareUrls.size) return html;
+
+  const titles = new Map();
+  await Promise.all(
+    [...bareUrls].map(async (u) => titles.set(u, await fetchLinkTitle(u)))
+  );
+
+  return html.replace(anchorRe, (m, href, text) => {
+    if (!/^https?:\/\//i.test(text.replace(/<[^>]+>/g, "").trim())) return m; // custom text
+    const title = titles.get(href);
+    return title ? `<a href="${href}">${escapeHtml(title)}</a>` : m;
+  });
 }
 
 // ---------- Notion fetch ----------
@@ -374,8 +443,9 @@ function articlePage({ title, description, bodyHtml, tocHtml, slug, style }) {
     <nav class="table_of_contents">
 ${tocHtml}
     </nav>
-  </aside>`
-    : `  <aside class="side"></aside>`;
+  </aside>
+`
+    : "";
 
   return `<!DOCTYPE html>
 ${GENERATED_MARKER}
@@ -537,10 +607,13 @@ async function main() {
     }
     seen.add(slug);
 
+    tocSeen = false;
     const md = await pageToMarkdown(item.id);
     let bodyHtml = marked.parse(md);
     bodyHtml = await localizeImages(bodyHtml, slug);
     bodyHtml = wrapFigures(bodyHtml);
+    bodyHtml = bodyHtml.replace(/<details\s+open\b/gi, "<details"); // collapse toggles
+    bodyHtml = await nameBareLinks(bodyHtml);
     const withToc = addTocAndIds(bodyHtml);
     const description = excerptFromMarkdown(md);
     const dateISO = item.createdTime;
@@ -549,7 +622,8 @@ async function main() {
       title,
       description,
       bodyHtml: withToc.html,
-      tocHtml: tocItemsHtml(withToc.toc),
+      // Only show the left menu when the Notion doc has a Contents block.
+      tocHtml: tocSeen ? tocItemsHtml(withToc.toc) : "",
       slug,
       style,
     });
