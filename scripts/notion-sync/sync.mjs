@@ -777,9 +777,11 @@ async function main() {
     seen.add(slug);
 
     tocSeen = false;
-    const md = await pageToMarkdown(item.id);
-    const _gi = md.indexOf("largely gone");
-    if (_gi >= 0) console.log("MD-CONTEXT:\n" + JSON.stringify(md.slice(_gi - 140, _gi + 320)));
+    let md = await pageToMarkdown(item.id);
+    // Empty Notion bullets render as a lone "- ", which marked misreads as a
+    // Setext heading underline (turning the text above into an <h2>). Drop
+    // empty list-item lines.
+    md = md.replace(/^[ \t]*[-*+][ \t]*$/gm, "").replace(/^[ \t]*\d+\.[ \t]*$/gm, "");
     let bodyHtml = marked.parse(md);
     bodyHtml = replaceToggles(bodyHtml); // collapsed <details>, content inside
     bodyHtml = replaceRawHtml(bodyHtml); // video embeds
