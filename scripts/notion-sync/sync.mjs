@@ -73,6 +73,25 @@ async function toggleTransformer(block) {
   return `\n\n@@TOGGLE:${payload}@@\n\n`;
 }
 
+const YOUTUBE_ID = /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/;
+
+// Render Notion video/embed blocks like manifest.html: a responsive iframe for
+// YouTube, otherwise a plain link. Emitted as a raw-HTML placeholder so marked
+// leaves the markup intact (see replaceRawHtml).
+async function videoTransformer(block) {
+  const v = block[block.type] || {};
+  const url = v.external?.url || v.url || v.file?.url || "";
+  if (!url) return "";
+  const title = escapeHtml((await fetchLinkTitle(url)) || "video");
+  const href = escapeHtml(url);
+  const yt = url.match(YOUTUBE_ID)?.[1];
+  const html = yt
+    ? `<figure class="video-embed"><div class="frame"><iframe src="https://www.youtube.com/embed/${yt}" title="${title}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><a href="${href}" target="_blank" rel="noreferrer">${title}</a></figure>`
+    : `<figure class="video-embed"><a href="${href}" target="_blank" rel="noreferrer">${title}</a></figure>`;
+  const payload = Buffer.from(JSON.stringify({ html }), "utf8").toString("base64");
+  return `\n\n@@HTML:${payload}@@\n\n`;
+}
+
 // A NotionToMarkdown configured with our custom block handling. We follow
 // nested/linked pages ourselves (see pageToMarkdown), so child_page/
 // link_to_page render nothing here; table_of_contents flags the left menu.
@@ -85,6 +104,8 @@ function makeConverter() {
     return "";
   });
   inst.setCustomTransformer("toggle", toggleTransformer);
+  inst.setCustomTransformer("video", videoTransformer);
+  inst.setCustomTransformer("embed", videoTransformer);
   return inst;
 }
 
@@ -108,6 +129,21 @@ function replaceToggles(html) {
     .replace(/<p>\s*(<details>)/g, "$1")
     .replace(/(<\/details>)\s*<\/p>/g, "$1")
     .replace(/<pre><code>\s*(<details>[\s\S]*?<\/details>)\s*<\/code><\/pre>/g, "$1");
+}
+
+// Expand raw-HTML placeholders (e.g. video embeds), unwrapping the <p> marked
+// wraps them in.
+function replaceRawHtml(html) {
+  return html
+    .replace(/@@HTML:([A-Za-z0-9+/=]+)@@/g, (m, b64) => {
+      try {
+        return JSON.parse(Buffer.from(b64, "base64").toString("utf8")).html || "";
+      } catch {
+        return "";
+      }
+    })
+    .replace(/<p>\s*(<figure)/g, "$1")
+    .replace(/(<\/figure>)\s*<\/p>/g, "$1");
 }
 
 // ---------- helpers ----------
@@ -499,33 +535,38 @@ async function siteStyle() {
     .footer-nav { margin-top: 72px; padding-top: 20px; border-top: 1px solid #ece8e1; }`;
 }
 
-// marked renders a lone image as <p><img></p>; turn those into <figure> (with a
-// caption when the image has meaningful alt text), matching manifest.html.
+// marked renders a lone image as <p><img></p>; turn those into
+// <figure class="image"> with a click-to-open link wrapper (and a caption when
+// the image has meaningful alt text), matching manifest.html.
 function wrapFigures(html) {
-  return html.replace(/<p>\s*(<img\b[^>]*>)\s*<\/p>/gi, (_m, img) => {
-    const alt = (img.match(/\balt="([^"]*)"/i)?.[1] || "").trim();
+  return html.replace(/<p>\s*<img\b([^>]*)>\s*<\/p>/gi, (_m, attrs) => {
+    const src = attrs.match(/\bsrc="([^"]*)"/i)?.[1] || "";
+    const alt = (attrs.match(/\balt="([^"]*)"/i)?.[1] || "").trim();
     const caption =
       alt && !/\.(png|jpe?g|gif|webp|svg|avif)$/i.test(alt)
         ? `<figcaption>${escapeHtml(alt)}</figcaption>`
         : "";
-    return `<figure>${img}${caption}</figure>`;
+    return `<figure class="image"><a href="${src}"><img src="${src}"/></a>${caption}</figure>`;
   });
 }
 
-// Give headings stable ids and collect a table of contents (h2→h3→h4).
+// Shift Notion headings down one level (h1/h2/h3 → h2/h3/h4, reserving h1 for
+// the page title, as manifest.html does), give them stable ids, and collect a
+// table of contents.
 function addTocAndIds(html) {
   const toc = [];
   const used = new Set();
-  const out = html.replace(/<h([234])>([\s\S]*?)<\/h\1>/gi, (m, lvl, inner) => {
+  const out = html.replace(/<h([123])>([\s\S]*?)<\/h\1>/gi, (m, lvl, inner) => {
     const text = inner.replace(/<[^>]+>/g, "").trim();
     if (!text) return m;
+    const level = Number(lvl) + 1; // h1→h2, h2→h3, h3→h4
     let id = slugify(text) || "section";
     const base = id;
     let n = 2;
     while (used.has(id)) id = `${base}-${n++}`;
     used.add(id);
-    toc.push({ level: Number(lvl), text, id });
-    return `<h${lvl} id="${id}">${inner}</h${lvl}>`;
+    toc.push({ level, text, id });
+    return `<h${level} id="${id}" class="">${inner}</h${level}>`;
   });
   return { html: out, toc };
 }
@@ -547,7 +588,7 @@ function articlePage({ title, description, bodyHtml, tocHtml, slug, style }) {
   const side = tocHtml
     ? `  <aside class="side">
     <div class="toc-label">Contents</div>
-    <nav class="table_of_contents">
+    <nav class="block-color-gray table_of_contents">
 ${tocHtml}
     </nav>
   </aside>
@@ -590,7 +631,7 @@ ${side}
 <div class="page-body">
 ${bodyHtml}
 </div>
-  <div class="footer-nav"><a href="writing.html">← back to writing</a></div>
+  <div class="footer-nav"><a href="index.html">← back to home</a></div>
   </main>
   </div>
 
@@ -718,9 +759,13 @@ async function main() {
     const md = await pageToMarkdown(item.id);
     let bodyHtml = marked.parse(md);
     bodyHtml = replaceToggles(bodyHtml); // collapsed <details>, content inside
+    bodyHtml = replaceRawHtml(bodyHtml); // video embeds
     bodyHtml = await localizeImages(bodyHtml, slug); // also localizes toggle images
     bodyHtml = wrapFigures(bodyHtml);
     bodyHtml = await nameBareLinks(bodyHtml);
+    bodyHtml = bodyHtml
+      .replace(/<ul>/g, '<ul class="bulleted-list">')
+      .replace(/<ol>/g, '<ol class="numbered-list">'); // match manifest.html classes
     const withToc = addTocAndIds(bodyHtml);
     const description = excerptFromMarkdown(md);
     const dateISO = item.createdTime;
