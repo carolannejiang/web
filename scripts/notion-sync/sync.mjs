@@ -720,6 +720,24 @@ async function main() {
   const items = await fetchEntries(PARENT_PAGE_ID);
   const style = await siteStyle();
 
+  // TEMP DIAGNOSTIC: dump block structure of the first entry.
+  async function dumpBlocks(id, depth = 0) {
+    const res = await notion.blocks.children.list({ block_id: id, page_size: 100 });
+    for (const b of res.results) {
+      const t = b[b.type] || {};
+      const text = (t.rich_text || t.text || []).map((x) => x.plain_text).join("").slice(0, 45);
+      console.log(
+        `${"  ".repeat(depth)}${b.type}${t.is_toggleable ? "[TOGGLEABLE]" : ""}${b.has_children ? "[kids]" : ""} "${text}"`
+      );
+      if (b.has_children && depth < 2) await dumpBlocks(b.id, depth + 1);
+    }
+  }
+  if (items[0]) {
+    console.log("=== BLOCK DUMP ===");
+    await dumpBlocks(items[0].id);
+    console.log("=== END DUMP ===");
+  }
+
   const seen = new Set();
   const entries = [];
 
