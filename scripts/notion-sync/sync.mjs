@@ -63,7 +63,7 @@ async function toggleTransformer(block) {
   if (block.has_children) {
     try {
       const inner = makeConverter();
-      const childMd = inner.toMarkdownString(await inner.pageToMarkdown(block.id)).parent || "";
+      const childMd = inner.toMarkdownString(untoggle(await inner.pageToMarkdown(block.id))).parent || "";
       childHtml = marked.parse(childMd);
     } catch (err) {
       console.warn(`  toggle "${summary.slice(0, 40)}" render error: ${err.message}`);
@@ -451,10 +451,22 @@ async function pageTitle(pageId) {
 // inside it (up to two levels deep). This means an essay you wrote in a nested
 // sub-page — or in a separate page you linked to — still gets pulled in fully
 // instead of showing up as just a link.
+// notion-to-md's toMarkdownString special-cases toggle blocks and drops our
+// custom-transformer output (the placeholder) unless it recursed the children
+// itself. Retyping toggle nodes to "paragraph" makes it emit our placeholder as
+// ordinary content. (Safe: our toggle transformer already produced the parent.)
+function untoggle(blocks) {
+  for (const b of blocks) {
+    if (b.type === "toggle") b.type = "paragraph";
+    if (b.children?.length) untoggle(b.children);
+  }
+  return blocks;
+}
+
 async function pageToMarkdown(pageId, depth = 0, seen = new Set()) {
   if (seen.has(pageId)) return "";
   seen.add(pageId);
-  const own = (n2m.toMarkdownString(await n2m.pageToMarkdown(pageId)).parent || "").trim();
+  const own = (n2m.toMarkdownString(untoggle(await n2m.pageToMarkdown(pageId))).parent || "").trim();
   const parts = own ? [own] : [];
   if (depth < 2) {
     for (const child of await linkedPages(pageId)) {
