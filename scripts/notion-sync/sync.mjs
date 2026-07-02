@@ -63,6 +63,41 @@ n2m.setCustomTransformer("table_of_contents", async () => {
   return "";
 });
 
+// Render toggles ourselves so their content ends up INSIDE a collapsed
+// <details> (letting notion-to-md + marked handle it produces broken, spilled
+// markup). We emit a placeholder carrying the summary + already-rendered child
+// HTML, and expand it after the page markdown is converted (see replaceToggles).
+n2m.setCustomTransformer("toggle", async (block) => {
+  const summary = plainText(block.toggle?.rich_text || []);
+  let childHtml = "";
+  if (block.has_children) {
+    const childMd = n2m.toMarkdownString(await n2m.pageToMarkdown(block.id)).parent || "";
+    childHtml = marked.parse(childMd);
+  }
+  const payload = Buffer.from(JSON.stringify({ summary, childHtml }), "utf8").toString("base64");
+  return `\n\n@@TOGGLE:${payload}@@\n\n`;
+});
+
+// Expand toggle placeholders into collapsed <details> blocks, unwrapping any
+// <p> or <pre><code> that marked may have put around the placeholder, and
+// recursing so nested toggles work too.
+function replaceToggles(html) {
+  const expanded = html.replace(/@@TOGGLE:([A-Za-z0-9+/=]+)@@/g, (m, b64) => {
+    let data;
+    try {
+      data = JSON.parse(Buffer.from(b64, "base64").toString("utf8"));
+    } catch {
+      return "";
+    }
+    const inner = replaceToggles(data.childHtml || "");
+    return `<details><summary>${escapeHtml(data.summary || "")}</summary>\n${inner}\n</details>`;
+  });
+  return expanded
+    .replace(/<p>\s*(<details>)/g, "$1")
+    .replace(/(<\/details>)\s*<\/p>/g, "$1")
+    .replace(/<pre><code>\s*(<details>[\s\S]*?<\/details>)\s*<\/code><\/pre>/g, "$1");
+}
+
 // ---------- helpers ----------
 
 function escapeHtml(str = "") {
@@ -658,9 +693,9 @@ async function main() {
     tocSeen = false;
     const md = await pageToMarkdown(item.id);
     let bodyHtml = marked.parse(md);
-    bodyHtml = await localizeImages(bodyHtml, slug);
+    bodyHtml = replaceToggles(bodyHtml); // collapsed <details>, content inside
+    bodyHtml = await localizeImages(bodyHtml, slug); // also localizes toggle images
     bodyHtml = wrapFigures(bodyHtml);
-    bodyHtml = bodyHtml.replace(/<details\s+open\b/gi, "<details"); // collapse toggles
     bodyHtml = await nameBareLinks(bodyHtml);
     const withToc = addTocAndIds(bodyHtml);
     const description = excerptFromMarkdown(md);
