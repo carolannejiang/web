@@ -105,6 +105,10 @@ Repo → **Settings → Secrets and variables → Actions → New repository sec
 - **Nested pages are followed.** You can write the essay directly in the row/
   sub-page body, *or* in a page nested one or two levels inside it — the sync
   inlines that nested content either way.
+- **Images are made permanent.** Notion's own image links expire after ~1 hour,
+  so the sync downloads each image into `images/notion/<slug>/` and points the
+  page at that local copy. Change an image in Notion and the next sync updates
+  it. (External images you link to by URL are left untouched.)
 
 - **Renaming an essay changes its URL** (the slug comes from the title), which
   breaks old links to it. Rename before sharing, not after.
