@@ -46,10 +46,11 @@ const BLOCK_END = "<!-- NOTION:END -->";
 const notion = new Client({ auth: NOTION_TOKEN });
 const n2m = new NotionToMarkdown({ notionClient: notion });
 
-// We follow nested pages ourselves (see pageToMarkdown) and inline their
-// content, so suppress the default link-to-child-page rendering to avoid
-// duplicate title links in the output.
+// We follow nested/linked pages ourselves (see pageToMarkdown) and inline their
+// content, so suppress the default rendering of these blocks to avoid leaving
+// duplicate bare links in the output.
 n2m.setCustomTransformer("child_page", async () => "");
+n2m.setCustomTransformer("link_to_page", async () => "");
 
 // ---------- helpers ----------
 
@@ -192,7 +193,10 @@ async function fetchEntries(id) {
   return pages;
 }
 
-async function listChildPages(pageId) {
+// Pages referenced from inside a page: real sub-pages (child_page) and
+// "link to page" blocks that point at another page. Titles come along when
+// Notion gives them (child_page blocks include the title).
+async function linkedPages(pageId) {
   const out = [];
   let cursor;
   do {
@@ -202,23 +206,40 @@ async function listChildPages(pageId) {
       page_size: 100,
     });
     for (const b of res.results) {
-      if (b.type === "child_page") out.push({ id: b.id });
+      if (b.type === "child_page") {
+        out.push({ id: b.id, title: b.child_page?.title || "" });
+      } else if (b.type === "link_to_page" && b.link_to_page?.type === "page_id") {
+        out.push({ id: b.link_to_page.page_id, title: "" });
+      }
     }
     cursor = res.has_more ? res.next_cursor : undefined;
   } while (cursor);
   return out;
 }
 
-// Markdown for a page, inlining the content of any pages nested inside it (up
-// to two levels deep). This means an essay you wrote in a nested sub-page —
-// rather than directly in the row/page body — still gets pulled in fully
+// Title of a standalone page (used for "link to page" targets, whose title
+// isn't carried on the link block itself).
+async function pageTitle(pageId) {
+  try {
+    const page = await notion.pages.retrieve({ page_id: pageId });
+    return readTitle(page.properties || {});
+  } catch {
+    return "";
+  }
+}
+
+// Markdown for a page, inlining the content of any pages nested or linked
+// inside it (up to two levels deep). This means an essay you wrote in a nested
+// sub-page — or in a separate page you linked to — still gets pulled in fully
 // instead of showing up as just a link.
-async function pageToMarkdown(pageId, depth = 0) {
+async function pageToMarkdown(pageId, depth = 0, seen = new Set()) {
+  if (seen.has(pageId)) return "";
+  seen.add(pageId);
   const own = (n2m.toMarkdownString(await n2m.pageToMarkdown(pageId)).parent || "").trim();
   const parts = own ? [own] : [];
   if (depth < 2) {
-    for (const child of await listChildPages(pageId)) {
-      const sub = await pageToMarkdown(child.id, depth + 1);
+    for (const child of await linkedPages(pageId)) {
+      const sub = await pageToMarkdown(child.id, depth + 1, seen);
       if (sub.trim()) parts.push(sub);
     }
   }
@@ -379,12 +400,21 @@ async function main() {
   const entries = [];
 
   for (const item of items) {
-    const title = (item.title || "").trim();
+    if (item.published === false) continue; // Published checkbox unchecked
+
+    let title = (item.title || "").trim();
+
+    // If the row/page has no title of its own, borrow it from the first page it
+    // links to or nests — handy when a table row just points at an essay page.
+    const linked = await linkedPages(item.id);
+    if (!title && linked.length) {
+      title = (linked[0].title || (await pageTitle(linked[0].id)) || "").trim();
+    }
+
     if (!title) {
-      console.warn("Skipping an entry with no title.");
+      console.warn("Skipping an entry with no title (and no linked page to borrow one from).");
       continue;
     }
-    if (item.published === false) continue; // Published checkbox unchecked
     if (isDraft(title)) {
       console.log(`Skipping draft: "${title}"`);
       continue;
