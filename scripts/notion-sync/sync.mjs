@@ -73,16 +73,34 @@ function readTitle(props) {
   return "";
 }
 
-function readRichText(props, name) {
-  const p = props[name];
-  if (!p || p.type !== "rich_text") return "";
-  return plainText(p.rich_text);
+// Find a property by name, case-insensitively, tolerating a few common
+// variants. Notion property names are case-sensitive in the API, so this saves
+// the user from having to match capitalization exactly.
+function findProp(props, names, type) {
+  const wanted = names.map((n) => n.toLowerCase());
+  for (const [key, value] of Object.entries(props)) {
+    if (type && value.type !== type) continue;
+    if (wanted.includes(key.toLowerCase())) return value;
+  }
+  return null;
 }
 
-function readDate(props, name) {
-  const p = props[name];
-  if (!p || p.type !== "date" || !p.date) return null;
-  return p.date.start; // ISO string, e.g. "2026-07-02"
+function readRichText(props, names) {
+  const p = findProp(props, names, "rich_text");
+  return p ? plainText(p.rich_text) : "";
+}
+
+function readDate(props, names) {
+  const p = findProp(props, names, "date");
+  return p && p.date ? p.date.start : null; // ISO string, e.g. "2026-07-02"
+}
+
+// Returns true (publish), false (explicitly unchecked), or null (no gate column
+// found — caller decides what that means).
+function readPublished(props) {
+  const p = findProp(props, ["Published", "Publish", "Public", "Live"], "checkbox");
+  if (!p) return null;
+  return p.checkbox === true;
 }
 
 function formatFullDate(iso) {
@@ -104,17 +122,13 @@ function yearOf(iso) {
 
 // ---------- Notion fetch ----------
 
-async function fetchPublishedRows() {
+async function fetchAllRows() {
   const rows = [];
   let cursor;
   do {
     const res = await notion.databases.query({
       database_id: DATABASE_ID,
       start_cursor: cursor,
-      filter: {
-        property: "Published",
-        checkbox: { equals: true },
-      },
     });
     rows.push(...res.results);
     cursor = res.has_more ? res.next_cursor : undefined;
@@ -281,16 +295,30 @@ async function safeDelete(slug) {
 // ---------- main ----------
 
 async function main() {
-  const rows = await fetchPublishedRows();
-  console.log(`Found ${rows.length} published row(s) in Notion.`);
+  const rows = await fetchAllRows();
+  console.log(`Fetched ${rows.length} row(s) from Notion.`);
 
   const seen = new Set();
   const entries = [];
+  let gateMissingWarned = false;
 
   for (const row of rows) {
     const props = row.properties;
+
+    // Publish gate: skip rows explicitly unchecked. If there's no Published
+    // column at all, publish everything but warn loudly (once).
+    const published = readPublished(props);
+    if (published === false) continue;
+    if (published === null && !gateMissingWarned) {
+      console.warn(
+        "No 'Published' checkbox column found — publishing ALL rows. " +
+          "Add a checkbox column named 'Published' to control what goes live."
+      );
+      gateMissingWarned = true;
+    }
+
     const title = readTitle(props) || "Untitled";
-    let slug = readRichText(props, "Slug").trim() || slugify(title);
+    let slug = readRichText(props, ["Slug", "URL", "Path"]).trim() || slugify(title);
     slug = slugify(slug);
 
     if (!slug) {
@@ -303,8 +331,8 @@ async function main() {
     }
     seen.add(slug);
 
-    const description = readRichText(props, "Description");
-    const dateISO = readDate(props, "Date");
+    const description = readRichText(props, ["Description", "Summary", "Subtitle"]);
+    const dateISO = readDate(props, ["Date", "Published", "Published on", "Date published"]);
 
     const bodyHtml = await pageToHtml(row.id);
     const pageHtml = articlePage({ title, dateISO, description, bodyHtml, slug });
