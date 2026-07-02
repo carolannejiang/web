@@ -70,6 +70,7 @@ async function toggleTransformer(block) {
     }
   }
   const payload = Buffer.from(JSON.stringify({ summary, childHtml }), "utf8").toString("base64");
+  console.log(`  [toggle emit] "${summary.slice(0, 30)}" childHtmlLen=${childHtml.length} payloadLen=${payload.length}`);
   return `\n\n@@TOGGLE:${payload}@@\n\n`;
 }
 
@@ -704,8 +705,11 @@ async function main() {
 
     tocSeen = false;
     const md = await pageToMarkdown(item.id);
+    const mdToggles = (md.match(/@@TOGGLE:/g) || []).length;
     let bodyHtml = marked.parse(md);
+    const htmlToggles = (bodyHtml.match(/@@TOGGLE:/g) || []).length;
     bodyHtml = replaceToggles(bodyHtml); // collapsed <details>, content inside
+    console.log(`  [toggles] in md=${mdToggles} in html=${htmlToggles} details after=${(bodyHtml.match(/<details/g) || []).length}`);
     bodyHtml = await localizeImages(bodyHtml, slug); // also localizes toggle images
     bodyHtml = wrapFigures(bodyHtml);
     bodyHtml = await nameBareLinks(bodyHtml);
