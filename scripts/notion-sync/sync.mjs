@@ -125,6 +125,9 @@ function makeConverter() {
   inst.setCustomTransformer("video", videoTransformer);
   inst.setCustomTransformer("embed", videoTransformer);
   inst.setCustomTransformer("heading_4", heading4Transformer);
+  // Emit dividers as explicit <hr>. As markdown "---" right after a text line,
+  // marked would misread the text as a Setext <h2> heading.
+  inst.setCustomTransformer("divider", async () => "\n\n<hr>\n\n");
   return inst;
 }
 
