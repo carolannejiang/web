@@ -302,11 +302,80 @@ async function pageToMarkdown(pageId, depth = 0, seen = new Set()) {
 
 // ---------- templates ----------
 
-function articlePage({ title, dateISO, description, bodyHtml, slug }) {
+// Reuse the exact <style> from manifest.html so generated essays always match
+// that page's look. If she restyles manifest.html, generated pages follow.
+async function siteStyle() {
+  try {
+    const html = await fs.readFile(path.join(REPO_ROOT, "manifest.html"), "utf8");
+    const m = html.match(/<style>([\s\S]*?)<\/style>/i);
+    if (m) return m[1];
+  } catch {
+    /* fall through to minimal fallback */
+  }
+  return `
+    body { max-width: 680px; margin: 0 auto; padding: 40px 28px; color: #1a1a1a;
+      font-family: 'Libre Baskerville', Georgia, serif; line-height: 1.75; }
+    .site-nav { display: flex; gap: 20px; margin-bottom: 24px; }
+    .site-nav a { color: #595959; text-decoration: none; font-size: 0.78rem; }
+    .side { display: none; }
+    figure { margin: 1.6em 0; text-align: center; }
+    figure img, img { max-width: 100%; height: auto; }
+    .footer-nav { margin-top: 72px; padding-top: 20px; border-top: 1px solid #ece8e1; }`;
+}
+
+// marked renders a lone image as <p><img></p>; turn those into <figure> (with a
+// caption when the image has meaningful alt text), matching manifest.html.
+function wrapFigures(html) {
+  return html.replace(/<p>\s*(<img\b[^>]*>)\s*<\/p>/gi, (_m, img) => {
+    const alt = (img.match(/\balt="([^"]*)"/i)?.[1] || "").trim();
+    const caption =
+      alt && !/\.(png|jpe?g|gif|webp|svg|avif)$/i.test(alt)
+        ? `<figcaption>${escapeHtml(alt)}</figcaption>`
+        : "";
+    return `<figure>${img}${caption}</figure>`;
+  });
+}
+
+// Give headings stable ids and collect a table of contents (h2→h3→h4).
+function addTocAndIds(html) {
+  const toc = [];
+  const used = new Set();
+  const out = html.replace(/<h([234])>([\s\S]*?)<\/h\1>/gi, (m, lvl, inner) => {
+    const text = inner.replace(/<[^>]+>/g, "").trim();
+    if (!text) return m;
+    let id = slugify(text) || "section";
+    const base = id;
+    let n = 2;
+    while (used.has(id)) id = `${base}-${n++}`;
+    used.add(id);
+    toc.push({ level: Number(lvl), text, id });
+    return `<h${lvl} id="${id}">${inner}</h${lvl}>`;
+  });
+  return { html: out, toc };
+}
+
+function tocItemsHtml(toc) {
+  if (!toc.length) return "";
+  return toc
+    .map((t) => {
+      const indent = t.level - 2; // h2→0, h3→1, h4→2
+      return `      <div class="table_of_contents-item table_of_contents-indent-${indent}"><a class="table_of_contents-link" href="#${t.id}">${escapeHtml(t.text)}</a></div>`;
+    })
+    .join("\n");
+}
+
+function articlePage({ title, description, bodyHtml, tocHtml, slug, style }) {
   const url = `https://www.carolannejiang.com/${slug}.html`;
   const safeTitle = escapeHtml(title);
   const safeDesc = escapeHtml(description || "");
-  const dateLabel = escapeHtml(formatFullDate(dateISO));
+  const side = tocHtml
+    ? `  <aside class="side">
+    <div class="toc-label">Contents</div>
+    <nav class="table_of_contents">
+${tocHtml}
+    </nav>
+  </aside>`
+    : `  <aside class="side"></aside>`;
 
   return `<!DOCTYPE html>
 ${GENERATED_MARKER}
@@ -314,7 +383,7 @@ ${GENERATED_MARKER}
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${safeTitle} — Carolanne Jiang</title>
+  <title>${safeTitle}</title>
   <meta name="description" content="${safeDesc}">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Carolanne Jiang">
@@ -328,48 +397,26 @@ ${GENERATED_MARKER}
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap">
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></noscript>
-  <style>
-    body {
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 60px 32px;
-      line-height: 1.7;
-      font-family: 'Libre Baskerville', Georgia, serif;
-      color: #1a1a1a;
-    }
-    h1 { margin-bottom: 6px; font-size: 1.5rem; }
-    .article-date {
-      font-size: 0.68rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: #a9a29a;
-      margin-bottom: 36px;
-    }
-    .article-body p { margin-bottom: 18px; }
-    .article-body h2 { margin: 32px 0 12px; font-size: 1.15rem; }
-    .article-body h3 { margin: 28px 0 10px; font-size: 1rem; }
-    .article-body ul, .article-body ol { margin: 0 0 18px 1.2em; }
-    .article-body li { margin-bottom: 6px; }
-    .article-body blockquote {
-      margin: 0 0 18px; padding-left: 16px;
-      border-left: 2px solid #c9c4bc; color: #555;
-    }
-    .article-body img { max-width: 100%; height: auto; }
-    .article-body a { color: #1155cc; }
-    .article-body a:hover { color: #0b3d91; }
-    .back { display: inline-block; margin-top: 48px; color: #888; }
-    .back:hover { color: #555; }
-  </style>
+  <style>${style}</style>
 </head>
 <body>
-  <main>
-    <h1>${safeTitle}</h1>
-    ${dateLabel ? `<div class="article-date">${dateLabel}</div>` : ""}
-    <div class="article-body">
+
+<nav class="site-nav" aria-label="Site links">
+  <a href="index.html">home</a>
+  <a href="mailto:carolannejiang@gmail.com">email</a>
+  <a href="https://www.linkedin.com/in/carolanne-j-87a0b329a/" target="_blank" rel="noreferrer">linkedin</a>
+</nav>
+<div class="layout">
+${side}
+  <main class="article">
+<header><h1 class="page-title" dir="auto">${safeTitle}</h1><p class="page-description" dir="auto"></p></header>
+<div class="page-body">
 ${bodyHtml}
-    </div>
-    <a class="back" href="writing.html">← back to writing</a>
+</div>
+  <div class="footer-nav"><a href="writing.html">← back to writing</a></div>
   </main>
+  </div>
+
 </body>
 </html>
 `;
@@ -453,6 +500,7 @@ async function safeDelete(slug) {
 
 async function main() {
   const items = await fetchEntries(PARENT_PAGE_ID);
+  const style = await siteStyle();
 
   const seen = new Set();
   const entries = [];
@@ -492,10 +540,19 @@ async function main() {
     const md = await pageToMarkdown(item.id);
     let bodyHtml = marked.parse(md);
     bodyHtml = await localizeImages(bodyHtml, slug);
+    bodyHtml = wrapFigures(bodyHtml);
+    const withToc = addTocAndIds(bodyHtml);
     const description = excerptFromMarkdown(md);
     const dateISO = item.createdTime;
 
-    const pageHtml = articlePage({ title, dateISO, description, bodyHtml, slug });
+    const pageHtml = articlePage({
+      title,
+      description,
+      bodyHtml: withToc.html,
+      tocHtml: tocItemsHtml(withToc.toc),
+      slug,
+      style,
+    });
     await fs.writeFile(path.join(REPO_ROOT, `${slug}.html`), pageHtml);
     console.log(`Wrote ${slug}.html  ("${title}")`);
 
