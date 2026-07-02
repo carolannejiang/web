@@ -46,37 +46,49 @@ const BLOCK_START = "<!-- NOTION:START (auto-generated — do not edit between t
 const BLOCK_END = "<!-- NOTION:END -->";
 
 const notion = new Client({ auth: NOTION_TOKEN });
-const n2m = new NotionToMarkdown({ notionClient: notion });
 
-// We follow nested/linked pages ourselves (see pageToMarkdown) and inline their
-// content, so suppress the default rendering of these blocks to avoid leaving
-// duplicate bare links in the output.
-n2m.setCustomTransformer("child_page", async () => "");
-n2m.setCustomTransformer("link_to_page", async () => "");
-
-// If the Notion page has a Table-of-Contents block we show the left menu; the
-// block itself is dropped from the body (we render our own sidebar version).
+// Track whether the current essay had a Table-of-Contents block (→ left menu).
 // Reset before rendering each essay.
 let tocSeen = false;
-n2m.setCustomTransformer("table_of_contents", async () => {
-  tocSeen = true;
-  return "";
-});
 
 // Render toggles ourselves so their content ends up INSIDE a collapsed
 // <details> (letting notion-to-md + marked handle it produces broken, spilled
 // markup). We emit a placeholder carrying the summary + already-rendered child
-// HTML, and expand it after the page markdown is converted (see replaceToggles).
-n2m.setCustomTransformer("toggle", async (block) => {
+// HTML, expanded after conversion (see replaceToggles). Children are rendered
+// with a FRESH converter — reusing the outer instance reentrantly corrupts its
+// state and drops the block.
+async function toggleTransformer(block) {
   const summary = plainText(block.toggle?.rich_text || []);
   let childHtml = "";
   if (block.has_children) {
-    const childMd = n2m.toMarkdownString(await n2m.pageToMarkdown(block.id)).parent || "";
-    childHtml = marked.parse(childMd);
+    try {
+      const inner = makeConverter();
+      const childMd = inner.toMarkdownString(await inner.pageToMarkdown(block.id)).parent || "";
+      childHtml = marked.parse(childMd);
+    } catch (err) {
+      console.warn(`  toggle "${summary.slice(0, 40)}" render error: ${err.message}`);
+    }
   }
   const payload = Buffer.from(JSON.stringify({ summary, childHtml }), "utf8").toString("base64");
   return `\n\n@@TOGGLE:${payload}@@\n\n`;
-});
+}
+
+// A NotionToMarkdown configured with our custom block handling. We follow
+// nested/linked pages ourselves (see pageToMarkdown), so child_page/
+// link_to_page render nothing here; table_of_contents flags the left menu.
+function makeConverter() {
+  const inst = new NotionToMarkdown({ notionClient: notion });
+  inst.setCustomTransformer("child_page", async () => "");
+  inst.setCustomTransformer("link_to_page", async () => "");
+  inst.setCustomTransformer("table_of_contents", async () => {
+    tocSeen = true;
+    return "";
+  });
+  inst.setCustomTransformer("toggle", toggleTransformer);
+  return inst;
+}
+
+const n2m = makeConverter();
 
 // Expand toggle placeholders into collapsed <details> blocks, unwrapping any
 // <p> or <pre><code> that marked may have put around the placeholder, and
