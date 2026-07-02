@@ -1,8 +1,9 @@
-// Notion → website sync (page mode).
+// Notion → website sync.
 //
-// Reads the sub-pages of one parent Notion "Writing" page, converts each to
-// HTML wrapped in the site's template, writes one <slug>.html per sub-page to
-// the repo root, and refreshes the auto-managed block inside writing.html.
+// Reads essays from one Notion source — either a database (Table view, where
+// each row is a page) or a plain page whose sub-pages are the essays — converts
+// each to HTML wrapped in the site's template, writes one <slug>.html per essay
+// to the repo root, and refreshes the auto-managed block inside writing.html.
 //
 // - Page title      → the writing's title (and its URL slug).
 // - Page created date → the date shown on the piece.
@@ -89,6 +90,29 @@ function yearOf(iso) {
 
 const isDraft = (title) => /^\s*(\[draft\]|draft\s*:)/i.test(title);
 
+// --- database-row property helpers (only used when the source is a table) ---
+
+function plainText(richText = []) {
+  return richText.map((t) => t.plain_text).join("");
+}
+
+// The database's title-type property, whatever it's named.
+function readTitle(props) {
+  for (const value of Object.values(props)) {
+    if (value.type === "title") return plainText(value.title);
+  }
+  return "";
+}
+
+// Optional Published checkbox: true / false, or null if there's no such column.
+function readPublished(props) {
+  for (const [key, value] of Object.entries(props)) {
+    if (value.type !== "checkbox") continue;
+    if (/^(published|publish|public|live)$/i.test(key)) return value.checkbox === true;
+  }
+  return null;
+}
+
 // Pull the first real paragraph out of the markdown to use as a summary.
 function excerptFromMarkdown(md, maxLen = 160) {
   for (let line of md.split("\n")) {
@@ -107,13 +131,43 @@ function excerptFromMarkdown(md, maxLen = 160) {
 
 // ---------- Notion fetch ----------
 
-// Direct child pages of the parent, in the order they appear in Notion.
-async function fetchChildPages(parentId) {
+// Each essay as { id, title, createdTime, published }. Works whether the source
+// is a database (Table view — each row is a page) or a plain page whose
+// sub-pages are the essays. `published` is null unless a table has a Published
+// checkbox column.
+async function fetchEntries(id) {
+  // Try treating it as a database (table) first.
+  try {
+    const rows = [];
+    let cursor;
+    do {
+      const res = await notion.databases.query({
+        database_id: id,
+        start_cursor: cursor,
+      });
+      rows.push(...res.results);
+      cursor = res.has_more ? res.next_cursor : undefined;
+    } while (cursor);
+    console.log(`Source is a database — found ${rows.length} row(s).`);
+    return rows.map((r) => ({
+      id: r.id,
+      title: readTitle(r.properties),
+      createdTime: r.created_time || null,
+      published: readPublished(r.properties),
+    }));
+  } catch (err) {
+    // Not a database — fall through to page mode. Any other error is real.
+    if (err.code !== "object_not_found" && err.code !== "validation_error") {
+      throw err;
+    }
+  }
+
+  // Plain page: its direct child pages, in Notion order.
   const pages = [];
   let cursor;
   do {
     const res = await notion.blocks.children.list({
-      block_id: parentId,
+      block_id: id,
       start_cursor: cursor,
       page_size: 100,
     });
@@ -123,11 +177,13 @@ async function fetchChildPages(parentId) {
           id: block.id,
           title: block.child_page?.title || "",
           createdTime: block.created_time || null,
+          published: null,
         });
       }
     }
     cursor = res.has_more ? res.next_cursor : undefined;
   } while (cursor);
+  console.log(`Source is a page — found ${pages.length} sub-page(s).`);
   return pages;
 }
 
@@ -284,18 +340,18 @@ async function safeDelete(slug) {
 // ---------- main ----------
 
 async function main() {
-  const children = await fetchChildPages(PARENT_PAGE_ID);
-  console.log(`Found ${children.length} sub-page(s) under the parent page.`);
+  const items = await fetchEntries(PARENT_PAGE_ID);
 
   const seen = new Set();
   const entries = [];
 
-  for (const child of children) {
-    const title = (child.title || "").trim();
+  for (const item of items) {
+    const title = (item.title || "").trim();
     if (!title) {
-      console.warn("Skipping a sub-page with no title.");
+      console.warn("Skipping an entry with no title.");
       continue;
     }
+    if (item.published === false) continue; // Published checkbox unchecked
     if (isDraft(title)) {
       console.log(`Skipping draft: "${title}"`);
       continue;
@@ -312,10 +368,10 @@ async function main() {
     }
     seen.add(slug);
 
-    const md = await pageToMarkdown(child.id);
+    const md = await pageToMarkdown(item.id);
     const bodyHtml = marked.parse(md);
     const description = excerptFromMarkdown(md);
-    const dateISO = child.createdTime;
+    const dateISO = item.createdTime;
 
     const pageHtml = articlePage({ title, dateISO, description, bodyHtml, slug });
     await fs.writeFile(path.join(REPO_ROOT, `${slug}.html`), pageHtml);

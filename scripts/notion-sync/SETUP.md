@@ -6,15 +6,32 @@ styled to match the rest of the site. Your existing hand-written pages
 
 ## How it works
 
-You keep **one parent Notion page** called "Writing." Each **sub-page** inside
-it is one essay:
+You keep **one Notion source** for your writing. It can be either shape — the
+sync auto-detects which:
 
+**Option 1 — a plain page with sub-pages:**
 ```
 📄 Writing              ← the parent page (you connect the integration to this)
    ├─ 📄 On Friendship      → https://www.carolannejiang.com/on-friendship.html
    ├─ 📄 Notes on Drawing   → https://www.carolannejiang.com/notes-on-drawing.html
    └─ 📄 Draft: half-baked  → skipped (title starts with "Draft:")
 ```
+
+**Option 2 — a database / Table view** (if you like the tidy table look). Each
+row is a page: open a row and write the essay in its body. No columns are
+required — just the title and the body. If you add a `Published` checkbox
+column, unchecked rows are skipped; otherwise every row publishes.
+
+```
+| Title             |   ← each row opens into a full page you write in
+| ----------------- |
+| On Friendship     |   → /on-friendship.html
+| Notes on Drawing  |   → /notes-on-drawing.html
+```
+
+Either way: the **title** becomes the essay title + URL, the **page body** is
+the content, and the **created date** is the date shown. Sub-pages/rows titled
+`Draft: ...` are skipped.
 
 Once an hour, a GitHub Action reads every sub-page, converts it to HTML using
 the site's template, writes one `<slug>.html` per essay, and rebuilds the list
