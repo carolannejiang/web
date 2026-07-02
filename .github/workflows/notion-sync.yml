@@ -36,6 +36,9 @@ jobs:
         working-directory: scripts/notion-sync
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          # The parent "Writing" page ID. Falls back to the old secret name so
+          # you can just change the value of the existing secret if you prefer.
+          NOTION_PARENT_PAGE_ID: ${{ secrets.NOTION_PARENT_PAGE_ID }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
         run: node sync.mjs
 

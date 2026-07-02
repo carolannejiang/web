@@ -1,8 +1,13 @@
-// Notion → website sync.
+// Notion → website sync (page mode).
 //
-// Reads every "Published" row from a Notion database, converts each page's body
-// to HTML wrapped in the site's template, writes one <slug>.html per writing to
+// Reads the sub-pages of one parent Notion "Writing" page, converts each to
+// HTML wrapped in the site's template, writes one <slug>.html per sub-page to
 // the repo root, and refreshes the auto-managed block inside writing.html.
+//
+// - Page title      → the writing's title (and its URL slug).
+// - Page created date → the date shown on the piece.
+// - First paragraph → the one-line summary on the Writing index.
+// - Sub-pages titled "Draft: ..." are skipped.
 //
 // Hand-written pages (on-education.html, manifest.html, etc.) are never touched.
 // Only files this script generated carry the GENERATED_MARKER, and only those
@@ -16,11 +21,14 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const NOTION_TOKEN = process.env.NOTION_TOKEN;
-const DATABASE_ID = process.env.NOTION_DATABASE_ID;
+// Accept the new name, but fall back to the old secret so nothing breaks if you
+// simply change the value of the existing NOTION_DATABASE_ID secret.
+const PARENT_PAGE_ID =
+  process.env.NOTION_PARENT_PAGE_ID || process.env.NOTION_DATABASE_ID;
 
-if (!NOTION_TOKEN || !DATABASE_ID) {
+if (!NOTION_TOKEN || !PARENT_PAGE_ID) {
   console.error(
-    "Missing env vars. Set NOTION_TOKEN and NOTION_DATABASE_ID (repo secrets)."
+    "Missing env vars. Set NOTION_TOKEN and NOTION_PARENT_PAGE_ID (repo secrets)."
   );
   process.exit(1);
 }
@@ -61,53 +69,10 @@ function slugify(text = "") {
     .replace(/^-+|-+$/g, "");
 }
 
-function plainText(richText = []) {
-  return richText.map((t) => t.plain_text).join("");
-}
-
-// Find the database's title-type property regardless of what it's named.
-function readTitle(props) {
-  for (const value of Object.values(props)) {
-    if (value.type === "title") return plainText(value.title);
-  }
-  return "";
-}
-
-// Find a property by name, case-insensitively, tolerating a few common
-// variants. Notion property names are case-sensitive in the API, so this saves
-// the user from having to match capitalization exactly.
-function findProp(props, names, type) {
-  const wanted = names.map((n) => n.toLowerCase());
-  for (const [key, value] of Object.entries(props)) {
-    if (type && value.type !== type) continue;
-    if (wanted.includes(key.toLowerCase())) return value;
-  }
-  return null;
-}
-
-function readRichText(props, names) {
-  const p = findProp(props, names, "rich_text");
-  return p ? plainText(p.rich_text) : "";
-}
-
-function readDate(props, names) {
-  const p = findProp(props, names, "date");
-  return p && p.date ? p.date.start : null; // ISO string, e.g. "2026-07-02"
-}
-
-// Returns true (publish), false (explicitly unchecked), or null (no gate column
-// found — caller decides what that means).
-function readPublished(props) {
-  const p = findProp(props, ["Published", "Publish", "Public", "Live"], "checkbox");
-  if (!p) return null;
-  return p.checkbox === true;
-}
-
 function formatFullDate(iso) {
   if (!iso) return "";
-  // Anchor to UTC so a date-only value doesn't shift across timezones.
-  const d = new Date(`${iso.slice(0, 10)}T00:00:00Z`);
-  if (Number.isNaN(d.getTime())) return iso;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
   return d.toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -117,29 +82,58 @@ function formatFullDate(iso) {
 }
 
 function yearOf(iso) {
-  return iso ? iso.slice(0, 4) : "";
+  if (!iso) return "";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? "" : String(d.getUTCFullYear());
+}
+
+const isDraft = (title) => /^\s*(\[draft\]|draft\s*:)/i.test(title);
+
+// Pull the first real paragraph out of the markdown to use as a summary.
+function excerptFromMarkdown(md, maxLen = 160) {
+  for (let line of md.split("\n")) {
+    line = line.trim();
+    if (!line) continue;
+    if (/^(#{1,6}\s|!\[|[-*>|`])/.test(line)) continue; // skip headings/images/lists/quotes/tables/code
+    const text = line
+      .replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1") // links/images -> their text
+      .replace(/[*_`~]/g, "")
+      .trim();
+    if (!text) continue;
+    return text.length > maxLen ? `${text.slice(0, maxLen - 1).trimEnd()}…` : text;
+  }
+  return "";
 }
 
 // ---------- Notion fetch ----------
 
-async function fetchAllRows() {
-  const rows = [];
+// Direct child pages of the parent, in the order they appear in Notion.
+async function fetchChildPages(parentId) {
+  const pages = [];
   let cursor;
   do {
-    const res = await notion.databases.query({
-      database_id: DATABASE_ID,
+    const res = await notion.blocks.children.list({
+      block_id: parentId,
       start_cursor: cursor,
+      page_size: 100,
     });
-    rows.push(...res.results);
+    for (const block of res.results) {
+      if (block.type === "child_page") {
+        pages.push({
+          id: block.id,
+          title: block.child_page?.title || "",
+          createdTime: block.created_time || null,
+        });
+      }
+    }
     cursor = res.has_more ? res.next_cursor : undefined;
   } while (cursor);
-  return rows;
+  return pages;
 }
 
-async function pageToHtml(pageId) {
+async function pageToMarkdown(pageId) {
   const blocks = await n2m.pageToMarkdown(pageId);
-  const md = n2m.toMarkdownString(blocks).parent || "";
-  return marked.parse(md);
+  return n2m.toMarkdownString(blocks).parent || "";
 }
 
 // ---------- templates ----------
@@ -218,10 +212,10 @@ ${bodyHtml}
 }
 
 function indexEntry({ title, slug, year, description }) {
+  const meta = year ? `\n        <div class="entry-meta">${escapeHtml(year)}</div>` : "";
   const desc = description
     ? `\n        <div class="entry-desc">${escapeHtml(description)}</div>`
     : "";
-  const meta = year ? `\n        <div class="entry-meta">${escapeHtml(year)}</div>` : "";
   return `      <div class="entry">
         <a class="entry-title" href="${slug}.html">${escapeHtml(title)}</a>${meta}${desc}
       </div>`;
@@ -241,8 +235,6 @@ async function updateIndex(entries) {
     );
     html = html.replace(re, block);
   } else {
-    // First run: insert the managed block right after the "Writing" heading so
-    // Notion posts appear above any hand-written entries below it.
     const anchor = '<div class="writing-title">Writing</div>';
     if (!html.includes(anchor)) {
       throw new Error(
@@ -259,8 +251,7 @@ async function updateIndex(entries) {
 
 async function readState() {
   try {
-    const raw = await fs.readFile(STATE_FILE, "utf8");
-    const data = JSON.parse(raw);
+    const data = JSON.parse(await fs.readFile(STATE_FILE, "utf8"));
     return Array.isArray(data.slugs) ? data.slugs : [];
   } catch {
     return [];
@@ -281,11 +272,9 @@ async function safeDelete(slug) {
     const contents = await fs.readFile(file, "utf8");
     if (contents.includes(GENERATED_MARKER)) {
       await fs.unlink(file);
-      console.log(`Removed (unpublished/deleted in Notion): ${slug}.html`);
+      console.log(`Removed (no longer published in Notion): ${slug}.html`);
     } else {
-      console.warn(
-        `Skipped deleting ${slug}.html — not a notion-sync generated file.`
-      );
+      console.warn(`Skipped deleting ${slug}.html — not a notion-sync file.`);
     }
   } catch {
     /* already gone */
@@ -295,59 +284,50 @@ async function safeDelete(slug) {
 // ---------- main ----------
 
 async function main() {
-  const rows = await fetchAllRows();
-  console.log(`Fetched ${rows.length} row(s) from Notion.`);
+  const children = await fetchChildPages(PARENT_PAGE_ID);
+  console.log(`Found ${children.length} sub-page(s) under the parent page.`);
 
   const seen = new Set();
   const entries = [];
-  let gateMissingWarned = false;
 
-  for (const row of rows) {
-    const props = row.properties;
-
-    // Publish gate: skip rows explicitly unchecked. If there's no Published
-    // column at all, publish everything but warn loudly (once).
-    const published = readPublished(props);
-    if (published === false) continue;
-    if (published === null && !gateMissingWarned) {
-      console.warn(
-        "No 'Published' checkbox column found — publishing ALL rows. " +
-          "Add a checkbox column named 'Published' to control what goes live."
-      );
-      gateMissingWarned = true;
+  for (const child of children) {
+    const title = (child.title || "").trim();
+    if (!title) {
+      console.warn("Skipping a sub-page with no title.");
+      continue;
+    }
+    if (isDraft(title)) {
+      console.log(`Skipping draft: "${title}"`);
+      continue;
     }
 
-    const title = readTitle(props) || "Untitled";
-    let slug = readRichText(props, ["Slug", "URL", "Path"]).trim() || slugify(title);
-    slug = slugify(slug);
-
+    const slug = slugify(title);
     if (!slug) {
-      console.warn(`Skipping a row with no usable title/slug: "${title}"`);
+      console.warn(`Skipping "${title}" — title produced an empty slug.`);
       continue;
     }
     if (seen.has(slug)) {
-      console.warn(`Duplicate slug "${slug}" — skipping the later one.`);
+      console.warn(`Duplicate slug "${slug}" from "${title}" — skipping later one.`);
       continue;
     }
     seen.add(slug);
 
-    const description = readRichText(props, ["Description", "Summary", "Subtitle"]);
-    const dateISO = readDate(props, ["Date", "Published", "Published on", "Date published"]);
+    const md = await pageToMarkdown(child.id);
+    const bodyHtml = marked.parse(md);
+    const description = excerptFromMarkdown(md);
+    const dateISO = child.createdTime;
 
-    const bodyHtml = await pageToHtml(row.id);
     const pageHtml = articlePage({ title, dateISO, description, bodyHtml, slug });
     await fs.writeFile(path.join(REPO_ROOT, `${slug}.html`), pageHtml);
-    console.log(`Wrote ${slug}.html`);
+    console.log(`Wrote ${slug}.html  ("${title}")`);
 
-    entries.push({ title, slug, description, dateISO, year: yearOf(dateISO) });
+    entries.push({ title, slug, description, year: yearOf(dateISO) });
   }
 
-  // Newest first; undated entries sink to the bottom.
-  entries.sort((a, b) => (b.dateISO || "").localeCompare(a.dateISO || ""));
-
+  // Keep the order you arranged the sub-pages in Notion.
   await updateIndex(entries);
 
-  // Remove pages that were previously generated but are no longer published.
+  // Remove pages that were generated before but are no longer published.
   const previous = await readState();
   const current = new Set(entries.map((e) => e.slug));
   for (const oldSlug of previous) {
