@@ -135,6 +135,60 @@ function excerptFromMarkdown(md, maxLen = 160) {
   return "";
 }
 
+// ---------- images ----------
+
+// Notion serves uploaded images via temporary signed URLs that expire in ~1h.
+// These hosts are the ones we must download and self-host so they don't break.
+const isNotionAsset = (url) =>
+  /amazonaws\.com|notion\.so|notion-static|notionusercontent|secure\.notion/i.test(url);
+
+function extFromUrl(url) {
+  try {
+    const ext = path.extname(new URL(url).pathname).toLowerCase();
+    if (/^\.(png|jpe?g|gif|webp|svg|avif)$/.test(ext)) return ext;
+  } catch {
+    /* fall through */
+  }
+  return ".png";
+}
+
+// Download every Notion-hosted image referenced in the HTML into
+// images/notion/<slug>/ and rewrite the <img src> to that local path, so the
+// essay's images are permanent instead of expiring. Re-downloading identical
+// images produces identical bytes, so repeat runs create no git churn.
+async function localizeImages(html, slug) {
+  const urls = [];
+  const re = /<img\b[^>]*?\ssrc="([^"]+)"/gi;
+  let m;
+  while ((m = re.exec(html)) !== null) urls.push(m[1]);
+  if (!urls.length) return html;
+
+  const dir = path.join(REPO_ROOT, "images", "notion", slug);
+  await fs.mkdir(dir, { recursive: true });
+
+  let out = html;
+  let i = 0;
+  for (const url of urls) {
+    if (!/^https?:/i.test(url) || !isNotionAsset(url)) continue; // skip local/external
+    i += 1;
+    const rel = `images/notion/${slug}/img-${i}${extFromUrl(url)}`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) {
+        console.warn(`  image ${i} download failed (HTTP ${res.status}) — left as-is`);
+        continue;
+      }
+      const buf = Buffer.from(await res.arrayBuffer());
+      await fs.writeFile(path.join(REPO_ROOT, rel), buf);
+      out = out.split(url).join(rel);
+      console.log(`  image ${i}: ${rel} (${buf.length} bytes)`);
+    } catch (err) {
+      console.warn(`  image ${i} error (${err.message}) — left as-is`);
+    }
+  }
+  return out;
+}
+
 // ---------- Notion fetch ----------
 
 // Each essay as { id, title, createdTime, published }. Works whether the source
@@ -382,6 +436,10 @@ async function safeDelete(slug) {
     const contents = await fs.readFile(file, "utf8");
     if (contents.includes(GENERATED_MARKER)) {
       await fs.unlink(file);
+      await fs.rm(path.join(REPO_ROOT, "images", "notion", slug), {
+        recursive: true,
+        force: true,
+      });
       console.log(`Removed (no longer published in Notion): ${slug}.html`);
     } else {
       console.warn(`Skipped deleting ${slug}.html — not a notion-sync file.`);
@@ -432,7 +490,8 @@ async function main() {
     seen.add(slug);
 
     const md = await pageToMarkdown(item.id);
-    const bodyHtml = marked.parse(md);
+    let bodyHtml = marked.parse(md);
+    bodyHtml = await localizeImages(bodyHtml, slug);
     const description = excerptFromMarkdown(md);
     const dateISO = item.createdTime;
 
