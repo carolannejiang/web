@@ -46,6 +46,11 @@ const BLOCK_END = "<!-- NOTION:END -->";
 const notion = new Client({ auth: NOTION_TOKEN });
 const n2m = new NotionToMarkdown({ notionClient: notion });
 
+// We follow nested pages ourselves (see pageToMarkdown) and inline their
+// content, so suppress the default link-to-child-page rendering to avoid
+// duplicate title links in the output.
+n2m.setCustomTransformer("child_page", async () => "");
+
 // ---------- helpers ----------
 
 function escapeHtml(str = "") {
@@ -187,9 +192,37 @@ async function fetchEntries(id) {
   return pages;
 }
 
-async function pageToMarkdown(pageId) {
-  const blocks = await n2m.pageToMarkdown(pageId);
-  return n2m.toMarkdownString(blocks).parent || "";
+async function listChildPages(pageId) {
+  const out = [];
+  let cursor;
+  do {
+    const res = await notion.blocks.children.list({
+      block_id: pageId,
+      start_cursor: cursor,
+      page_size: 100,
+    });
+    for (const b of res.results) {
+      if (b.type === "child_page") out.push({ id: b.id });
+    }
+    cursor = res.has_more ? res.next_cursor : undefined;
+  } while (cursor);
+  return out;
+}
+
+// Markdown for a page, inlining the content of any pages nested inside it (up
+// to two levels deep). This means an essay you wrote in a nested sub-page —
+// rather than directly in the row/page body — still gets pulled in fully
+// instead of showing up as just a link.
+async function pageToMarkdown(pageId, depth = 0) {
+  const own = (n2m.toMarkdownString(await n2m.pageToMarkdown(pageId)).parent || "").trim();
+  const parts = own ? [own] : [];
+  if (depth < 2) {
+    for (const child of await listChildPages(pageId)) {
+      const sub = await pageToMarkdown(child.id, depth + 1);
+      if (sub.trim()) parts.push(sub);
+    }
+  }
+  return parts.join("\n\n");
 }
 
 // ---------- templates ----------
