@@ -778,6 +778,8 @@ async function main() {
 
     tocSeen = false;
     const md = await pageToMarkdown(item.id);
+    const _gi = md.indexOf("largely gone");
+    if (_gi >= 0) console.log("MD-CONTEXT:\n" + JSON.stringify(md.slice(_gi - 140, _gi + 320)));
     let bodyHtml = marked.parse(md);
     bodyHtml = replaceToggles(bodyHtml); // collapsed <details>, content inside
     bodyHtml = replaceRawHtml(bodyHtml); // video embeds
