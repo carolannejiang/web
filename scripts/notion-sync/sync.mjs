@@ -17,6 +17,8 @@
 import { Client } from "@notionhq/client";
 import { NotionToMarkdown } from "notion-to-md";
 import { marked } from "marked";
+import sharp from "sharp";
+import heicConvert from "heic-convert";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -161,10 +163,43 @@ function extFromUrl(url) {
   return ".png";
 }
 
+// Max rendered width the article column ever uses is ~680px; 1600px covers
+// high-DPI (retina) displays with margin while shrinking huge originals.
+const IMAGE_MAX_WIDTH = 1600;
+const WEBP_QUALITY = 82;
+
+async function toWebp(input) {
+  return sharp(input)
+    .rotate() // respect EXIF orientation before metadata is dropped
+    .resize({ width: IMAGE_MAX_WIDTH, withoutEnlargement: true })
+    .webp({ quality: WEBP_QUALITY })
+    .toBuffer();
+}
+
+// Downscale + re-encode to WebP. Identical at display size, a fraction of the
+// bytes. SVG/GIF pass through untouched (vector / animation). iPhone HEIC files
+// (which sharp can't decode) are first converted to JPEG via heic-convert.
+async function optimizeImage(buf, srcExt) {
+  if (srcExt === ".svg" || srcExt === ".gif") return { out: buf, ext: srcExt };
+  let webp = null;
+  try {
+    webp = await toWebp(buf);
+  } catch {
+    try {
+      const jpeg = await heicConvert({ buffer: buf, format: "JPEG", quality: 0.92 });
+      webp = await toWebp(Buffer.from(jpeg));
+    } catch {
+      webp = null; // not a raster image we can handle — keep original
+    }
+  }
+  return webp && webp.length < buf.length ? { out: webp, ext: ".webp" } : { out: buf, ext: srcExt };
+}
+
 // Download every Notion-hosted image referenced in the HTML into
-// images/notion/<slug>/ and rewrite the <img src> to that local path, so the
-// essay's images are permanent instead of expiring. Re-downloading identical
-// images produces identical bytes, so repeat runs create no git churn.
+// images/notion/<slug>/, optimize it, and rewrite the <img src> to that local
+// path — so the essay's images are permanent (Notion links expire in ~1h) and
+// lightweight. The folder is rebuilt each run; identical inputs yield identical
+// bytes, so repeat runs create no git churn.
 async function localizeImages(html, slug) {
   const urls = [];
   const re = /<img\b[^>]*?\ssrc="([^"]+)"/gi;
@@ -173,14 +208,16 @@ async function localizeImages(html, slug) {
   if (!urls.length) return html;
 
   const dir = path.join(REPO_ROOT, "images", "notion", slug);
+  await fs.rm(dir, { recursive: true, force: true }); // drop stale/renamed files
   await fs.mkdir(dir, { recursive: true });
 
   let out = html;
   let i = 0;
+  let rawTotal = 0;
+  let optTotal = 0;
   for (const url of urls) {
     if (!/^https?:/i.test(url) || !isNotionAsset(url)) continue; // skip local/external
     i += 1;
-    const rel = `images/notion/${slug}/img-${i}${extFromUrl(url)}`;
     try {
       const res = await fetch(url);
       if (!res.ok) {
@@ -188,12 +225,23 @@ async function localizeImages(html, slug) {
         continue;
       }
       const buf = Buffer.from(await res.arrayBuffer());
-      await fs.writeFile(path.join(REPO_ROOT, rel), buf);
+      const { out: optimized, ext } = await optimizeImage(buf, extFromUrl(url));
+      const rel = `images/notion/${slug}/img-${i}${ext}`;
+      await fs.writeFile(path.join(REPO_ROOT, rel), optimized);
       out = out.split(url).join(rel);
-      console.log(`  image ${i}: ${rel} (${buf.length} bytes)`);
+      rawTotal += buf.length;
+      optTotal += optimized.length;
+      console.log(
+        `  image ${i}: ${rel} (${(buf.length / 1048576).toFixed(1)}MB → ${(optimized.length / 1048576).toFixed(2)}MB)`
+      );
     } catch (err) {
       console.warn(`  image ${i} error (${err.message}) — left as-is`);
     }
+  }
+  if (i) {
+    console.log(
+      `  images: ${(rawTotal / 1048576).toFixed(1)}MB → ${(optTotal / 1048576).toFixed(1)}MB total`
+    );
   }
   return out;
 }
