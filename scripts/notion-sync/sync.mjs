@@ -563,7 +563,7 @@ async function siteStyle() {
 function wrapFigures(html) {
   return html.replace(/<p>\s*<img\b([^>]*)>\s*<\/p>/gi, (_m, attrs) => {
     const src = attrs.match(/\bsrc="([^"]*)"/i)?.[1] || "";
-    const alt = (attrs.match(/\balt="([^"]*)"/i)?.[1] || "").trim();
+    const alt = decodeEntities((attrs.match(/\balt="([^"]*)"/i)?.[1] || "")).trim();
     const caption =
       alt && !/\.(png|jpe?g|gif|webp|svg|avif)$/i.test(alt)
         ? `<figcaption>${escapeHtml(alt)}</figcaption>`
