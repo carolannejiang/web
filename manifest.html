@@ -108,6 +108,7 @@
     .table_of_contents-indent-2 { margin-left: 1.7rem; }
     .table_of_contents-link { color: #6a6a6a; text-decoration: none; border-bottom: none; }
     .table_of_contents-link:hover { color: #1a1a1a; }
+    .table_of_contents-link.active { color: #1a1a1a; font-weight: 700; }
 
     .column-list { display: flex; gap: 22px; }
     .column { min-width: 0; flex: 1; }
@@ -257,7 +258,7 @@
 <li>meeting notes are so useful (thank you, Austin, for causing me to now have this habit)</li>
 <li>I wish I started my “everything I learned on this job” doc sooner and took more notes during the job.</li>
 </ul>
-<figure class="video-embed"><div class="frame"><iframe src="https://www.youtube.com/embed/dZFlobeagHA" title="video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><a href="https://www.youtube.com/watch?v=dZFlobeagHA" target="_blank" rel="noreferrer">video</a></figure>
+<figure class="video-embed"><div class="frame"><iframe src="https://www.youtube.com/embed/dZFlobeagHA" title="- YouTube" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><a href="https://www.youtube.com/watch?v=dZFlobeagHA" target="_blank" rel="noreferrer">- YouTube</a></figure>
 <ul class="bulleted-list">
 <li>wow Manifold’s notion page and documentation habit is so useful<ul class="bulleted-list">
 <li>some significant parts of the emails I’ve sent out to the attendees were largely copied from the emails sent out in the past</li>
@@ -463,7 +464,7 @@ war is war, l’art pour l’art, in politics there’s no room for compunction,
 </ul>
 <p>TODO: explain this clearer</p>
 <figure class="image"><a href="images/notion/manifest/img-29.webp"><img src="images/notion/manifest/img-29.webp"/></a></figure>
-<figure class="video-embed"><div class="frame"><iframe src="https://www.youtube.com/embed/1L2ef1CP-yw" title="video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><a href="https://www.youtube.com/watch?v=1L2ef1CP-yw" target="_blank" rel="noreferrer">video</a></figure>
+<figure class="video-embed"><div class="frame"><iframe src="https://www.youtube.com/embed/1L2ef1CP-yw" title="- YouTube" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><a href="https://www.youtube.com/watch?v=1L2ef1CP-yw" target="_blank" rel="noreferrer">- YouTube</a></figure>
 
 </details>
 <p>TODO: add thoughts about food, toilets, prioritization problems </p>
@@ -540,5 +541,26 @@ war is war, l’art pour l’art, in politics there’s no room for compunction,
   </main>
   </div>
 
+<script>
+(function () {
+  var links = [].slice.call(document.querySelectorAll('.table_of_contents-link'));
+  if (!links.length) return;
+  var items = links.map(function (a) {
+    return { link: a, heading: document.getElementById(a.getAttribute('href').slice(1)) };
+  }).filter(function (x) { return x.heading; });
+  function update() {
+    var current = null;
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].heading.getBoundingClientRect().top <= 120) current = items[i];
+      else break;
+    }
+    links.forEach(function (a) { a.classList.remove('active'); });
+    if (current) current.link.classList.add('active');
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update, { passive: true });
+  update();
+})();
+</script>
 </body>
 </html>
