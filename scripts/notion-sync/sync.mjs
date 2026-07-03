@@ -578,7 +578,9 @@ function addTocAndIds(html) {
   const toc = [];
   const used = new Set();
   const out = html.replace(/<h([234])>([\s\S]*?)<\/h\1>/gi, (m, lvl, inner) => {
-    const text = inner.replace(/<[^>]+>/g, "").trim();
+    // Decode entities from the heading HTML so the TOC text isn't double-encoded
+    // (e.g. "&amp;" → "&") and the slug is clean.
+    const text = decodeEntities(inner.replace(/<[^>]+>/g, "")).trim();
     if (!text) return m;
     const level = Number(lvl);
     let id = slugify(text) || "section";
