@@ -110,6 +110,33 @@ async function heading4Transformer(block) {
   return `\n\n#### ${text}${childMd}\n\n`;
 }
 
+// Render Notion column layouts side-by-side (like Notion / manifest.html)
+// instead of stacking. Each column's content is rendered with a fresh
+// converter and wrapped in .column-list / .column (styled in article.css).
+async function columnListTransformer(block) {
+  let columns = [];
+  try {
+    const res = await notion.blocks.children.list({ block_id: block.id, page_size: 100 });
+    columns = res.results.filter((b) => b.type === "column");
+  } catch {
+    return "";
+  }
+  const colHtml = [];
+  for (const col of columns) {
+    try {
+      const inner = makeConverter();
+      const md = inner.toMarkdownString(untoggle(await inner.pageToMarkdown(col.id))).parent || "";
+      colHtml.push(`<div class="column">\n${marked.parse(md)}\n</div>`);
+    } catch {
+      colHtml.push('<div class="column"></div>');
+    }
+  }
+  if (!colHtml.length) return "";
+  const html = `<div class="column-list">\n${colHtml.join("\n")}\n</div>`;
+  const payload = Buffer.from(JSON.stringify({ html }), "utf8").toString("base64");
+  return `\n\n@@HTML:${payload}@@\n\n`;
+}
+
 // A NotionToMarkdown configured with our custom block handling. We follow
 // nested/linked pages ourselves (see pageToMarkdown), so child_page/
 // link_to_page render nothing here; table_of_contents flags the left menu.
@@ -124,6 +151,7 @@ function makeConverter() {
   inst.setCustomTransformer("toggle", toggleTransformer);
   inst.setCustomTransformer("video", videoTransformer);
   inst.setCustomTransformer("embed", videoTransformer);
+  inst.setCustomTransformer("column_list", columnListTransformer);
   inst.setCustomTransformer("heading_4", heading4Transformer);
   // Emit dividers as explicit <hr>. As markdown "---" right after a text line,
   // marked would misread the text as a Setext <h2> heading.
@@ -164,8 +192,8 @@ function replaceRawHtml(html) {
         return "";
       }
     })
-    .replace(/<p>\s*(<figure)/g, "$1")
-    .replace(/(<\/figure>)\s*<\/p>/g, "$1");
+    .replace(/<p>\s*(<figure|<div class="column-list">)/g, "$1")
+    .replace(/(<\/figure>|<\/div>)\s*<\/p>/g, "$1");
 }
 
 // ---------- helpers ----------
