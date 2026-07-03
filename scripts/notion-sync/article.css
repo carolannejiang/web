@@ -88,6 +88,7 @@
     .table_of_contents-indent-2 { margin-left: 1.7rem; }
     .table_of_contents-link { color: #6a6a6a; text-decoration: none; border-bottom: none; }
     .table_of_contents-link:hover { color: #1a1a1a; }
+    .table_of_contents-link.active { color: #1a1a1a; font-weight: 700; }
 
     .column-list { display: flex; gap: 22px; }
     .column { min-width: 0; flex: 1; }
