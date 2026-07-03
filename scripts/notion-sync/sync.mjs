@@ -226,6 +226,17 @@ function readTitle(props) {
   return "";
 }
 
+// Read a rich-text/url property by name (case-insensitive), e.g. Slug.
+function readRichText(props, names) {
+  const wanted = names.map((n) => n.toLowerCase());
+  for (const [key, value] of Object.entries(props)) {
+    if (!wanted.includes(key.toLowerCase())) continue;
+    if (value.type === "rich_text") return plainText(value.rich_text);
+    if (value.type === "url") return value.url || "";
+  }
+  return "";
+}
+
 // Optional Published checkbox: true / false, or null if there's no such column.
 function readPublished(props) {
   for (const [key, value] of Object.entries(props)) {
