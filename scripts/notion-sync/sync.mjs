@@ -605,7 +605,7 @@ function wrapFigures(html) {
     const src = attrs.match(/\bsrc="([^"]*)"/i)?.[1] || "";
     const alt = decodeEntities((attrs.match(/\balt="([^"]*)"/i)?.[1] || "")).trim();
     const caption =
-      alt && !/\.(png|jpe?g|gif|webp|svg|avif)$/i.test(alt)
+      alt && !/\.(png|jpe?g|gif|webp|svg|avif|heic|heif|tiff?)$/i.test(alt)
         ? `<figcaption>${escapeHtml(alt)}</figcaption>`
         : "";
     return `<figure class="image"><a href="${src}"><img src="${src}"/></a>${caption}</figure>`;
