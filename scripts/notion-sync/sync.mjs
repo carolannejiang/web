@@ -698,6 +698,27 @@ ${bodyHtml}
   </main>
   </div>
 
+<script>
+(function () {
+  var links = [].slice.call(document.querySelectorAll('.table_of_contents-link'));
+  if (!links.length) return;
+  var items = links.map(function (a) {
+    return { link: a, heading: document.getElementById(a.getAttribute('href').slice(1)) };
+  }).filter(function (x) { return x.heading; });
+  function update() {
+    var current = null;
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].heading.getBoundingClientRect().top <= 120) current = items[i];
+      else break;
+    }
+    links.forEach(function (a) { a.classList.remove('active'); });
+    if (current) current.link.classList.add('active');
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update, { passive: true });
+  update();
+})();
+</script>
 </body>
 </html>
 `;
