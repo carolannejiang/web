@@ -549,13 +549,12 @@ async function pageToMarkdown(pageId, depth = 0, seen = new Set()) {
 
 // ---------- templates ----------
 
-// Reuse the exact <style> from manifest.html so generated essays always match
-// that page's look. If she restyles manifest.html, generated pages follow.
+// The article CSS lives in article.css (edit it to restyle generated pages).
+// It's a dedicated file — not read back from a generated page — so edits are
+// stable and never duplicated.
 async function siteStyle() {
   try {
-    const html = await fs.readFile(path.join(REPO_ROOT, "manifest.html"), "utf8");
-    const m = html.match(/<style>([\s\S]*?)<\/style>/i);
-    if (m) return m[1];
+    return await fs.readFile(path.join(__dirname, "article.css"), "utf8");
   } catch {
     /* fall through to minimal fallback */
   }
