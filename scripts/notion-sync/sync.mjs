@@ -41,6 +41,13 @@ const REPO_ROOT = path.resolve(__dirname, "..", "..");
 const INDEX_FILE = path.join(REPO_ROOT, "writing.html");
 const STATE_FILE = path.join(__dirname, ".generated.json");
 
+// Cusdis comments (https://cusdis.com). Paste the "App ID" from your Cusdis
+// dashboard between the quotes to show a comment box at the bottom of every
+// essay. Leave it empty and no comment box is rendered (the site is unchanged).
+// Self-hosting Cusdis instead of the hosted app? Point CUSDIS_HOST at it.
+const CUSDIS_APP_ID = "16dbe1dd-67b3-49bb-b2fa-a0e81cd9080f";
+const CUSDIS_HOST = "https://cusdis.com";
+
 const GENERATED_MARKER = "<!-- generated-by: notion-sync — edits will be overwritten -->";
 const BLOCK_START = "<!-- NOTION:START (auto-generated — do not edit between these markers) -->";
 const BLOCK_END = "<!-- NOTION:END -->";
@@ -644,6 +651,24 @@ function tocItemsHtml(toc) {
     .join("\n");
 }
 
+// The Cusdis comment thread for one essay, or "" when no App ID is configured.
+// data-page-id is the slug — stable and unique — so an essay keeps its comments
+// even if its title or URL later changes.
+function commentsSection({ slug, title, url }) {
+  if (!CUSDIS_APP_ID) return "";
+  return `  <section class="comments" aria-label="Comments">
+    <h2 class="comments-title">Comments</h2>
+    <div id="cusdis_thread"
+      data-host="${CUSDIS_HOST}"
+      data-app-id="${escapeHtml(CUSDIS_APP_ID)}"
+      data-page-id="${escapeHtml(slug)}"
+      data-page-url="${escapeHtml(url)}"
+      data-page-title="${escapeHtml(title)}"></div>
+    <script async defer src="${CUSDIS_HOST}/js/cusdis.es.js"></script>
+  </section>
+`;
+}
+
 function articlePage({ title, description, bodyHtml, tocHtml, slug, style }) {
   const url = `https://www.carolannejiang.com/${slug}.html`;
   const safeTitle = escapeHtml(title);
@@ -694,7 +719,7 @@ ${side}
 <div class="page-body">
 ${bodyHtml}
 </div>
-  <div class="footer-nav"><a href="index.html">← back to home</a></div>
+${commentsSection({ slug, title, url })}  <div class="footer-nav"><a href="index.html">← back to home</a></div>
   </main>
   </div>
 

@@ -101,6 +101,9 @@
 
     hr { border: none; border-bottom: 1px solid #ece8e1; margin: 2em 0; }
 
+    .comments { margin-top: 72px; padding-top: 20px; border-top: 1px solid #ece8e1; }
+    .comments-title { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: #a9a29a; font-weight: 700; margin-bottom: 22px; }
+
     .footer-nav { margin-top: 72px; padding-top: 20px; border-top: 1px solid #ece8e1; font-size: 0.85rem; }
     .footer-nav a { color: #8a8a8a; text-decoration: none; }
     .footer-nav a:hover { color: #1a1a1a; }
