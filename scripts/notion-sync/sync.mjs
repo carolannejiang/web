@@ -436,6 +436,7 @@ async function fetchEntries(id) {
       title: readTitle(r.properties),
       createdTime: r.created_time || null,
       published: readPublished(r.properties),
+      slug: readRichText(r.properties, ["Slug", "URL", "Path"]),
     }));
   } catch (err) {
     // Not a database — fall through to page mode. Any other error is real.
@@ -460,6 +461,7 @@ async function fetchEntries(id) {
           title: block.child_page?.title || "",
           createdTime: block.created_time || null,
           published: null,
+          slug: "",
         });
       }
     }
@@ -767,7 +769,8 @@ async function main() {
       continue;
     }
 
-    const slug = slugify(title);
+    // Use the Notion Slug property if set, otherwise derive from the title.
+    const slug = slugify(item.slug?.trim() || title);
     if (!slug) {
       console.warn(`Skipping "${title}" — title produced an empty slug.`);
       continue;
