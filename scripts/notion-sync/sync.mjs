@@ -10,9 +10,10 @@
 // - First paragraph → the one-line summary on the Writing index.
 // - Sub-pages titled "Draft: ..." are skipped.
 //
-// Hand-written pages (on-education.html, manifest.html, etc.) are never touched.
-// Only files this script generated carry the GENERATED_MARKER, and only those
-// can be overwritten or deleted by it.
+// Hand-written pages (index.html, art.html, etc.) are never touched. Only
+// files this script generated carry the GENERATED_MARKER, and only those can
+// be overwritten or deleted by it — an essay whose slug collides with a
+// hand-written page is skipped with a warning instead of clobbering it.
 
 import { Client } from "@notionhq/client";
 import { NotionToMarkdown } from "notion-to-md";
@@ -998,6 +999,21 @@ async function main() {
       console.warn(`Duplicate slug "${slug}" from "${title}" — skipping later one.`);
       continue;
     }
+
+    // Refuse to overwrite anything this script didn't generate: a hand-written
+    // page lacks the marker, so an essay titled e.g. "Art" must not replace it.
+    const outFile = path.join(REPO_ROOT, `${slug}.html`);
+    try {
+      const existing = await fs.readFile(outFile, "utf8");
+      if (!existing.includes(GENERATED_MARKER)) {
+        console.warn(
+          `Skipping "${title}" — ${slug}.html already exists and is not a notion-sync file.`
+        );
+        continue;
+      }
+    } catch {
+      /* no existing file — safe to write */
+    }
     seen.add(slug);
 
     tocSeen = false;
@@ -1028,7 +1044,7 @@ async function main() {
       slug,
       style,
     });
-    await fs.writeFile(path.join(REPO_ROOT, `${slug}.html`), pageHtml);
+    await fs.writeFile(outFile, pageHtml);
     console.log(`Wrote ${slug}.html  ("${title}")`);
 
     entries.push({ title, slug, description, year: yearOf(dateISO) });
