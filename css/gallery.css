@@ -1,0 +1,27 @@
+/* Shared shell for the gallery pages (paintings, 3d, pleinair, comic).
+   Layout for each gallery lives in the page's own <style> block, which is
+   loaded after this file so it can override these defaults. */
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  background: #f3f0eb;
+  color: #111;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: #888; text-decoration: none; }
+
+.back-link {
+  display: inline-block;
+  padding: 24px 32px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: lowercase;
+  letter-spacing: 0.05em;
+  color: #555;
+  transition: color 0.2s;
+}
+
+.back-link:hover { color: #000; }

@@ -12,34 +12,11 @@
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap">
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></noscript>
+  <link rel="stylesheet" href="css/site.css">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      background-color: #ffffff;
-      font-family: 'Libre Baskerville', Georgia, serif;
-      color: #1a1a1a;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .page {
-      max-width: 700px;
-      margin: 0 auto;
-      width: 100%;
-      padding: 0 60px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-    }
-
-    .side-menu {
+    /* This page's menu is a fixed left rail, unlike the shared top bar,
+       so it uses its own class instead of .side-menu. */
+    .side-rail {
       position: fixed;
       left: 28px;
       top: 0;
@@ -54,7 +31,7 @@
       border-right: 1px solid #c9c4bc;
     }
 
-    .side-menu a {
+    .side-rail a {
       font-size: 0.76rem;
       line-height: 1.4;
       color: #595959;
@@ -62,7 +39,7 @@
       letter-spacing: 0.02em;
     }
 
-    .side-menu a:hover {
+    .side-rail a:hover {
       color: #1a1a1a;
     }
 
@@ -87,13 +64,12 @@
     }
 
     @media (max-width: 600px) {
-      .side-menu {
+      .side-rail {
         left: auto;
         right: 20px;
         top: auto;
         bottom: 20px;
       }
-      .page { padding: 0 36px; }
       .timeline { margin-top: 72px; }
     }
 
@@ -101,7 +77,7 @@
 </head>
 <body>
 
-  <div class="side-menu" aria-label="Site links">
+  <div class="side-rail" aria-label="Site links">
     <a href="index.html">home</a>
     <a href="mailto:carolannejiang@gmail.com">email</a>
     <a href="https://www.linkedin.com/in/carolanne-j-87a0b329a/" target="_blank" rel="noreferrer">linkedin</a>

@@ -591,25 +591,9 @@ async function pageToMarkdown(pageId, depth = 0, seen = new Set()) {
 
 // ---------- templates ----------
 
-// The article CSS lives in article.css (edit it to restyle generated pages).
-// It's a dedicated file — not read back from a generated page — so edits are
-// stable and never duplicated.
-async function siteStyle() {
-  try {
-    return await fs.readFile(path.join(__dirname, "article.css"), "utf8");
-  } catch {
-    /* fall through to minimal fallback */
-  }
-  return `
-    body { max-width: 680px; margin: 0 auto; padding: 40px 28px; color: #1a1a1a;
-      font-family: 'Libre Baskerville', Georgia, serif; line-height: 1.75; }
-    .site-nav { display: flex; gap: 20px; margin-bottom: 24px; }
-    .site-nav a { color: #595959; text-decoration: none; font-size: 0.78rem; }
-    .side { display: none; }
-    figure { margin: 1.6em 0; text-align: center; }
-    figure img, img { max-width: 100%; height: auto; }
-    .footer-nav { margin-top: 72px; padding-top: 20px; border-top: 1px solid #ece8e1; }`;
-}
+// The article CSS lives in css/article.css at the repo root (edit it to
+// restyle generated pages). Pages link it rather than inlining it, so a
+// style change doesn't require regenerating every essay.
 
 // marked renders a lone image as <p><img></p>; turn those into
 // <figure class="image"> with a click-to-open link wrapper (and a caption when
@@ -805,7 +789,7 @@ function commentsSection({ slug, title, url }) {
 `;
 }
 
-function articlePage({ title, description, bodyHtml, tocHtml, slug, style }) {
+function articlePage({ title, description, bodyHtml, tocHtml, slug }) {
   const url = `https://www.carolannejiang.com/${slug}.html`;
   const safeTitle = escapeHtml(title);
   const safeDesc = escapeHtml(description || "");
@@ -839,7 +823,7 @@ ${GENERATED_MARKER}
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap">
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></noscript>
-  <style>${style}</style>
+  <link rel="stylesheet" href="css/article.css">
 </head>
 <body>
 
@@ -963,7 +947,6 @@ async function safeDelete(slug) {
 
 async function main() {
   const items = await fetchEntries(PARENT_PAGE_ID);
-  const style = await siteStyle();
 
   const seen = new Set();
   const entries = [];
@@ -1042,7 +1025,6 @@ async function main() {
       // Only show the left menu when the Notion doc has a Contents block.
       tocHtml: tocSeen ? tocItemsHtml(withToc.toc) : "",
       slug,
-      style,
     });
     await fs.writeFile(outFile, pageHtml);
     console.log(`Wrote ${slug}.html  ("${title}")`);
