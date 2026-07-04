@@ -5,11 +5,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>everything I’ve learned from running Manifest</title>
-  <meta name="description" content="Last updated 2026-07-02">
+  <meta name="description" content="About two months ago, after helping out at the West Coast EA retreat, before my supposed flight back to Chicago, Saul gave me a pitch on becoming the co-organi…">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Carolanne Jiang">
   <meta property="og:title" content="everything I’ve learned from running Manifest">
-  <meta property="og:description" content="Last updated 2026-07-02">
+  <meta property="og:description" content="About two months ago, after helping out at the West Coast EA retreat, before my supposed flight back to Chicago, Saul gave me a pitch on becoming the co-organi…">
   <meta property="og:url" content="https://www.carolannejiang.com/manifest.html">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -212,8 +212,6 @@
 
 <nav class="site-nav" aria-label="Site links">
   <a href="index.html">home</a>
-  <a href="mailto:carolannejiang@gmail.com">email</a>
-  <a href="https://www.linkedin.com/in/carolanne-j-87a0b329a/" target="_blank" rel="noreferrer">linkedin</a>
 </nav>
 <div class="layout">
   <aside class="side">
@@ -555,7 +553,7 @@ war is war, l’art pour l’art, in politics there’s no room for compunction,
 <h4 id="some-links-i-found-helpful" class="">Some links I found helpful:</h4>
 <p><a href="https://www.brasstacks.blog/mistakes-often-made-by-inexperienced-event-organizers/">Mistakes often made by inexperienced event organizers</a></p>
 <p><a href="https://taylor.town/productize-yourself">Productize Yourself</a></p>
-<p><a href="https://selvaradov.net/working/">Some early lessons from the world of work | Rohan&#39;s Rambles</a></p>
+<p><a href="https://selvaradov.net/working/">https://selvaradov.net/working/</a></p>
 <p><a href="https://hath.blog/posts/freelancing/">What they don</a></p>
 <p><a href="https://ansonyu.me/meeting">To Do Meetings Well</a></p>
 <p><a href="https://mishaglouberman.substack.com/p/everything-you-did-to-make-your-conference">https://mishaglouberman.substack.com/p/everything-you-did-to-make-your-conference</a></p>
@@ -621,6 +619,25 @@ war is war, l’art pour l’art, in politics there’s no room for compunction,
       return n;
     }
 
+    function sanitize(html) {
+      var doc = new DOMParser().parseFromString(html, 'text/html');
+      var nodes = doc.body.querySelectorAll('*');
+      for (var i = 0; i < nodes.length; i++) {
+        var node = nodes[i];
+        if (/^(script|style|iframe|object|embed|form|link|meta)$/i.test(node.tagName)) {
+          node.parentNode.removeChild(node);
+          continue;
+        }
+        for (var j = node.attributes.length - 1; j >= 0; j--) {
+          var attr = node.attributes[j];
+          if (/^on/i.test(attr.name) || /^s*(javascript|vbscript|data):/i.test(String(attr.value))) {
+            node.removeAttribute(attr.name);
+          }
+        }
+      }
+      return doc.body.innerHTML;
+    }
+
     function endReply() {
       replyTo = null;
       cancel.hidden = true;
@@ -644,7 +661,7 @@ war is war, l’art pour l’art, in politics there’s no room for compunction,
       meta.appendChild(el('span', 'comment-date', String(c.parsedCreatedAt || c.createdAt || '').slice(0, 10)));
       node.appendChild(meta);
       var body = el('div', 'comment-body');
-      if (c.parsedContent) body.innerHTML = c.parsedContent;
+      if (c.parsedContent) body.innerHTML = sanitize(c.parsedContent);
       else body.textContent = c.content || '';
       node.appendChild(body);
       var reply = el('button', 'comment-reply', 'reply');
