@@ -45,6 +45,12 @@ const STATE_FILE = path.join(__dirname, ".generated.json");
 // dashboard between the quotes to show a comment box at the bottom of every
 // essay. Leave it empty and no comment box is rendered (the site is unchanged).
 // Self-hosting Cusdis instead of the hosted app? Point CUSDIS_HOST at it.
+//
+// The comment UI is rendered natively in the page (form + thread, styled in
+// article.css) and talks to Cusdis's open API directly — the same
+// GET/POST /api/open/comments the official iframe widget uses — so comments
+// match the site's typography. Moderation is unchanged: new comments stay
+// hidden until approved in the Cusdis dashboard.
 const CUSDIS_APP_ID = "16dbe1dd-67b3-49bb-b2fa-a0e81cd9080f";
 const CUSDIS_HOST = "https://cusdis.com";
 
@@ -651,21 +657,150 @@ function tocItemsHtml(toc) {
     .join("\n");
 }
 
-// The Cusdis comment thread for one essay, or "" when no App ID is configured.
-// data-page-id is the slug — stable and unique — so an essay keeps its comments
-// even if its title or URL later changes.
+// JSON-encode a value for embedding inside an inline <script> ("<" is escaped
+// so content can never close the script tag early).
+function jsStr(value) {
+  return JSON.stringify(String(value)).replace(/</g, "\\u003c");
+}
+
+// The comment section for one essay, or "" when no App ID is configured.
+// pageId sent to Cusdis is the slug — stable and unique — so an essay keeps
+// its comments even if its title or URL later changes. parsedContent is safe
+// to insert as HTML: Cusdis renders it server-side with markdown-it (raw HTML
+// escaped, link/image syntax disabled), and comments are moderated anyway.
 function commentsSection({ slug, title, url }) {
   if (!CUSDIS_APP_ID) return "";
   return `  <section class="comments" aria-label="Comments">
     <h2 class="comments-title">Comments</h2>
-    <div id="cusdis_thread"
-      data-host="${CUSDIS_HOST}"
-      data-app-id="${escapeHtml(CUSDIS_APP_ID)}"
-      data-page-id="${escapeHtml(slug)}"
-      data-page-url="${escapeHtml(url)}"
-      data-page-title="${escapeHtml(title)}"></div>
-    <script async defer src="${CUSDIS_HOST}/js/cusdis.es.js"></script>
+    <form class="comment-form" id="comment-form">
+      <input class="comment-field" name="nickname" type="text" maxlength="50" placeholder="your name" required>
+      <textarea class="comment-field comment-text" name="content" rows="4" maxlength="10000" placeholder="leave a comment" required></textarea>
+      <div class="comment-actions">
+        <button class="comment-submit" type="submit">post comment</button>
+        <button class="comment-cancel" type="button" hidden>cancel reply</button>
+        <span class="comment-status" role="status" aria-live="polite"></span>
+      </div>
+    </form>
+    <div class="comment-list" id="comment-list" hidden></div>
+    <button class="comment-more" id="comment-more" type="button" hidden>more comments</button>
   </section>
+  <script>
+  (function () {
+    var API = ${jsStr(CUSDIS_HOST + "/api/open/comments")};
+    var APP_ID = ${jsStr(CUSDIS_APP_ID)};
+    var PAGE_ID = ${jsStr(slug)};
+    var PAGE_URL = ${jsStr(url)};
+    var PAGE_TITLE = ${jsStr(title)};
+
+    var form = document.getElementById('comment-form');
+    var list = document.getElementById('comment-list');
+    var more = document.getElementById('comment-more');
+    var status = form.querySelector('.comment-status');
+    var cancel = form.querySelector('.comment-cancel');
+    var submit = form.querySelector('.comment-submit');
+    var nameField = form.querySelector('[name="nickname"]');
+    var textField = form.querySelector('[name="content"]');
+    var replyTo = null;
+    var page = 1;
+
+    function el(tag, cls, text) {
+      var n = document.createElement(tag);
+      n.className = cls;
+      if (text) n.textContent = text;
+      return n;
+    }
+
+    function endReply() {
+      replyTo = null;
+      cancel.hidden = true;
+      list.parentNode.insertBefore(form, list);
+    }
+
+    function startReply(comment, node) {
+      replyTo = comment.id;
+      cancel.hidden = false;
+      status.textContent = '';
+      node.appendChild(form);
+      textField.focus();
+    }
+
+    function render(c) {
+      var node = el('div', 'comment');
+      var meta = el('div', 'comment-meta');
+      var name = (c.moderator && c.moderator.displayName) || c.by_nickname || 'anonymous';
+      meta.appendChild(el('span', 'comment-author', name));
+      if (c.moderatorId) meta.appendChild(el('span', 'comment-author-badge', 'author'));
+      meta.appendChild(el('span', 'comment-date', String(c.parsedCreatedAt || c.createdAt || '').slice(0, 10)));
+      node.appendChild(meta);
+      var body = el('div', 'comment-body');
+      if (c.parsedContent) body.innerHTML = c.parsedContent;
+      else body.textContent = c.content || '';
+      node.appendChild(body);
+      var reply = el('button', 'comment-reply', 'reply');
+      reply.type = 'button';
+      reply.addEventListener('click', function () { startReply(c, node); });
+      node.appendChild(reply);
+      if (c.replies && c.replies.data && c.replies.data.length) {
+        var kids = el('div', 'comment-replies');
+        c.replies.data.forEach(function (r) { kids.appendChild(render(r)); });
+        node.appendChild(kids);
+      }
+      return node;
+    }
+
+    function load() {
+      fetch(API + '?appId=' + APP_ID + '&pageId=' + encodeURIComponent(PAGE_ID) + '&page=' + page, {
+        headers: { 'x-timezone-offset': String(-(new Date().getTimezoneOffset() / 60)) }
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          var d = res && res.data;
+          if (!d) return;
+          (d.data || []).forEach(function (c) { list.appendChild(render(c)); });
+          list.hidden = !list.firstChild;
+          more.hidden = !(page < (d.pageCount || 1));
+        })
+        .catch(function () {});
+    }
+
+    more.addEventListener('click', function () { page += 1; load(); });
+    cancel.addEventListener('click', endReply);
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var content = textField.value.trim();
+      var nickname = nameField.value.trim();
+      if (!content || !nickname) return;
+      submit.disabled = true;
+      status.textContent = 'sending\\u2026';
+      fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          appId: APP_ID,
+          pageId: PAGE_ID,
+          content: content,
+          nickname: nickname,
+          parentId: replyTo || undefined,
+          pageUrl: PAGE_URL,
+          pageTitle: PAGE_TITLE
+        })
+      })
+        .then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          textField.value = '';
+          endReply();
+          status.textContent = 'thank you \\u2014 your comment will appear once approved.';
+        })
+        .catch(function () {
+          status.textContent = 'something went wrong \\u2014 please try again.';
+        })
+        .then(function () { submit.disabled = false; });
+    });
+
+    load();
+  })();
+  </script>
 `;
 }
 
