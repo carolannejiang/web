@@ -874,8 +874,6 @@ ${GENERATED_MARKER}
 
 <nav class="site-nav" aria-label="Site links">
   <a href="index.html">home</a>
-  <a href="mailto:carolannejiang@gmail.com">email</a>
-  <a href="https://www.linkedin.com/in/carolanne-j-87a0b329a/" target="_blank" rel="noreferrer">linkedin</a>
 </nav>
 <div class="layout">
 ${side}
