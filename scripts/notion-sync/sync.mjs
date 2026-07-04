@@ -234,18 +234,6 @@ function slugify(text = "") {
     .replace(/^-+|-+$/g, "");
 }
 
-function formatFullDate(iso) {
-  if (!iso) return "";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  return d.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    timeZone: "UTC",
-  });
-}
-
 function yearOf(iso) {
   if (!iso) return "";
   const d = new Date(iso);
