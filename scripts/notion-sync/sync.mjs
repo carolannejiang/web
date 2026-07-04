@@ -96,7 +96,7 @@ async function videoTransformer(block) {
   const v = block[block.type] || {};
   const url = v.external?.url || v.url || v.file?.url || "";
   if (!url) return "";
-  const title = escapeHtml((await fetchLinkTitle(url)) || "video");
+  const title = escapeHtml((await cachedLinkTitle(url)) || "video");
   const href = escapeHtml(url);
   const yt = url.match(YOUTUBE_ID)?.[1];
   const html = yt
@@ -299,6 +299,7 @@ function excerptFromMarkdown(md, maxLen = 160) {
       .replace(/[*_`~]/g, "")
       .trim();
     if (!text) continue;
+    if (/^last updated\b/i.test(text)) continue; // date-stamp boilerplate, not a summary
     return text.length > maxLen ? `${text.slice(0, maxLen - 1).trimEnd()}…` : text;
   }
   return "";
@@ -359,11 +360,14 @@ async function optimizeImage(buf, srcExt) {
 // lightweight. The folder is rebuilt each run; identical inputs yield identical
 // bytes, so repeat runs create no git churn.
 async function localizeImages(html, slug) {
-  const urls = [];
+  // De-duped: the same URL appearing twice would otherwise be downloaded
+  // twice, and the second file orphaned (the first rewrite below already
+  // replaces every occurrence).
+  const urls = new Set();
   const re = /<img\b[^>]*?\ssrc="([^"]+)"/gi;
   let m;
-  while ((m = re.exec(html)) !== null) urls.push(m[1]);
-  if (!urls.length) return html;
+  while ((m = re.exec(html)) !== null) urls.add(m[1]);
+  if (!urls.size) return html;
 
   const dir = path.join(REPO_ROOT, "images", "notion", slug);
   await fs.rm(dir, { recursive: true, force: true }); // drop stale/renamed files
@@ -442,6 +446,23 @@ async function fetchLinkTitle(url) {
   }
 }
 
+// Titles are cached in the state file (.generated.json) so repeat runs are
+// deterministic: a URL is fetched once, and a later title change on the
+// target site doesn't churn the generated HTML. Only successful lookups are
+// cached; failures fall back to showing the bare URL and retry next run.
+let linkTitleCache = {};
+const usedTitleUrls = new Set();
+
+async function cachedLinkTitle(url) {
+  usedTitleUrls.add(url);
+  if (Object.prototype.hasOwnProperty.call(linkTitleCache, url)) {
+    return linkTitleCache[url];
+  }
+  const title = await fetchLinkTitle(url);
+  if (title) linkTitleCache[url] = title;
+  return title;
+}
+
 // Replace links whose visible text is just the raw URL with the linked page's
 // title. Links you gave custom text to are left exactly as-is.
 async function nameBareLinks(html) {
@@ -454,7 +475,7 @@ async function nameBareLinks(html) {
 
   const titles = new Map();
   await Promise.all(
-    [...bareUrls].map(async (u) => titles.set(u, await fetchLinkTitle(u)))
+    [...bareUrls].map(async (u) => titles.set(u, await cachedLinkTitle(u)))
   );
 
   return html.replace(anchorRe, (m, href, text) => {
@@ -666,9 +687,10 @@ function jsStr(value) {
 
 // The comment section for one essay, or "" when no App ID is configured.
 // pageId sent to Cusdis is the slug — stable and unique — so an essay keeps
-// its comments even if its title or URL later changes. parsedContent is safe
-// to insert as HTML: Cusdis renders it server-side with markdown-it (raw HTML
-// escaped, link/image syntax disabled), and comments are moderated anyway.
+// its comments even if its title or URL later changes. parsedContent comes
+// from Cusdis rendered server-side with markdown-it (raw HTML escaped,
+// link/image syntax disabled) and comments are moderated; the client-side
+// sanitize() below is defense-in-depth in case that ever changes.
 function commentsSection({ slug, title, url }) {
   if (!CUSDIS_APP_ID) return "";
   return `  <section class="comments" aria-label="Comments">
@@ -711,6 +733,25 @@ function commentsSection({ slug, title, url }) {
       return n;
     }
 
+    function sanitize(html) {
+      var doc = new DOMParser().parseFromString(html, 'text/html');
+      var nodes = doc.body.querySelectorAll('*');
+      for (var i = 0; i < nodes.length; i++) {
+        var node = nodes[i];
+        if (/^(script|style|iframe|object|embed|form|link|meta)$/i.test(node.tagName)) {
+          node.parentNode.removeChild(node);
+          continue;
+        }
+        for (var j = node.attributes.length - 1; j >= 0; j--) {
+          var attr = node.attributes[j];
+          if (/^on/i.test(attr.name) || /^\s*(javascript|vbscript|data):/i.test(String(attr.value))) {
+            node.removeAttribute(attr.name);
+          }
+        }
+      }
+      return doc.body.innerHTML;
+    }
+
     function endReply() {
       replyTo = null;
       cancel.hidden = true;
@@ -734,7 +775,7 @@ function commentsSection({ slug, title, url }) {
       meta.appendChild(el('span', 'comment-date', String(c.parsedCreatedAt || c.createdAt || '').slice(0, 10)));
       node.appendChild(meta);
       var body = el('div', 'comment-body');
-      if (c.parsedContent) body.innerHTML = c.parsedContent;
+      if (c.parsedContent) body.innerHTML = sanitize(c.parsedContent);
       else body.textContent = c.content || '';
       node.appendChild(body);
       var reply = el('button', 'comment-reply', 'reply');
@@ -926,16 +967,25 @@ async function updateIndex(entries) {
 async function readState() {
   try {
     const data = JSON.parse(await fs.readFile(STATE_FILE, "utf8"));
-    return Array.isArray(data.slugs) ? data.slugs : [];
+    return {
+      slugs: Array.isArray(data.slugs) ? data.slugs : [],
+      linkTitles:
+        data.linkTitles && typeof data.linkTitles === "object" ? data.linkTitles : {},
+    };
   } catch {
-    return [];
+    return { slugs: [], linkTitles: {} };
   }
 }
 
 async function writeState(slugs) {
+  // Keep only cache entries for links that still appear in some essay.
+  const linkTitles = {};
+  for (const url of Object.keys(linkTitleCache).sort()) {
+    if (usedTitleUrls.has(url)) linkTitles[url] = linkTitleCache[url];
+  }
   await fs.writeFile(
     STATE_FILE,
-    `${JSON.stringify({ slugs: [...slugs].sort() }, null, 2)}\n`
+    `${JSON.stringify({ slugs: [...slugs].sort(), linkTitles }, null, 2)}\n`
   );
 }
 
@@ -962,6 +1012,9 @@ async function safeDelete(slug) {
 // ---------- main ----------
 
 async function main() {
+  const previous = await readState();
+  linkTitleCache = previous.linkTitles;
+
   const items = await fetchEntries(PARENT_PAGE_ID);
   const style = await siteStyle();
 
@@ -1054,9 +1107,8 @@ async function main() {
   await updateIndex(entries);
 
   // Remove pages that were generated before but are no longer published.
-  const previous = await readState();
   const current = new Set(entries.map((e) => e.slug));
-  for (const oldSlug of previous) {
+  for (const oldSlug of previous.slugs) {
     if (!current.has(oldSlug)) await safeDelete(oldSlug);
   }
   await writeState(current);
