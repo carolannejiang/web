@@ -1,0 +1,103 @@
+/* Chrome shared by the hand-written pages. Only rules that are identical
+   across the pages that use them live here; everything page-specific stays
+   in that page's own <style> block, which loads after this file and can
+   override it (overrides must repeat the body-class prefix so specificity
+   matches).
+
+   body.menu-page    — white serif pages with the top menu bar
+                       (index, writing, art)
+   body.gallery-page — gallery pages with the "← back" link
+                       (paintings, 3d, comic, pleinair) */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body.menu-page {
+  background-color: #ffffff;
+  font-family: 'Libre Baskerville', Georgia, serif;
+  color: #1a1a1a;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-page .page {
+  max-width: 700px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 60px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.menu-page .side-menu {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+  padding: 32px 60px 14px;
+  border-bottom: 1px solid #c9c4bc;
+}
+
+.menu-page .side-menu a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  line-height: 1.4;
+  color: #595959;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+
+.menu-page .side-menu a:hover {
+  color: #1a1a1a;
+}
+
+.menu-page .side-menu .icon {
+  width: 14px;
+  height: 14px;
+  display: block;
+  flex: none;
+}
+
+@media (max-width: 600px) {
+  .menu-page .page { padding: 0 36px; }
+  .menu-page .side-menu { padding-left: 36px; padding-right: 36px; }
+}
+
+body.gallery-page {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  background: #f3f0eb;
+  color: #111;
+  -webkit-font-smoothing: antialiased;
+}
+
+.gallery-page a {
+  color: #888;
+  text-decoration: none;
+}
+
+.gallery-page .back-link {
+  display: inline-block;
+  padding: 24px 32px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: lowercase;
+  letter-spacing: 0.05em;
+  color: #555;
+  transition: color 0.2s;
+}
+
+.gallery-page .back-link:hover {
+  color: #000;
+}
