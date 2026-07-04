@@ -124,6 +124,45 @@
     .comments { margin-top: 72px; padding-top: 20px; border-top: 1px solid #ece8e1; }
     .comments-title { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: #a9a29a; font-weight: 700; margin-bottom: 22px; }
 
+    .comment-field {
+      display: block; width: 100%;
+      font-family: inherit; font-size: 0.85rem; line-height: 1.6; color: #1a1a1a;
+      background: #ffffff; border: 1px solid #e6e1d8; border-radius: 6px;
+      padding: 0.55em 0.85em; margin: 0 0 10px;
+    }
+    .comment-field:focus { outline: none; border-color: #b9b2a6; }
+    .comment-field::placeholder { color: #a9a29a; opacity: 1; }
+    input.comment-field { max-width: 240px; }
+    .comment-text { resize: vertical; min-height: 84px; }
+    .comment-actions { display: flex; align-items: baseline; gap: 16px; }
+    .comment-submit {
+      font-family: inherit; font-size: 0.72rem; letter-spacing: 0.08em;
+      color: #595959; background: none; border: 1px solid #d8d2c8; border-radius: 6px;
+      padding: 0.5em 1.2em; cursor: pointer;
+    }
+    .comment-submit:hover { border-color: #1a1a1a; color: #1a1a1a; }
+    .comment-submit[disabled] { opacity: 0.45; cursor: default; }
+    .comment-cancel, .comment-reply, .comment-more { font-family: inherit; font-size: 0.72rem; color: #8a8a8a; background: none; border: none; padding: 0; cursor: pointer; }
+    .comment-cancel:hover, .comment-reply:hover, .comment-more:hover { color: #1a1a1a; }
+    .comment-status { font-size: 0.78rem; font-style: italic; color: #8a8a8a; }
+    .comment-list { margin-top: 34px; }
+    .comment { margin-bottom: 26px; }
+    .comment-meta { font-size: 0.75rem; margin-bottom: 1px; }
+    .comment-author { font-weight: 700; color: #1a1a1a; }
+    .comment-author-badge {
+      font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: #a9a29a; border: 1px solid #ece8e1; border-radius: 4px;
+      padding: 0.05em 0.5em; margin-left: 8px;
+    }
+    .comment-date { color: #a9a29a; margin-left: 10px; }
+    .comment-body { overflow-wrap: break-word; }
+    .comment-body p { margin: 0.35em 0; }
+    .comment-reply { color: #a9a29a; }
+    .comment .comment-form { margin: 14px 0 4px; }
+    .comment-replies { margin: 16px 0 0 4px; padding-left: 16px; border-left: 2px solid #ece8e1; }
+    .comment-replies .comment { margin-bottom: 18px; }
+    .comment-more { font-size: 0.78rem; }
+
     .footer-nav { margin-top: 72px; padding-top: 20px; border-top: 1px solid #ece8e1; font-size: 0.85rem; }
     .footer-nav a { color: #8a8a8a; text-decoration: none; }
     .footer-nav a:hover { color: #1a1a1a; }
@@ -542,14 +581,135 @@ war is war, l’art pour l’art, in politics there’s no room for compunction,
 </div>
   <section class="comments" aria-label="Comments">
     <h2 class="comments-title">Comments</h2>
-    <div id="cusdis_thread"
-      data-host="https://cusdis.com"
-      data-app-id="16dbe1dd-67b3-49bb-b2fa-a0e81cd9080f"
-      data-page-id="manifest"
-      data-page-url="https://www.carolannejiang.com/manifest.html"
-      data-page-title="everything I’ve learned from running Manifest"></div>
-    <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+    <form class="comment-form" id="comment-form">
+      <input class="comment-field" name="nickname" type="text" maxlength="50" placeholder="your name" required>
+      <textarea class="comment-field comment-text" name="content" rows="4" maxlength="10000" placeholder="leave a comment" required></textarea>
+      <div class="comment-actions">
+        <button class="comment-submit" type="submit">post comment</button>
+        <button class="comment-cancel" type="button" hidden>cancel reply</button>
+        <span class="comment-status" role="status" aria-live="polite"></span>
+      </div>
+    </form>
+    <div class="comment-list" id="comment-list" hidden></div>
+    <button class="comment-more" id="comment-more" type="button" hidden>more comments</button>
   </section>
+  <script>
+  (function () {
+    var API = "https://cusdis.com/api/open/comments";
+    var APP_ID = "16dbe1dd-67b3-49bb-b2fa-a0e81cd9080f";
+    var PAGE_ID = "manifest";
+    var PAGE_URL = "https://www.carolannejiang.com/manifest.html";
+    var PAGE_TITLE = "everything I’ve learned from running Manifest";
+
+    var form = document.getElementById('comment-form');
+    var list = document.getElementById('comment-list');
+    var more = document.getElementById('comment-more');
+    var status = form.querySelector('.comment-status');
+    var cancel = form.querySelector('.comment-cancel');
+    var submit = form.querySelector('.comment-submit');
+    var nameField = form.querySelector('[name="nickname"]');
+    var textField = form.querySelector('[name="content"]');
+    var replyTo = null;
+    var page = 1;
+
+    function el(tag, cls, text) {
+      var n = document.createElement(tag);
+      n.className = cls;
+      if (text) n.textContent = text;
+      return n;
+    }
+
+    function endReply() {
+      replyTo = null;
+      cancel.hidden = true;
+      list.parentNode.insertBefore(form, list);
+    }
+
+    function startReply(comment, node) {
+      replyTo = comment.id;
+      cancel.hidden = false;
+      status.textContent = '';
+      node.appendChild(form);
+      textField.focus();
+    }
+
+    function render(c) {
+      var node = el('div', 'comment');
+      var meta = el('div', 'comment-meta');
+      var name = (c.moderator && c.moderator.displayName) || c.by_nickname || 'anonymous';
+      meta.appendChild(el('span', 'comment-author', name));
+      if (c.moderatorId) meta.appendChild(el('span', 'comment-author-badge', 'author'));
+      meta.appendChild(el('span', 'comment-date', String(c.parsedCreatedAt || c.createdAt || '').slice(0, 10)));
+      node.appendChild(meta);
+      var body = el('div', 'comment-body');
+      if (c.parsedContent) body.innerHTML = c.parsedContent;
+      else body.textContent = c.content || '';
+      node.appendChild(body);
+      var reply = el('button', 'comment-reply', 'reply');
+      reply.type = 'button';
+      reply.addEventListener('click', function () { startReply(c, node); });
+      node.appendChild(reply);
+      if (c.replies && c.replies.data && c.replies.data.length) {
+        var kids = el('div', 'comment-replies');
+        c.replies.data.forEach(function (r) { kids.appendChild(render(r)); });
+        node.appendChild(kids);
+      }
+      return node;
+    }
+
+    function load() {
+      fetch(API + '?appId=' + APP_ID + '&pageId=' + encodeURIComponent(PAGE_ID) + '&page=' + page, {
+        headers: { 'x-timezone-offset': String(-(new Date().getTimezoneOffset() / 60)) }
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          var d = res && res.data;
+          if (!d) return;
+          (d.data || []).forEach(function (c) { list.appendChild(render(c)); });
+          list.hidden = !list.firstChild;
+          more.hidden = !(page < (d.pageCount || 1));
+        })
+        .catch(function () {});
+    }
+
+    more.addEventListener('click', function () { page += 1; load(); });
+    cancel.addEventListener('click', endReply);
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var content = textField.value.trim();
+      var nickname = nameField.value.trim();
+      if (!content || !nickname) return;
+      submit.disabled = true;
+      status.textContent = 'sending\u2026';
+      fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          appId: APP_ID,
+          pageId: PAGE_ID,
+          content: content,
+          nickname: nickname,
+          parentId: replyTo || undefined,
+          pageUrl: PAGE_URL,
+          pageTitle: PAGE_TITLE
+        })
+      })
+        .then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          textField.value = '';
+          endReply();
+          status.textContent = 'thank you \u2014 your comment will appear once approved.';
+        })
+        .catch(function () {
+          status.textContent = 'something went wrong \u2014 please try again.';
+        })
+        .then(function () { submit.disabled = false; });
+    });
+
+    load();
+  })();
+  </script>
   <div class="footer-nav"><a href="index.html">← back to home</a></div>
   </main>
   </div>
