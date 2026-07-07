@@ -342,11 +342,30 @@ async function optimizeImage(buf, srcExt) {
   return webp && webp.length < buf.length ? { out: webp, ext: ".webp" } : { out: buf, ext: srcExt };
 }
 
+// A failed download must not reach the published page: Notion asset URLs are
+// signed and expire in ~1h, so "leave the URL as-is" means a broken image an
+// hour later. Retry transient failures, then abort the run — the previous
+// good page stays live and the next hourly run gets fresh URLs.
+async function fetchWithRetry(url, attempts = 3) {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      const res = await fetch(url);
+      if (res.ok) return res;
+      if (attempt === attempts) throw new Error(`HTTP ${res.status}`);
+    } catch (err) {
+      if (attempt === attempts) throw err instanceof Error ? err : new Error(String(err));
+    }
+    await new Promise((r) => setTimeout(r, 1000 * attempt));
+  }
+}
+
 // Download every Notion-hosted image referenced in the HTML into
 // images/notion/<slug>/, optimize it, and rewrite the <img src> to that local
 // path — so the essay's images are permanent (Notion links expire in ~1h) and
 // lightweight. The folder is rebuilt each run; identical inputs yield identical
-// bytes, so repeat runs create no git churn.
+// bytes, so repeat runs create no git churn. Returns the rewritten html plus a
+// map of local path → intrinsic pixel size, so wrapFigures can emit
+// width/height and the browser can reserve space before the image loads.
 async function localizeImages(html, slug) {
   // De-duped: the same URL appearing twice would otherwise be downloaded
   // twice, and the second file orphaned (the first rewrite below already
@@ -355,7 +374,8 @@ async function localizeImages(html, slug) {
   const re = /<img\b[^>]*?\ssrc="([^"]+)"/gi;
   let m;
   while ((m = re.exec(html)) !== null) urls.add(m[1]);
-  if (!urls.size) return html;
+  const dims = new Map();
+  if (!urls.size) return { html, dims };
 
   const dir = path.join(REPO_ROOT, "images", "notion", slug);
   await fs.rm(dir, { recursive: true, force: true }); // drop stale/renamed files
@@ -369,23 +389,25 @@ async function localizeImages(html, slug) {
     if (!/^https?:/i.test(url) || !isNotionAsset(url)) continue; // skip local/external
     i += 1;
     try {
-      const res = await fetch(url);
-      if (!res.ok) {
-        console.warn(`  image ${i} download failed (HTTP ${res.status}) — left as-is`);
-        continue;
-      }
+      const res = await fetchWithRetry(url);
       const buf = Buffer.from(await res.arrayBuffer());
       const { out: optimized, ext } = await optimizeImage(buf, extFromUrl(url));
       const rel = `images/notion/${slug}/img-${i}${ext}`;
       await fs.writeFile(path.join(REPO_ROOT, rel), optimized);
       out = out.split(url).join(rel);
+      try {
+        const meta = await sharp(optimized).metadata();
+        if (meta.width && meta.height) dims.set(rel, { width: meta.width, height: meta.height });
+      } catch {
+        /* pass-through format sharp can't read — just omit width/height */
+      }
       rawTotal += buf.length;
       optTotal += optimized.length;
       console.log(
         `  image ${i}: ${rel} (${(buf.length / 1048576).toFixed(1)}MB → ${(optimized.length / 1048576).toFixed(2)}MB)`
       );
     } catch (err) {
-      console.warn(`  image ${i} error (${err.message}) — left as-is`);
+      throw new Error(`image ${i} of "${slug}" failed after retries (${err.message}) — aborting sync`);
     }
   }
   if (i) {
@@ -393,7 +415,7 @@ async function localizeImages(html, slug) {
       `  images: ${(rawTotal / 1048576).toFixed(1)}MB → ${(optTotal / 1048576).toFixed(1)}MB total`
     );
   }
-  return out;
+  return { html: out, dims };
 }
 
 // ---------- link titles ----------
@@ -622,16 +644,21 @@ async function siteStyle() {
 
 // marked renders a lone image as <p><img></p>; turn those into
 // <figure class="image"> with a click-to-open link wrapper (and a caption when
-// the image has meaningful alt text), matching manifest.html.
-function wrapFigures(html) {
+// the image has meaningful alt text), matching manifest.html. The caption text
+// doubles as the alt attribute (filename-shaped alts count as no alt), every
+// body image lazy-loads, and width/height come from the dims map built by
+// localizeImages so the layout doesn't shift while images stream in.
+function wrapFigures(html, dims = new Map()) {
   return html.replace(/<p>\s*<img\b([^>]*)>\s*<\/p>/gi, (_m, attrs) => {
     const src = attrs.match(/\bsrc="([^"]*)"/i)?.[1] || "";
     const alt = decodeEntities((attrs.match(/\balt="([^"]*)"/i)?.[1] || "")).trim();
+    const isFilename = /\.(png|jpe?g|gif|webp|svg|avif|heic|heif|tiff?)$/i.test(alt);
     const caption =
-      alt && !/\.(png|jpe?g|gif|webp|svg|avif|heic|heif|tiff?)$/i.test(alt)
-        ? `<figcaption>${escapeHtml(alt)}</figcaption>`
-        : "";
-    return `<figure class="image"><a href="${src}"><img src="${src}"/></a>${caption}</figure>`;
+      alt && !isFilename ? `<figcaption>${escapeHtml(alt)}</figcaption>` : "";
+    const altAttr = ` alt="${alt && !isFilename ? escapeHtml(alt) : ""}"`;
+    const d = dims.get(src);
+    const sizeAttrs = d ? ` width="${d.width}" height="${d.height}"` : "";
+    return `<figure class="image"><a href="${src}"><img src="${src}"${altAttr}${sizeAttrs} loading="lazy"/></a>${caption}</figure>`;
   });
 }
 
@@ -834,10 +861,15 @@ function commentsSection({ slug, title, url }) {
 `;
 }
 
-function articlePage({ title, description, bodyHtml, tocHtml, slug, style }) {
+function articlePage({ title, description, bodyHtml, tocHtml, slug, style, ogImage }) {
   const url = `https://www.carolannejiang.com/${slug}.html`;
   const safeTitle = escapeHtml(title);
   const safeDesc = escapeHtml(description || "");
+  // Social embeds show a bare text card without og:image; use the essay's
+  // first body image when there is one.
+  const ogImageTag = ogImage
+    ? `\n  <meta property="og:image" content="https://www.carolannejiang.com/${ogImage}">`
+    : "";
   const side = tocHtml
     ? `  <aside class="side">
     <div class="toc-label">Contents</div>
@@ -860,7 +892,7 @@ ${GENERATED_MARKER}
   <meta property="og:site_name" content="Carolanne Jiang">
   <meta property="og:title" content="${safeTitle}">
   <meta property="og:description" content="${safeDesc}">
-  <meta property="og:url" content="${url}">
+  <meta property="og:url" content="${url}">${ogImageTag}
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1064,8 +1096,8 @@ async function main() {
     let bodyHtml = marked.parse(md);
     bodyHtml = replaceToggles(bodyHtml); // collapsed <details>, content inside
     bodyHtml = replaceRawHtml(bodyHtml); // video embeds
-    bodyHtml = await localizeImages(bodyHtml, slug); // also localizes toggle images
-    bodyHtml = wrapFigures(bodyHtml);
+    const localized = await localizeImages(bodyHtml, slug); // also localizes toggle images
+    bodyHtml = wrapFigures(localized.html, localized.dims);
     bodyHtml = await nameBareLinks(bodyHtml);
     bodyHtml = bodyHtml
       .replace(/<ul>/g, '<ul class="bulleted-list">')
@@ -1082,6 +1114,7 @@ async function main() {
       tocHtml: tocSeen ? tocItemsHtml(withToc.toc) : "",
       slug,
       style,
+      ogImage: withToc.html.match(/<img\b[^>]*?\ssrc="(images\/notion\/[^"]+)"/)?.[1] || "",
     });
     await fs.writeFile(outFile, pageHtml);
     console.log(`Wrote ${slug}.html  ("${title}")`);
