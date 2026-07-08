@@ -40,8 +40,16 @@ minute.
 
 - **Title** of the sub-page → the essay title and its URL.
 - **Created date** of the sub-page → the date shown on the piece.
-- **First paragraph** → the one-line summary on the Writing index.
-- **Order** of sub-pages in Notion → the order they appear on the site.
+- **Preview** column (Table only) → the one-line summary on the Writing index.
+  Type any text in a `Preview` column (also accepts `Description`/`Summary`/
+  `Excerpt`) and it's used verbatim. Leave it blank and the **first paragraph**
+  of the essay is used instead.
+- **Order** on the site:
+  - *Page with sub-pages:* the order you arrange the sub-pages in Notion.
+  - *Database / Table:* Notion's API **cannot** read a Table view's manual
+    drag-order, so add a number column named **`Order`** (or `Sort`/`Position`/
+    `Rank`) and type `1`, `2`, `3`… — essays sort by it ascending. Rows with no
+    number sink to the bottom. No such column → the existing order is kept.
 - Sub-pages titled **`Draft: ...`** are skipped. To keep something private,
   either prefix it `Draft:` or keep it *outside* the Writing page until ready.
 
