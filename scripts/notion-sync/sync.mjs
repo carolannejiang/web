@@ -639,7 +639,10 @@ async function siteStyle() {
     .side { display: none; }
     figure { margin: 1.6em 0; text-align: center; }
     figure img, img { max-width: 100%; height: auto; }
-    .footer-nav { margin-top: 72px; padding-top: 20px; border-top: 1px solid #ece8e1; }`;
+    .footer-nav { margin: 0; padding: 24px 28px 48px; border-top: 1px solid #ece8e1; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+    .footer-nav-links { display: flex; gap: 20px; align-items: center; }
+    .footer-nav a { font-size: 0.76rem; color: #595959; text-decoration: none; letter-spacing: 0.02em; }
+    .footer-nav a:hover { color: #1a1a1a; }`;
 }
 
 // marked renders a lone image as <p><img></p>; turn those into
@@ -914,9 +917,9 @@ ${side}
 <div class="page-body">
 ${bodyHtml}
 </div>
-${commentsSection({ slug, title, url })}  <div class="footer-nav"><a href="index.html">← back to home</a></div>
-  </main>
+${commentsSection({ slug, title, url })}  </main>
   </div>
+  <nav class="footer-nav" aria-label="Site links"><a href="index.html">← back to home</a><div class="footer-nav-links"><a href="art.html">art</a><a href="https://savvycal.com/carolanne">chat</a><a href="work.html">work</a></div></nav>
 
 <script>
 (function () {

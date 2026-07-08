@@ -41,11 +41,15 @@ body.menu-page {
   width: 100%;
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
+  justify-content: flex-end;
   align-items: center;
   gap: 20px;
   padding: 32px 60px 14px;
   border-bottom: 1px solid #c9c4bc;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: #ffffff;
 }
 
 .menu-page .side-menu a {
@@ -63,6 +67,11 @@ body.menu-page {
   color: #1a1a1a;
 }
 
+/* "home" stays pinned to the left while the other links sit on the right */
+.menu-page .side-menu .nav-home {
+  margin-right: auto;
+}
+
 .menu-page .side-menu .icon {
   width: 14px;
   height: 14px;
@@ -77,7 +86,7 @@ body.menu-page {
 
 body.gallery-page {
   font-family: 'Libre Baskerville', Georgia, serif;
-  background: #f3f0eb;
+  background: #ffffff;
   color: #111;
   -webkit-font-smoothing: antialiased;
 }
@@ -100,4 +109,82 @@ body.gallery-page {
 
 .gallery-page .back-link:hover {
   color: #000;
+}
+
+/* Top navigation bar for the gallery pages, matching the homepage menu bar
+   (art / writing / work / chat on the right) with a "← back" button added. */
+.gallery-page .site-nav {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 32px 60px 14px;
+  border-bottom: 1px solid #c9c4bc;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: #ffffff;
+}
+
+.gallery-page .site-nav .nav-links {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+}
+
+.gallery-page .site-nav a {
+  font-size: 0.76rem;
+  line-height: 1.4;
+  color: #595959;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+
+.gallery-page .site-nav a:hover {
+  color: #1a1a1a;
+}
+
+@media (max-width: 600px) {
+  .gallery-page .site-nav {
+    padding-left: 36px;
+    padding-right: 36px;
+  }
+}
+
+/* Social icons pinned to the bottom-right corner of every page. */
+.social-corner {
+  position: fixed;
+  bottom: 20px;
+  right: 24px;
+  z-index: 10;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+
+.social-corner a {
+  display: inline-flex;
+  color: #595959;
+}
+
+.social-corner a:hover {
+  color: #1a1a1a;
+}
+
+.social-corner .icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+@media (max-width: 600px) {
+  .social-corner {
+    bottom: 16px;
+    right: 16px;
+    gap: 14px;
+  }
 }
