@@ -645,6 +645,41 @@ async function siteStyle() {
     .footer-nav a:hover { color: #1a1a1a; }`;
 }
 
+// ---------- manual overrides ----------
+// Hand-dictated edits that must survive re-syncs. Notion stays the source of
+// truth for content; these are re-applied on top of the freshly generated HTML
+// on every run, keyed by slug (see overrides.json). Each rule replaces one
+// exact substring. If the text no longer appears (Notion changed it) or appears
+// more than once (ambiguous), the rule is skipped with a warning so it can never
+// silently corrupt a page.
+async function loadOverrides() {
+  try {
+    return JSON.parse(await fs.readFile(path.join(__dirname, "overrides.json"), "utf8"));
+  } catch {
+    return {};
+  }
+}
+
+function applyOverrides(html, slug, overrides) {
+  const rules = overrides?.[slug];
+  if (!Array.isArray(rules)) return html;
+  let out = html;
+  for (const rule of rules) {
+    if (!rule || typeof rule.find !== "string" || typeof rule.replace !== "string") continue;
+    const label = rule.note ? ` (${rule.note})` : "";
+    const count = out.split(rule.find).length - 1;
+    if (count === 1) {
+      out = out.replace(rule.find, () => rule.replace); // fn replacer: no $-substitution
+      console.log(`  override applied on ${slug}.html${label}`);
+    } else if (count === 0) {
+      console.warn(`  override skipped on ${slug}.html — text not found, Notion may have changed it${label}`);
+    } else {
+      console.warn(`  override skipped on ${slug}.html — ${count} matches, ambiguous${label}`);
+    }
+  }
+  return out;
+}
+
 // marked renders a lone image as <p><img></p>; turn those into
 // <figure class="image"> with a click-to-open link wrapper (and a caption when
 // the image has meaningful alt text), matching manifest.html. The caption text
@@ -1038,6 +1073,7 @@ async function main() {
 
   const items = await fetchEntries(PARENT_PAGE_ID);
   const style = await siteStyle();
+  const overrides = await loadOverrides();
 
   const seen = new Set();
   const entries = [];
@@ -1109,7 +1145,7 @@ async function main() {
     const description = excerptFromMarkdown(md);
     const dateISO = item.createdTime;
 
-    const pageHtml = articlePage({
+    let pageHtml = articlePage({
       title,
       description,
       bodyHtml: withToc.html,
@@ -1119,6 +1155,7 @@ async function main() {
       style,
       ogImage: withToc.html.match(/<img\b[^>]*?\ssrc="(images\/notion\/[^"]+)"/)?.[1] || "",
     });
+    pageHtml = applyOverrides(pageHtml, slug, overrides);
     await fs.writeFile(outFile, pageHtml);
     console.log(`Wrote ${slug}.html  ("${title}")`);
 
