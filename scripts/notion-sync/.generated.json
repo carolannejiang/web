@@ -1,6 +1,7 @@
 {
   "slugs": [
-    "manifest"
+    "manifest",
+    "website-setup"
   ],
   "linkTitles": {
     "https://ansonyu.me/meeting": "To Do Meetings Well",
