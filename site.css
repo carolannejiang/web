@@ -48,6 +48,15 @@ body.menu-page {
   border-bottom: 1px solid #c9c4bc;
 }
 
+.menu-page .side-menu .site-name {
+  font-family: 'Playfair Display', 'Libre Baskerville', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #1a1a1a;
+  margin-right: auto; /* keep the name in the corner, links on the right */
+}
+
 .menu-page .side-menu a {
   display: inline-flex;
   align-items: center;
@@ -72,7 +81,13 @@ body.menu-page {
 
 @media (max-width: 600px) {
   .menu-page .page { padding: 0 36px; }
-  .menu-page .side-menu { padding-left: 36px; padding-right: 36px; }
+  .menu-page .side-menu {
+    padding-left: 36px;
+    padding-right: 36px;
+    flex-wrap: wrap; /* name + links can exceed a phone's width */
+    row-gap: 6px;
+  }
+  .menu-page .side-menu .site-name { font-size: 1.25rem; }
 }
 
 body.gallery-page {
