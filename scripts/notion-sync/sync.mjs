@@ -942,9 +942,6 @@ ${GENERATED_MARKER}
 </head>
 <body>
 
-<nav class="site-nav" aria-label="Site links">
-  <a href="index.html">home</a>
-</nav>
 <div class="layout">
 ${side}
   <main class="article">
@@ -954,7 +951,7 @@ ${bodyHtml}
 </div>
 ${commentsSection({ slug, title, url })}  </main>
   </div>
-  <nav class="footer-nav" aria-label="Site links"><a href="index.html">← back to home</a><div class="footer-nav-links"><a href="art.html">art</a><a href="https://savvycal.com/carolanne">chat</a><a href="work.html">work</a></div></nav>
+  <nav class="footer-nav" aria-label="Site links"><a href="index.html">← back to home</a><div class="footer-nav-links"><a href="art.html">art</a></div></nav>
 
 <script>
 (function () {
@@ -1141,6 +1138,8 @@ async function main() {
     bodyHtml = bodyHtml
       .replace(/<ul>/g, '<ul class="bulleted-list">')
       .replace(/<ol>/g, '<ol class="numbered-list">'); // match manifest.html classes
+    // Style the leading "Last updated <date>" stamp like the Contents label (grey, uppercase).
+    bodyHtml = bodyHtml.replace(/<p>(\s*Last updated\b[^<]*)<\/p>/i, '<p class="last-updated">$1</p>');
     const withToc = addTocAndIds(bodyHtml);
     const description = excerptFromMarkdown(md);
     const dateISO = item.createdTime;
