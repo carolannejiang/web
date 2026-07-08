@@ -267,6 +267,20 @@ function readRichText(props, names) {
   return "";
 }
 
+// Optional Order/Sort number column: its numeric value, or null if there's no
+// such column (or it's empty). Lets you control the order of essays on the site
+// by typing 1, 2, 3… in Notion — the drag-order of a Table view is NOT readable
+// through Notion's API, so a number column is the way to order rows explicitly.
+function readOrder(props) {
+  for (const [key, value] of Object.entries(props)) {
+    if (value.type !== "number") continue;
+    if (/^(order|sort|position|rank|#)$/i.test(key)) {
+      return typeof value.number === "number" ? value.number : null;
+    }
+  }
+  return null;
+}
+
 // Optional Published checkbox: true / false, or null if there's no such column.
 function readPublished(props) {
   for (const [key, value] of Object.entries(props)) {
@@ -515,13 +529,27 @@ async function fetchEntries(id) {
       cursor = res.has_more ? res.next_cursor : undefined;
     } while (cursor);
     console.log(`Source is a database — found ${rows.length} row(s).`);
-    return rows.map((r) => ({
+    const entries = rows.map((r) => ({
       id: r.id,
       title: readTitle(r.properties),
       createdTime: r.created_time || null,
       published: readPublished(r.properties),
       slug: readRichText(r.properties, ["Slug", "URL", "Path"]),
+      order: readOrder(r.properties),
+      preview: readRichText(r.properties, ["Preview", "Description", "Summary", "Excerpt"]),
     }));
+    // If the table has an Order/Sort number column, honor it: essays appear on
+    // the site in ascending numeric order. Notion's API can't read a Table
+    // view's manual drag-order, so this is how you control the sequence. Rows
+    // without a number sink to the bottom (in the API's own order) so an
+    // un-numbered row never jumps the queue. No such column → leave order as-is.
+    if (entries.some((e) => e.order !== null)) {
+      const rank = (e) => (e.order === null ? Infinity : e.order);
+      entries.forEach((e, i) => (e._i = i)); // stable tiebreak
+      entries.sort((a, b) => rank(a) - rank(b) || a._i - b._i);
+      entries.forEach((e) => delete e._i);
+    }
+    return entries;
   } catch (err) {
     // Not a database — fall through to page mode. Any other error is real.
     if (err.code !== "object_not_found" && err.code !== "validation_error") {
@@ -1103,7 +1131,10 @@ async function main() {
       .replace(/<ul>/g, '<ul class="bulleted-list">')
       .replace(/<ol>/g, '<ol class="numbered-list">'); // match manifest.html classes
     const withToc = addTocAndIds(bodyHtml);
-    const description = excerptFromMarkdown(md);
+    // A manual Preview column (if you typed one in Notion) wins; otherwise fall
+    // back to the essay's first paragraph. This sets the one-line summary on
+    // writing.html and the page's meta description.
+    const description = (item.preview || "").trim() || excerptFromMarkdown(md);
     const dateISO = item.createdTime;
 
     const pageHtml = articlePage({
