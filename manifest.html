@@ -122,6 +122,10 @@
     summary { cursor: pointer; font-weight: 700; padding: 0.15em 0; }
     summary:hover { color: #000; }
     details[open] > summary { margin-bottom: 0.4em; }
+    /* Indent a toggle's content (everything except its summary) a little,
+       so open toggles read as nested under their heading. Nested toggles
+       indent further, cumulatively. */
+    details > *:not(summary) { margin-left: 1.2em; }
 
     hr { border: none; border-bottom: 1px solid #ece8e1; margin: 2em 0; }
 

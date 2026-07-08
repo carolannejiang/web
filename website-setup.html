@@ -5,11 +5,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>How to automatically update your website from notion</title>
-  <meta name="description" content="I love notion. My writings page and its essays are updated from my Notion database automatically. A GitHub Action polls Notion every hour, pulls every row/page…">
+  <meta name="description" content="I love notion. This page and all of my other essaysare updated from my Notion database automatically. You can link your notion &amp; website in a ways such that Gi…">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Carolanne Jiang">
   <meta property="og:title" content="How to automatically update your website from notion">
-  <meta property="og:description" content="I love notion. My writings page and its essays are updated from my Notion database automatically. A GitHub Action polls Notion every hour, pulls every row/page…">
+  <meta property="og:description" content="I love notion. This page and all of my other essaysare updated from my Notion database automatically. You can link your notion &amp; website in a ways such that Gi…">
   <meta property="og:url" content="https://www.carolannejiang.com/website-setup.html">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -121,6 +121,10 @@
     summary { cursor: pointer; font-weight: 700; padding: 0.15em 0; }
     summary:hover { color: #000; }
     details[open] > summary { margin-bottom: 0.4em; }
+    /* Indent a toggle's content (everything except its summary) a little,
+       so open toggles read as nested under their heading. Nested toggles
+       indent further, cumulatively. */
+    details > *:not(summary) { margin-left: 1.2em; }
 
     hr { border: none; border-bottom: 1px solid #ece8e1; margin: 2em 0; }
 
@@ -218,8 +222,8 @@
 <header><h1 class="page-title" dir="auto">How to automatically update your website from notion</h1><p class="page-description" dir="auto"></p></header>
 <div class="page-body">
 <p class="last-updated">Last updated 2026-07-08 </p>
-<p>I love notion. My writings page and its essays are updated from my Notion database automatically. A GitHub Action polls Notion every hour, pulls every row/page, and publishes each one as its own page on the site plus updates the menu list. </p>
-<details><summary>GitHub setup</summary>
+<p>I love notion. This page and all of my other essaysare updated from my Notion database automatically. You can link your notion &amp; website in a ways such that GitHub Action polls Notion every hour (/other increment of time), pulls every row/page, and publishes each one as its own page on the site plus updates the menu list. </p>
+<details><summary>my GitHub setup</summary>
 <p>A <strong>GitHub Action</strong> (<code>.github/workflows/notion-sync.yml</code>) runs <strong>once an hour</strong> (and you can trigger it on-demand from the repo’s Actions tab). Each run:</p>
 <ol class="numbered-list">
 <li><p>Reads every essay from the Notion “Writing” page via the Notion API.</p>
@@ -231,7 +235,7 @@
 </li>
 <li><p><strong>Downloads images</strong> into <code>images/notion/&lt;slug&gt;/</code> — because Notion’s own image links expire after ~1 hour, so it makes local, permanent copies.</p>
 </li>
-<li><p>Commits the result; GitHub Pages publishes it within a minute.</p>
+<li><p>Commits the result</p>
 </li>
 </ol>
 <p>So edits show up within the hour, or instantly if you hit “Run workflow.”</p>
