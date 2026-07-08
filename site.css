@@ -49,9 +49,8 @@ body.menu-page {
 }
 
 .menu-page .side-menu .site-name {
-  font-family: 'Playfair Display', 'Libre Baskerville', Georgia, serif;
+  /* same face and weight as the body text (Libre Baskerville), just larger */
   font-size: 1.5rem;
-  font-weight: 500;
   line-height: 1.2;
   color: #1a1a1a;
   margin-right: auto; /* keep the name in the corner, links on the right */
