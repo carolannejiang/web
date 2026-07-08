@@ -19,7 +19,7 @@
       align-items: flex-start;
       gap: 46px;
     }
-    .article { flex: 1 1 auto; min-width: 0; max-width: 680px; padding-bottom: 96px; }
+    .article { flex: 1 1 auto; min-width: 0; max-width: 680px; padding-bottom: 48px; }
 
     .side {
       flex: 0 0 208px;
@@ -145,8 +145,9 @@
     .comment-replies .comment { margin-bottom: 18px; }
     .comment-more { font-size: 0.78rem; }
 
-    .footer-nav { margin-top: 72px; padding-top: 20px; border-top: 1px solid #ece8e1; font-size: 0.85rem; }
-    .footer-nav a { color: #8a8a8a; text-decoration: none; }
+    .footer-nav { margin: 0; padding: 24px 28px 48px; border-top: 1px solid #ece8e1; display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: 20px; }
+    .footer-nav-links { display: flex; flex-direction: row; gap: 20px; align-items: center; }
+    .footer-nav a { font-size: 0.76rem; color: #595959; text-decoration: none; letter-spacing: 0.02em; }
     .footer-nav a:hover { color: #1a1a1a; }
 
     @media (min-width: 1140px) {
@@ -174,7 +175,7 @@
       .side { position: static; width: auto; flex: none; max-height: none; overflow: visible; margin-bottom: 4px; padding-right: 0; }
       .site-nav { flex-direction: row; gap: 18px; margin-bottom: 10px; padding-bottom: 0; border-bottom: none; }
       .toc-label, .side nav.table_of_contents { display: none; }
-      .article { max-width: none; padding-bottom: 72px; }
+      .article { max-width: none; padding-bottom: 48px; }
     }
     @media (max-width: 640px) {
       body { font-size: 13px; }
