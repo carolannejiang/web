@@ -36,8 +36,63 @@
       color: #0b3d91;
     }
 
+    nav {
+      margin: 60px auto 0;
+      max-width: 460px;
+      width: 100%;
+    }
+
+    .nav-item summary {
+      font-size: 0.82rem;
+      color: #1a1a1a;
+      cursor: pointer;
+      line-height: 1.9;
+      list-style: none;
+    }
+
+    .nav-item summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .nav-item summary::before {
+      content: '';
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      margin-right: 8px;
+      vertical-align: -4px;
+      background: url('images/ui/expand-plus.png') no-repeat center / contain;
+    }
+
+    .nav-item[open] summary::before {
+      background-image: url('images/ui/expand-minus.png');
+    }
+
+    .nav-item summary:hover {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .nav-content {
+      padding: 6px 0 10px 0;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: #444;
+    }
+
+    .nav-content a {
+      color: #595959;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .nav-content a:hover {
+      color: #2a2a2a;
+    }
+
     @media (max-width: 600px) {
       .intro { margin-top: 32px; }
+      nav { margin-top: 40px; }
     }
 
   </style>
@@ -58,8 +113,18 @@
   <main class="page">
 
     <p class="intro">
-      Hi, I am Carolanne, an undergraduate student in philosophy at the University of Chicago. Previously I&rsquo;ve organized <a href="https://manifest.is">Manifest</a>, a conference on prediction markets &amp; forecasting. In another world I might have been a painter, you can see some of my work <a href="art.html">here</a>.
+      Hi, I am Carolanne, an undergraduate student in philosophy at the University of Chicago.
     </p>
+
+    <nav>
+      <details class="nav-item">
+        <summary>Things I've worked on</summary>
+        <div class="nav-content">
+          Previously I&rsquo;ve organized <a href="https://manifest.is">Manifest</a>, a conference on prediction markets &amp; forecasting.
+          <br><br>In another world I might have been a painter, you can see some of my work <a href="art.html">here</a>.
+        </div>
+      </details>
+    </nav>
 
   </main>
 
