@@ -93,12 +93,13 @@
     .corner-quote {
       position: fixed;
       right: 24px;
-      bottom: 52px;
-      max-width: 340px;
+      bottom: 20px;
+      max-width: calc(100vw - 160px);
       text-align: right;
+      font-family: 'Times New Roman', Times, serif;
       font-style: italic;
       font-size: 0.82rem;
-      line-height: 1.7;
+      line-height: 18px;
       color: #595959;
       text-decoration: none;
       z-index: 10;
@@ -111,7 +112,7 @@
     @media (max-width: 600px) {
       .intro { margin-top: 32px; }
       nav { margin-top: 40px; }
-      .corner-quote { right: 16px; bottom: 46px; max-width: 260px; }
+      .corner-quote { right: 16px; bottom: 42px; max-width: calc(100vw - 32px); }
     }
 
   </style>
