@@ -154,11 +154,11 @@ body.gallery-page {
   }
 }
 
-/* Social icons pinned to the bottom-right corner of every page. */
+/* Social icons pinned to the bottom-left corner (currently home only). */
 .social-corner {
   position: fixed;
   bottom: 20px;
-  right: 24px;
+  left: 24px;
   z-index: 10;
   display: flex;
   flex-direction: row;
@@ -184,7 +184,7 @@ body.gallery-page {
 @media (max-width: 600px) {
   .social-corner {
     bottom: 16px;
-    right: 16px;
+    left: 16px;
     gap: 14px;
   }
 }
