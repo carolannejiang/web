@@ -115,6 +115,153 @@
       .corner-quote { right: 16px; bottom: 42px; max-width: calc(100vw - 32px); }
     }
 
+    /* Gwern-style popup ("popframe") */
+    .popup.popframe {
+      position: absolute;
+      z-index: 1000;
+      display: flex;
+      flex-flow: column;
+      overflow: visible;
+      width: 620px;
+      max-width: calc(100vw - 24px);
+      max-height: min(700px, 88vh);
+      background-color: #fff;
+      border: 3px solid #aaa;
+      box-shadow: 0 0 8px #aaa;
+    }
+
+    .popup.popframe.hidden {
+      display: none;
+    }
+
+    .popframe-title-bar {
+      flex: 0 0 auto;
+      display: flex;
+      flex-flow: row;
+      justify-content: flex-end;
+      align-items: center;
+      height: calc(1.5rem + 1px);
+      cursor: grab;
+    }
+
+    .popup.dragging .popframe-title-bar {
+      cursor: grabbing;
+    }
+
+    .popframe-title-bar-button {
+      flex: 0 0 1.5rem;
+      width: 1.5rem;
+      height: 100%;
+      margin: 0 1px;
+      padding: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 0;
+      color: #777;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .popframe-title-bar-button:nth-child(n+2) {
+      margin: 0 0 0 1px;
+    }
+
+    .popframe-title-bar-button:hover {
+      color: #000;
+    }
+
+    .popframe-title-bar-button:active {
+      transform: scale(0.9);
+    }
+
+    .popframe-title-bar-button svg {
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      fill: currentColor;
+    }
+
+    .popframe-scroll-view {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-color: #aaa #fff;
+    }
+
+    .popframe-body.popup-body {
+      padding: 0.7em 0.9em 0.8em 0.9em;
+    }
+
+    .popframe-body p {
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: #444;
+      margin: 0 0 14px;
+    }
+
+    .popframe-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    .popframe-body img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .carousel {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 440px;
+      margin: 4px 0 14px;
+    }
+    .carousel img {
+      display: block;
+      max-width: calc(100% - 60px);
+      max-height: 440px;
+      width: auto;
+      height: auto;
+    }
+    .carousel-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 26px;
+      height: 40px;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    .carousel-arrow:hover {
+      color: #000;
+    }
+    .carousel-arrow svg {
+      width: 100%;
+      height: 100%;
+    }
+    .carousel-prev { left: -4px; }
+    .carousel-next { right: -4px; }
+
+    .popframe-body a {
+      color: #595959;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .popframe-body a:hover {
+      color: #2a2a2a;
+    }
+
   </style>
 </head>
 <body class="menu-page">
@@ -142,13 +289,164 @@
       <details class="nav-item">
         <summary>Things I've worked on</summary>
         <div class="nav-content">
-          Previously I&rsquo;ve organized <a href="https://manifest.is">Manifest</a>, a conference on prediction markets &amp; forecasting.
-          <br><br>In another world I might have been a painter, you can see some of my work <a href="art.html">here</a>.
+          Previously I&rsquo;ve organized Manifest, a conference on prediction markets &amp; forecasting. <a href="#" id="manifest-details-link">See more details here</a>.
+          <br><br>In another world I might have been a painter, you can see some of my work <a href="#" id="art-details-link">here</a>.
         </div>
       </details>
     </nav>
 
   </main>
+
+  <div class="popup popframe has-title-bar hidden" id="manifest-popup" role="dialog" aria-label="Manifest details">
+    <div class="popframe-title-bar">
+      <button class="popframe-title-bar-button close-button" type="button" title="Close" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6 L18 18 M18 6 L6 18" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="popframe-scroll-view">
+      <div class="popframe-content-view">
+        <div class="popframe-body popup-body">
+          <p>Manifest is an annual conference / festival about prediction markets and forecasting, in 2026, I was one of the 2-3 core organizers responsible for making the conference happen.</p>
+          <p>Speakers &amp; guests included Owain Evans, Chad Jones, Scott Alexander, Patrick Mckenzie, Robin Hanson, Noam Brown, Danielle Fong, Allison Duettman, David Shor, Emmett Shear, Eliezer Yudkowsky, Kenny Easwaran, and more.</p>
+          <p>Some of my favorite sessions included The Train to Crazytown with Richard Chappell; Debate on whether prediction markets are good for anything with Marcus Abramovich and Stephen Grugett; Discussion on Decision Theory with Eliezer Yudkowsky &amp; Kenny Easwaran.</p>
+          <p>See an incomplete write-up of everything I&rsquo;ve learned from running Manifest <a href="manifest.html">here</a>; For references, talk to Austin Chen.</p>
+          <p><img src="images/notion/manifest/group-photo.webp" alt="Group photo of Manifest attendees in a backyard" width="1600" height="926" loading="lazy"></p>
+          <p><img src="images/notion/manifest/reception.webp" alt="Evening reception at Manifest with Manifold and Manifund banners under string lights" width="1600" height="1067" loading="lazy"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="popup popframe has-title-bar hidden" id="art-popup" role="dialog" aria-label="Art">
+    <div class="popframe-title-bar">
+      <button class="popframe-title-bar-button close-button" type="button" title="Close" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6 L18 18 M18 6 L6 18" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="popframe-scroll-view">
+      <div class="popframe-content-view">
+        <div class="popframe-body popup-body">
+          <div class="carousel">
+            <button class="carousel-arrow carousel-prev" type="button" aria-label="Previous image">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 L8.5 12 L14.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <img id="art-carousel-img" src="images/art-gallery.jpg" alt="Carolanne Jiang with her paintings and sculptures at a gallery exhibition">
+            <button class="carousel-arrow carousel-next" type="button" aria-label="Next image">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5 L15.5 12 L9.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+          <p>See more: <a href="art.html#paintings">Paintings</a>, <a href="art.html#sculpture">Sculpture</a>, <a href="art.html#ceramics">Ceramics</a>, <a href="art.html#pleinair">Plein Air &amp; Other memories</a>, <a href="art.html#comic">A Comic Project</a>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var GAP = 6;
+
+      function wirePopup(link, popup) {
+        if (!link || !popup) return;
+        var titleBar = popup.querySelector('.popframe-title-bar');
+        var closeBtn = popup.querySelector('.close-button');
+
+        function position() {
+          var r = link.getBoundingClientRect();
+          var w = popup.offsetWidth;
+          var h = popup.offsetHeight;
+          var left = window.scrollX + r.left;
+          var top = window.scrollY + r.bottom + GAP;
+          // clamp horizontally within viewport
+          var maxLeft = window.scrollX + document.documentElement.clientWidth - w - 8;
+          if (left > maxLeft) left = Math.max(window.scrollX + 8, maxLeft);
+          // clamp vertically so the popup stays fully on screen
+          var maxTop = window.scrollY + window.innerHeight - h - 12;
+          if (top > maxTop) top = Math.max(window.scrollY + 12, maxTop);
+          popup.style.left = left + 'px';
+          popup.style.top = top + 'px';
+        }
+
+        function show() {
+          if (!popup.classList.contains('hidden')) return;
+          popup.classList.remove('hidden');
+          position();
+        }
+
+        function hide() {
+          popup.classList.add('hidden');
+          popup.classList.remove('dragging');
+        }
+
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          if (popup.classList.contains('hidden')) show();
+          else hide();
+        });
+
+        closeBtn.addEventListener('click', hide);
+
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && !popup.classList.contains('hidden')) hide();
+        });
+
+        // Drag by the title bar.
+        var dragging = false, offX = 0, offY = 0;
+        titleBar.addEventListener('mousedown', function (e) {
+          if (e.target.closest('.popframe-title-bar-button')) return;
+          dragging = true;
+          popup.classList.add('dragging');
+          offX = e.clientX - popup.offsetLeft + window.scrollX;
+          offY = e.clientY - popup.offsetTop + window.scrollY;
+          e.preventDefault();
+        });
+        document.addEventListener('mousemove', function (e) {
+          if (!dragging) return;
+          popup.style.left = (e.clientX + window.scrollX - offX) + 'px';
+          popup.style.top = (e.clientY + window.scrollY - offY) + 'px';
+        });
+        document.addEventListener('mouseup', function () {
+          if (!dragging) return;
+          dragging = false;
+          popup.classList.remove('dragging');
+        });
+      }
+
+      wirePopup(document.getElementById('manifest-details-link'), document.getElementById('manifest-popup'));
+      wirePopup(document.getElementById('art-details-link'), document.getElementById('art-popup'));
+
+      // Art popup carousel: one image at a time.
+      var slides = [
+        { src: 'images/art-gallery.jpg', alt: 'Carolanne Jiang with her paintings and sculptures at a gallery exhibition' },
+        { src: 'images/art/popup/still-life-table-sculpture.webp', alt: 'Ceramic sculpture of a still life on a striped table with fruit, a vase, and a teapot' },
+        { src: 'images/art/popup/figures-hand-painting.webp', alt: 'Oil painting of two figures and an outstretched hand in blue and orange tones' },
+        { src: 'images/art/popup/seated-portrait-painting.webp', alt: 'Oil painting of a seated shirtless man' },
+        { src: 'images/art/popup/fractured-portrait-painting.webp', alt: 'Painting of a face fractured into shifting colorful panels' },
+        { src: 'images/art/popup/self-absorbed-family-portrait.webp', alt: 'Painting titled Self Absorbed Family Portrait, a crowd of stylized figures' },
+        { src: 'images/art/popup/overlapping-faces-painting.webp', alt: 'Oil painting of overlapping faces outlined in black' },
+        { src: 'images/art/popup/porcelain-tea-set.webp', alt: 'Handmade porcelain tea set with cups, teapots, and marbled glazes' },
+        { src: 'images/art/popup/stairwell-mural-birds.webp', alt: 'Stairwell mural featuring large painted birds and a central eye' },
+        { src: 'images/art/popup/stairwell-mural-panels.webp', alt: 'Three panels of a stairwell mural with gardens, a rabbit, and a cosmic oyster' }
+      ];
+      var current = 0;
+      var artPopup = document.getElementById('art-popup');
+      var carouselImg = document.getElementById('art-carousel-img');
+
+      function showSlide(i) {
+        current = (i + slides.length) % slides.length;
+        carouselImg.src = slides[current].src;
+        carouselImg.alt = slides[current].alt;
+      }
+
+      artPopup.querySelector('.carousel-prev').addEventListener('click', function () { showSlide(current - 1); });
+      artPopup.querySelector('.carousel-next').addEventListener('click', function () { showSlide(current + 1); });
+
+      document.addEventListener('keydown', function (e) {
+        if (artPopup.classList.contains('hidden')) return;
+        if (e.key === 'ArrowLeft') showSlide(current - 1);
+        if (e.key === 'ArrowRight') showSlide(current + 1);
+      });
+    })();
+  </script>
 
 </body>
 </html>

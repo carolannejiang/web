@@ -4,13 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Carolanne Jiang</title>
-  <meta name="description" content="Art by Carolanne Jiang — painting, sculpture, ceramics, a comic project, and plein air sketches.">
+  <meta name="description" content="Art by Carolanne Jiang — paintings, sculpture, ceramics, plein air sketches, and a comic project, all on one page.">
   <meta property="og:site_name" content="Carolanne Jiang">
   <meta property="og:title" content="Carolanne Jiang">
-  <meta property="og:description" content="Art by Carolanne Jiang — painting, sculpture, ceramics, a comic project, and plein air sketches.">
+  <meta property="og:description" content="Art by Carolanne Jiang — paintings, sculpture, ceramics, plein air sketches, and a comic project, all on one page.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.carolannejiang.com/art.html">
-  <meta property="og:image" content="https://www.carolannejiang.com/images/art/r002908-1500.jpg">
+  <meta property="og:image" content="https://www.carolannejiang.com/images/art-gallery.jpg">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,75 +20,553 @@
   <noscript><link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></noscript>
   <link rel="stylesheet" href="site.css">
   <style>
-    .art-hero {
-      margin: 40px auto 0;
-      max-width: 460px;
-      width: 100%;
+    .gallery {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 24px 80px;
     }
-
+    .art-hero {
+      max-width: 700px;
+      margin: 20px auto 70px;
+    }
     .art-hero img {
       width: 100%;
       height: auto;
       display: block;
       border-radius: 4px;
     }
-
-    .art-links {
-      margin: 34px auto 0;
-      max-width: 460px;
-      width: 100%;
+    .section {
+      margin-bottom: 100px;
+      scroll-margin-top: 24px;
+    }
+    .section > h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .section .intro {
+      font-size: 0.9rem;
+      color: #555;
+      line-height: 1.55;
+      max-width: 620px;
+      margin-bottom: 24px;
+    }
+    .grid3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 44px 28px;
+      margin-top: 28px;
+    }
+    .piece .mat {
+      background: #ececec;
+      aspect-ratio: 1 / 1;
       display: flex;
-      flex-direction: column;
-      gap: 18px;
+      align-items: center;
+      justify-content: center;
+      padding: 5%;
+      box-sizing: border-box;
     }
-
-    .art-links a {
-      font-size: 1.25rem;
+    .piece .mat img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      display: block;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.14);
+    }
+    .piece .cap {
+      padding-top: 12px;
+    }
+    .piece .cap h3 {
+      font-size: 0.98rem;
+      font-weight: 700;
+      margin-bottom: 3px;
+      line-height: 1.4;
+    }
+    .piece .cap p {
+      font-size: 0.83rem;
+      font-weight: 500;
+      color: #555;
       line-height: 1.5;
-      color: #000;
-      text-decoration: none;
     }
-
-    .art-links a:hover {
-      color: #000;
+    /* One caption for a group of photos of the same work */
+    .group {
+      margin-top: 48px;
     }
-
-    .art-links a.art-painting {
-      font-size: 1.75rem;
+    .group:first-of-type {
+      margin-top: 28px;
     }
-
-    .art-links a.art-comic {
+    .group .grid3 {
+      margin-top: 0;
+      gap: 28px;
+    }
+    .group-cap {
+      padding-top: 14px;
+    }
+    .group-cap h3 {
       font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 3px;
     }
-
+    .group-cap p {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #555;
+    }
+    @media (max-width: 900px) {
+      .grid3 { grid-template-columns: repeat(2, 1fr); }
+    }
     @media (max-width: 600px) {
-      .art-hero { margin-top: 28px; }
-      .art-links { margin-top: 28px; }
+      .gallery { padding: 12px 16px 60px; }
+      .art-hero { margin-bottom: 48px; }
+      .section { margin-bottom: 64px; }
+      .grid3 { grid-template-columns: 1fr; gap: 32px; }
     }
 
+    /* Click-to-open piece popup */
+    .piece .mat {
+      cursor: zoom-in;
+    }
+    .popup.popframe {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+      display: flex;
+      flex-flow: column;
+      width: min(760px, 92vw);
+      max-height: 88vh;
+      background-color: #fff;
+      border: 3px solid #aaa;
+      box-shadow: 0 0 8px #aaa;
+    }
+    .popup.popframe.hidden {
+      display: none;
+    }
+    .popframe-title-bar {
+      flex: 0 0 auto;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      height: calc(1.5rem + 1px);
+    }
+    .popframe-title-bar-button {
+      flex: 0 0 1.5rem;
+      width: 1.5rem;
+      height: 100%;
+      margin: 0 1px;
+      padding: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 0;
+      color: #777;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    .popframe-title-bar-button:hover {
+      color: #000;
+    }
+    .popframe-title-bar-button:active {
+      transform: scale(0.9);
+    }
+    .popframe-title-bar-button svg {
+      width: 100%;
+      height: 100%;
+    }
+    .popframe-scroll-view {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-color: #aaa #fff;
+    }
+    .popframe-body {
+      padding: 0 1.2rem 1.1rem;
+    }
+    .popframe-body img {
+      display: block;
+      max-width: 100%;
+      max-height: calc(88vh - 8rem);
+      width: auto;
+      height: auto;
+      margin: 0 auto;
+    }
+    .popframe-body .popup-cap {
+      padding-top: 12px;
+      text-align: center;
+    }
+    .popframe-body .popup-cap h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+    .popframe-body .popup-cap p {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #555;
+    }
   </style>
 </head>
-<body class="menu-page">
+<body class="gallery-page">
+  <nav class="site-nav" aria-label="Site navigation">
+    <a href="index.html" class="nav-back">← home</a>
+    <div class="nav-links">
+      <a href="writing.html">writing</a>
+    </div>
+  </nav>
 
-  <div class="side-menu" aria-label="Site navigation">
-    <a href="index.html" class="nav-home">home</a>
-    <a href="writing.html">writing</a>
-  </div>
-
-  <main class="page">
+  <main class="gallery">
 
     <figure class="art-hero">
       <img src="images/art-gallery.jpg" alt="Carolanne Jiang with her paintings and sculptures at a gallery exhibition">
     </figure>
 
-    <nav class="art-links" aria-label="Artwork">
-      <a class="art-painting" href="paintings.html">Paintings</a>
-      <a href="3d.html">Sculptures &amp; Ceramics</a>
-      <a href="pleinair.html">Plein Air &amp; Other memories</a>
-      <a class="art-comic" href="comic.html">A Comic Project</a>
-    </nav>
+    <section class="section" id="paintings">
+      <h2>Paintings</h2>
+      <div class="grid3">
+        <div class="piece">
+          <div class="mat"><img src="images/paintings/5cccde27903c0273c3964426d292449e-750.jpg" srcset="images/paintings/5cccde27903c0273c3964426d292449e-750.jpg 750w, images/paintings/5cccde27903c0273c3964426d292449e-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="264" alt="Self Absorbed Family Portrait" decoding="async"></div>
+          <div class="cap"><h3>Self Absorbed Family Portrait</h3><p>Oil on Canvas, 63×70 inches, 2024</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/paintings/48x54-750.jpg" srcset="images/paintings/48x54-750.jpg 750w, images/paintings/48x54-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="340" alt="On Breakfast and the Universe" loading="lazy" decoding="async"></div>
+          <div class="cap"><h3>On Breakfast and the Universe</h3><p>Oil on panel, 48×54 inches, 2022</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/paintings/christmas-750.jpg" srcset="images/paintings/christmas-750.jpg 750w, images/paintings/christmas-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="360" alt="Christmas" loading="lazy" decoding="async"></div>
+          <div class="cap"><h3>Christmas</h3><p>Oil and acrylic on canvas, 2024</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/paintings/1s-750.jpg" srcset="images/paintings/1s-750.jpg 750w, images/paintings/1s-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="141" alt="Mural — panoramic view across the hallway" loading="lazy" decoding="async"></div>
+          <div class="cap"><h3>Mural</h3><p>Panoramic view across the hallway</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/paintings/maybe-in-another-world-750.jpg" srcset="images/paintings/maybe-in-another-world-750.jpg 750w, images/paintings/maybe-in-another-world-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="386" alt="Mural" loading="lazy" decoding="async"></div>
+          <div class="cap"><h3>Mural</h3><p>Oil Paint, 2023</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/paintings/img-2625-2-750.jpg" srcset="images/paintings/img-2625-2-750.jpg 750w, images/paintings/img-2625-2-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="239" alt="Untitled (Kate showed us tomatoes)" loading="lazy" decoding="async"></div>
+          <div class="cap"><h3>Untitled (Kate showed us tomatoes during some 8AM English class)</h3><p>Acrylic on panel</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/paintings/l-o-l-o-s-former-home-750.jpg" srcset="images/paintings/l-o-l-o-s-former-home-750.jpg 750w, images/paintings/l-o-l-o-s-former-home-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="362" alt="Texture study of wall" loading="lazy" decoding="async"></div>
+          <div class="cap"><h3>Texture study of wall</h3><p>Oil on canvas, 2019</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/paintings/20278688069e1b19580eb990fe238d7f-750.jpg" srcset="images/paintings/20278688069e1b19580eb990fe238d7f-750.jpg 750w, images/paintings/20278688069e1b19580eb990fe238d7f-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="400" alt="Water" loading="lazy" decoding="async"></div>
+          <div class="cap"><h3>Water</h3><p>Oil on Canvas, 12×16 inches, 2024</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/paintings/wechatimg23-copy-750.jpg" srcset="images/paintings/wechatimg23-copy-750.jpg 750w, images/paintings/wechatimg23-copy-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="180" alt="Portrait studies" loading="lazy" decoding="async"></div>
+          <div class="cap"><h3>Portrait studies of some friends (Solvi, Charlie, and Sophia)</h3><p>Acrylic and Oil on Canvas, 8×14 inches, 2024</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/paintings/img-1381-2-2-750.jpg" srcset="images/paintings/img-1381-2-2-750.jpg 750w, images/paintings/img-1381-2-2-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Figure From Observation" loading="lazy" decoding="async"></div>
+          <div class="cap"><h3>Figure From Observation</h3><p>Acrylic on canvas, 36×48 inches, 2024</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/paintings/img-1421-3-750.jpg" srcset="images/paintings/img-1421-3-750.jpg 750w, images/paintings/img-1421-3-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="442" alt="Figure From Observation 2" loading="lazy" decoding="async"></div>
+          <div class="cap"><h3>Figure From Observation 2</h3><p>Acrylic on canvas, 36×48 inches, 2024</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/paintings/img-0381-750.jpg" srcset="images/paintings/img-0381-750.jpg 750w, images/paintings/img-0381-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="384" alt="Touch" loading="lazy" decoding="async"></div>
+          <div class="cap"><h3>Touch</h3><p>Oil on Canvas, 8×12 inches, 2023</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/paintings/tempimagefytp96-750.jpg" srcset="images/paintings/tempimagefytp96-750.jpg 750w, images/paintings/tempimagefytp96-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="488" alt="Water 2" loading="lazy" decoding="async"></div>
+          <div class="cap"><h3>Water 2</h3><p>Oil on Canvas, 2022</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/paintings/sides-36x48-inches-750.jpg" srcset="images/paintings/sides-36x48-inches-750.jpg 750w, images/paintings/sides-36x48-inches-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="240" alt="Faces" loading="lazy" decoding="async"></div>
+          <div class="cap"><h3>Faces</h3><p>Oil on Canvas, 2022</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/paintings/tempimage5oh7ll-750.jpg" srcset="images/paintings/tempimage5oh7ll-750.jpg 750w, images/paintings/tempimage5oh7ll-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="302" alt="Fabric" loading="lazy" decoding="async"></div>
+          <div class="cap"><h3>Fabric</h3><p>Oil on Canvas, 2023</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/paintings/wechatimg5-750.jpg" srcset="images/paintings/wechatimg5-750.jpg 750w, images/paintings/wechatimg5-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="300" alt="A Sea of Change" loading="lazy" decoding="async"></div>
+          <div class="cap"><h3>A Sea of Change</h3><p>Oil and Acrylic on canvas, 30×30 inches, 2024</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/paintings/18b7dda0-5b4b-4fc2-9b7c-31699267dc89-750.jpg" srcset="images/paintings/18b7dda0-5b4b-4fc2-9b7c-31699267dc89-750.jpg 750w, images/paintings/18b7dda0-5b4b-4fc2-9b7c-31699267dc89-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="231" alt="Self Portrait" loading="lazy" decoding="async"></div>
+          <div class="cap"><h3>Self Portrait, Sixteen Years Old in Sophomore Year Dorm</h3><p>Oil on canvas, 36×48 inches, 2023</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="sculpture">
+      <h2>Sculpture</h2>
+
+      <div class="group">
+        <div class="grid3">
+          <div class="piece"><div class="mat"><img src="images/3d/img-3229-750.jpg" srcset="images/3d/img-3229-750.jpg 750w, images/3d/img-3229-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="200" alt="Cake in Two Parts" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3228-750.jpg" srcset="images/3d/img-3228-750.jpg 750w, images/3d/img-3228-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="200" alt="Cake in Two Parts" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3221-3-750.jpg" srcset="images/3d/img-3221-3-750.jpg 750w, images/3d/img-3221-3-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Cake in Two Parts" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3222-2-750.jpg" srcset="images/3d/img-3222-2-750.jpg 750w, images/3d/img-3222-2-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Cake in Two Parts" loading="lazy" decoding="async"></div></div>
+        </div>
+        <div class="group-cap"><h3>Cake in Two Parts</h3><p>Stoneware, 2024</p></div>
+      </div>
+
+      <div class="group">
+        <div class="grid3">
+          <div class="piece"><div class="mat"><img src="images/3d/img-3237-750.jpg" srcset="images/3d/img-3237-750.jpg 750w, images/3d/img-3237-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sculpture, stoneware and porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3238-750.jpg" srcset="images/3d/img-3238-750.jpg 750w, images/3d/img-3238-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sculpture, stoneware and porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3236-750.jpg" srcset="images/3d/img-3236-750.jpg 750w, images/3d/img-3236-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sculpture, stoneware and porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3234-750.jpg" srcset="images/3d/img-3234-750.jpg 750w, images/3d/img-3234-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sculpture, stoneware and porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3235-750.jpg" srcset="images/3d/img-3235-750.jpg 750w, images/3d/img-3235-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="200" alt="Sculpture, stoneware and porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3233-750.jpg" srcset="images/3d/img-3233-750.jpg 750w, images/3d/img-3233-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sculpture, stoneware and porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3232-750.jpg" srcset="images/3d/img-3232-750.jpg 750w, images/3d/img-3232-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sculpture, stoneware and porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3230-750.jpg" srcset="images/3d/img-3230-750.jpg 750w, images/3d/img-3230-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sculpture, stoneware and porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3231-750.jpg" srcset="images/3d/img-3231-750.jpg 750w, images/3d/img-3231-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sculpture, stoneware and porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-1539-750.jpg" srcset="images/3d/img-1539-750.jpg 750w, images/3d/img-1539-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sculpture, stoneware and porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3244-750.jpg" srcset="images/3d/img-3244-750.jpg 750w, images/3d/img-3244-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="402" alt="Sculpture, stoneware and porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-1535-750.jpg" srcset="images/3d/img-1535-750.jpg 750w, images/3d/img-1535-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sculpture, stoneware and porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3241-750.jpg" srcset="images/3d/img-3241-750.jpg 750w, images/3d/img-3241-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sculpture, stoneware and porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3242-750.jpg" srcset="images/3d/img-3242-750.jpg 750w, images/3d/img-3242-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sculpture, stoneware and porcelain" loading="lazy" decoding="async"></div></div>
+        </div>
+        <div class="group-cap"><h3>Sculptures</h3><p>Stoneware and Porcelain, 2023–2024</p></div>
+      </div>
+
+      <div class="group">
+        <div class="grid3">
+          <div class="piece"><div class="mat"><img src="images/3d/img-3259-750.jpg" srcset="images/3d/img-3259-750.jpg 750w, images/3d/img-3259-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="200" alt="Hands, porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3260-750.jpg" srcset="images/3d/img-3260-750.jpg 750w, images/3d/img-3260-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="200" alt="Hands, porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3258-750.jpg" srcset="images/3d/img-3258-750.jpg 750w, images/3d/img-3258-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Hands, porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3257-750.jpg" srcset="images/3d/img-3257-750.jpg 750w, images/3d/img-3257-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Hands, porcelain" loading="lazy" decoding="async"></div></div>
+        </div>
+        <div class="group-cap"><h3>Hands</h3><p>Porcelain, 2023</p></div>
+      </div>
+
+      <div class="group">
+        <div class="grid3">
+          <div class="piece"><div class="mat"><img src="images/3d/img-3250-3-2-750.jpg" srcset="images/3d/img-3250-3-2-750.jpg 750w, images/3d/img-3250-3-2-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Table With Still Life" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/26x18-2-750.jpg" srcset="images/3d/26x18-2-750.jpg 750w, images/3d/26x18-2-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Table With Still Life" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3251-3-750.jpg" srcset="images/3d/img-3251-3-750.jpg 750w, images/3d/img-3251-3-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Table With Still Life" loading="lazy" decoding="async"></div></div>
+        </div>
+        <div class="group-cap"><h3>Table With Still Life, David Schab study</h3><p>Stoneware, 2023</p></div>
+      </div>
+    </section>
+
+    <section class="section" id="ceramics">
+      <h2>Ceramics</h2>
+
+      <div class="group">
+        <div class="grid3">
+          <div class="piece"><div class="mat"><img src="images/3d/img-2653-750.jpg" srcset="images/3d/img-2653-750.jpg 750w, images/3d/img-2653-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Tea set, porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-2652-750.jpg" srcset="images/3d/img-2652-750.jpg 750w, images/3d/img-2652-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="200" alt="Tea set, porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-1998-750.jpg" srcset="images/3d/img-1998-750.jpg 750w, images/3d/img-1998-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="200" alt="Tea set, porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-1996-750.jpg" srcset="images/3d/img-1996-750.jpg 750w, images/3d/img-1996-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="200" alt="Tea set, porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-2004-750.jpg" srcset="images/3d/img-2004-750.jpg 750w, images/3d/img-2004-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Tea set, porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-2001-750.jpg" srcset="images/3d/img-2001-750.jpg 750w, images/3d/img-2001-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Tea set, porcelain" loading="lazy" decoding="async"></div></div>
+        </div>
+        <div class="group-cap"><h3>Tea Sets</h3><p>Porcelain, 2023</p></div>
+      </div>
+
+      <div class="group">
+        <div class="grid3">
+          <div class="piece"><div class="mat"><img src="images/3d/img-3256-750.jpg" srcset="images/3d/img-3256-750.jpg 750w, images/3d/img-3256-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="200" alt="Sushi, porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3255-750.jpg" srcset="images/3d/img-3255-750.jpg 750w, images/3d/img-3255-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="200" alt="Sushi, porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3253-750.jpg" srcset="images/3d/img-3253-750.jpg 750w, images/3d/img-3253-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="200" alt="Sushi, porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3219-750.jpg" srcset="images/3d/img-3219-750.jpg 750w, images/3d/img-3219-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="300" alt="Sushi, porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3217-750.jpg" srcset="images/3d/img-3217-750.jpg 750w, images/3d/img-3217-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sushi, porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3215-750.jpg" srcset="images/3d/img-3215-750.jpg 750w, images/3d/img-3215-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sushi, porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3220-750.jpg" srcset="images/3d/img-3220-750.jpg 750w, images/3d/img-3220-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="200" alt="Sushi, porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3218-750.jpg" srcset="images/3d/img-3218-750.jpg 750w, images/3d/img-3218-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="200" alt="Sushi, porcelain" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/3d/img-3214-750.jpg" srcset="images/3d/img-3214-750.jpg 750w, images/3d/img-3214-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sushi, porcelain" loading="lazy" decoding="async"></div></div>
+        </div>
+        <div class="group-cap"><h3>Sushi</h3><p>Porcelain</p></div>
+      </div>
+    </section>
+
+    <section class="section" id="pleinair">
+      <h2>Plein Air &amp; Other Memories</h2>
+
+      <div class="group">
+        <p class="intro">These were painted during the summer of 2025. I also made an arrangement consisting of hair ties and clips, that allows me to carry ~5 wet oil paintings while traveling.</p>
+        <div class="grid3">
+          <div class="piece">
+            <div class="mat"><img src="images/pleinair/_R002058.jpg" srcset="images/pleinair/_R002058-750.jpg 750w, images/pleinair/_R002058.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="999" alt="Karl-Marx-Straße, Berlin, 2025" loading="lazy" decoding="async"></div>
+            <div class="cap"><p>Karl-Marx-Straße, Berlin, 2025</p></div>
+          </div>
+          <div class="piece">
+            <div class="mat"><img src="images/pleinair/IMG_0871.jpg" srcset="images/pleinair/IMG_0871-750.jpg 750w, images/pleinair/IMG_0871.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="2000" alt="Treptower Park, Berlin, 2025" loading="lazy" decoding="async"></div>
+            <div class="cap"><p>Treptower Park, Berlin, 2025</p></div>
+          </div>
+          <div class="piece">
+            <div class="mat"><img src="images/pleinair/IMG_1884.jpg" srcset="images/pleinair/IMG_1884-750.jpg 750w, images/pleinair/IMG_1884.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="2000" alt="Karl-Marx-Straße, Berlin, 2025" loading="lazy" decoding="async"></div>
+            <div class="cap"><p>Karl-Marx-Straße, Berlin, 2025</p></div>
+          </div>
+          <div class="piece">
+            <div class="mat"><img src="images/pleinair/IMG_2429.jpg" srcset="images/pleinair/IMG_2429-750.jpg 750w, images/pleinair/IMG_2429.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="2000" alt="Prague 1, 2025" loading="lazy" decoding="async"></div>
+            <div class="cap"><p>Prague 1, 2025</p></div>
+          </div>
+          <div class="piece">
+            <div class="mat"><img src="images/pleinair/IMG_2529.jpg" srcset="images/pleinair/IMG_2529-750.jpg 750w, images/pleinair/IMG_2529.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="2000" alt="Natural History Museum, Vienna, 2025" loading="lazy" decoding="async"></div>
+            <div class="cap"><p>Natural History Museum, Vienna, 2025</p></div>
+          </div>
+          <div class="piece">
+            <div class="mat"><img src="images/pleinair/IMG_2535.jpg" srcset="images/pleinair/IMG_2535-750.jpg 750w, images/pleinair/IMG_2535.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="2000" alt="Natural History Museum, Vienna, 2025" loading="lazy" decoding="async"></div>
+            <div class="cap"><p>Natural History Museum, Vienna, 2025</p></div>
+          </div>
+          <div class="piece">
+            <div class="mat"><img src="images/pleinair/IMG_2582.jpg" srcset="images/pleinair/IMG_2582-750.jpg 750w, images/pleinair/IMG_2582.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="2000" alt="Bratislava, 2025" loading="lazy" decoding="async"></div>
+            <div class="cap"><p>Bratislava, 2025</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <p class="intro">Summer of 2023, most of these are acrylic on panel, in Florence, Italy</p>
+        <div class="grid3">
+          <div class="piece"><div class="mat"><img src="images/memories/m1.jpg" srcset="images/memories/m1-750.jpg 750w, images/memories/m1.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1183" alt="Florence, 2023" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/memories/m2.jpg" srcset="images/memories/m2-750.jpg 750w, images/memories/m2.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1497" alt="Florence, 2023" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/memories/m3.jpg" srcset="images/memories/m3-750.jpg 750w, images/memories/m3.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1128" alt="Florence, 2023" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/memories/m4.jpg" srcset="images/memories/m4-750.jpg 750w, images/memories/m4.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1498" alt="Florence, 2023" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/memories/m5.jpg" srcset="images/memories/m5-750.jpg 750w, images/memories/m5.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="2000" alt="Florence, 2023" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/memories/m6.jpg" srcset="images/memories/m6-750.jpg 750w, images/memories/m6.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1125" alt="Florence, 2023" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/memories/m7.jpg" srcset="images/memories/m7-750.jpg 750w, images/memories/m7.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="2000" alt="Florence, 2023" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/memories/m8.jpg" srcset="images/memories/m8-750.jpg 750w, images/memories/m8.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1197" alt="Florence, 2023" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/memories/m9.jpg" srcset="images/memories/m9-750.jpg 750w, images/memories/m9.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1500" alt="Florence, 2023" loading="lazy" decoding="async"></div></div>
+        </div>
+        <div class="group-cap"><p>Florence, 2023</p></div>
+      </div>
+
+      <div class="group">
+        <p class="intro">Paintings from various students. Between 2023 to 2025, I taught observational acrylic painting lessons at my local senior center. Here are some pieces from my students that I am particularly fond of. Nearly all of them had no prior experience.</p>
+        <div class="grid3">
+          <div class="piece"><div class="mat"><img src="images/students/s01.jpg" srcset="images/students/s01-750.jpg 750w, images/students/s01.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1191" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/students/s02.jpg" srcset="images/students/s02-750.jpg 750w, images/students/s02.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1156" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/students/s03.jpg" srcset="images/students/s03-750.jpg 750w, images/students/s03.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1173" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/students/s04.jpg" srcset="images/students/s04-750.jpg 750w, images/students/s04.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1159" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/students/s05.jpg" srcset="images/students/s05-750.jpg 750w, images/students/s05.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1117" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/students/s06.jpg" srcset="images/students/s06-750.jpg 750w, images/students/s06.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1986" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/students/s07.jpg" srcset="images/students/s07-750.jpg 750w, images/students/s07.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1157" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/students/s08.jpg" srcset="images/students/s08-750.jpg 750w, images/students/s08.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1172" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/students/s09.jpg" srcset="images/students/s09-750.jpg 750w, images/students/s09.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1163" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/students/s10.jpg" srcset="images/students/s10-750.jpg 750w, images/students/s10.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1206" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/students/s11.jpg" srcset="images/students/s11-750.jpg 750w, images/students/s11.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1200" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/students/s12.jpg" srcset="images/students/s12-750.jpg 750w, images/students/s12.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1908" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/students/s13.jpg" srcset="images/students/s13-750.jpg 750w, images/students/s13.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1186" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/students/s14.jpg" srcset="images/students/s14-750.jpg 750w, images/students/s14.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1184" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/students/s15.jpg" srcset="images/students/s15-750.jpg 750w, images/students/s15.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1185" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/students/s16.jpg" srcset="images/students/s16-750.jpg 750w, images/students/s16.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1178" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/students/s17.jpg" srcset="images/students/s17-750.jpg 750w, images/students/s17.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1179" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/students/s18.jpg" srcset="images/students/s18-750.jpg 750w, images/students/s18.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1932" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/students/s19.jpg" srcset="images/students/s19-750.jpg 750w, images/students/s19.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1080" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/students/s20.jpg" srcset="images/students/s20-750.jpg 750w, images/students/s20.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1128" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/students/s21.jpg" srcset="images/students/s21-750.jpg 750w, images/students/s21.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1866" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+        </div>
+        <div class="group-cap"><p>Paintings by my students, 2023–2025</p></div>
+      </div>
+    </section>
+
+    <section class="section" id="comic">
+      <h2>A Comic Project</h2>
+      <div class="grid3">
+        <div class="piece">
+          <div class="mat"><img src="images/comic/finding-1-copy-750.jpg" srcset="images/comic/finding-1-copy-750.jpg 750w, images/comic/finding-1-copy-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="451" alt="Finding page 1" loading="lazy" decoding="async"></div>
+          <div class="cap"><h3>Finding</h3><p>Page 1</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/comic/finding-2-copy-750.jpg" srcset="images/comic/finding-2-copy-750.jpg 750w, images/comic/finding-2-copy-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Finding page 2" loading="lazy" decoding="async"></div>
+          <div class="cap"><p>Page 2</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/comic/finding-3-copy-750.jpg" srcset="images/comic/finding-3-copy-750.jpg 750w, images/comic/finding-3-copy-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="457" alt="Finding page 3" loading="lazy" decoding="async"></div>
+          <div class="cap"><p>Page 3</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/comic/finding-4-copy-750.jpg" srcset="images/comic/finding-4-copy-750.jpg 750w, images/comic/finding-4-copy-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="455" alt="Finding page 4" loading="lazy" decoding="async"></div>
+          <div class="cap"><p>Page 4</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/comic/finding-5-copy-750.jpg" srcset="images/comic/finding-5-copy-750.jpg 750w, images/comic/finding-5-copy-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="453" alt="Finding page 5" loading="lazy" decoding="async"></div>
+          <div class="cap"><p>Page 5</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/comic/finding-6-copy-750.jpg" srcset="images/comic/finding-6-copy-750.jpg 750w, images/comic/finding-6-copy-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="452" alt="Finding page 6" loading="lazy" decoding="async"></div>
+          <div class="cap"><p>Page 6</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/comic/finding-7-copy-750.jpg" srcset="images/comic/finding-7-copy-750.jpg 750w, images/comic/finding-7-copy-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="451" alt="Finding page 7" loading="lazy" decoding="async"></div>
+          <div class="cap"><p>Page 7</p></div>
+        </div>
+      </div>
+    </section>
 
   </main>
+
+  <div class="popup popframe hidden" id="piece-popup" role="dialog" aria-label="Artwork">
+    <div class="popframe-title-bar">
+      <button class="popframe-title-bar-button close-button" type="button" title="Close" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6 L18 18 M18 6 L6 18" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="popframe-scroll-view">
+      <div class="popframe-body">
+        <img id="piece-popup-img" src="" alt="">
+        <div class="popup-cap" id="piece-popup-cap"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var popup = document.getElementById('piece-popup');
+      var popupImg = document.getElementById('piece-popup-img');
+      var popupCap = document.getElementById('piece-popup-cap');
+      var closeBtn = popup.querySelector('.close-button');
+
+      function largestSrc(img) {
+        var srcset = img.getAttribute('srcset');
+        if (!srcset) return img.src;
+        var best = null, bestW = 0;
+        srcset.split(',').forEach(function (entry) {
+          var parts = entry.trim().split(/\s+/);
+          var w = parseInt(parts[1], 10) || 0;
+          if (w >= bestW) { bestW = w; best = parts[0]; }
+        });
+        return best || img.src;
+      }
+
+      function open(piece) {
+        var img = piece.querySelector('.mat img');
+        if (!img) return;
+        popupImg.src = largestSrc(img);
+        popupImg.alt = img.alt;
+        var cap = piece.querySelector('.cap');
+        if (!cap) {
+          var group = piece.closest('.group');
+          if (group) cap = group.querySelector('.group-cap');
+        }
+        popupCap.innerHTML = cap ? cap.innerHTML : '';
+        popup.classList.remove('hidden');
+      }
+
+      function close() {
+        popup.classList.add('hidden');
+        popupImg.src = '';
+      }
+
+      document.querySelectorAll('.piece').forEach(function (piece) {
+        piece.querySelector('.mat').addEventListener('click', function () { open(piece); });
+      });
+
+      closeBtn.addEventListener('click', close);
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !popup.classList.contains('hidden')) close();
+      });
+
+      document.addEventListener('click', function (e) {
+        if (popup.classList.contains('hidden')) return;
+        if (!popup.contains(e.target) && !e.target.closest('.piece .mat')) close();
+      });
+    })();
+  </script>
 
 </body>
 </html>
