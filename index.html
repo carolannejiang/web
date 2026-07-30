@@ -186,6 +186,7 @@
 
     .popframe-scroll-view {
       flex: 1 1 auto;
+      min-height: 0;
       overflow-y: auto;
       overflow-x: hidden;
       scrollbar-color: #aaa #fff;
@@ -213,7 +214,6 @@
     }
 
     .carousel {
-      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -249,8 +249,8 @@
       width: 100%;
       height: 100%;
     }
-    .carousel-prev { left: -4px; }
-    .carousel-next { right: -4px; }
+    .carousel-prev { left: 4px; }
+    .carousel-next { right: 4px; }
 
     /* Must stay below the base .carousel rules to win the cascade. */
     @media (max-width: 600px) {
@@ -268,6 +268,19 @@
         position: absolute;
         inset: -8px;
       }
+    }
+
+    /* Cooking gallery: uniform square thumbnails, always 4 per row. */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      margin: 4px 0 2px;
+    }
+    .photo-grid img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
     }
 
     .popframe-body a {
@@ -309,7 +322,7 @@
         <div class="nav-content">
           Previously I&rsquo;ve organized Manifest, a conference on prediction markets &amp; forecasting. <a href="#" id="manifest-details-link">See more details here</a>.
           <br><br>In another world I might have been a painter, you can see some of my work <a href="#" id="art-details-link">here</a>.
-          <br><br>Other very small projects: <a href="https://book.carolanne.link/">book formatter</a>
+          <br><br>Other smaller projects: <a href="https://book.carolanne.link/">automatic typesetter tool</a>, <a href="#" id="design-details-link">mini design projects</a>, <a href="#" id="events-details-link">events</a>, <a href="#" id="photography-details-link">photography</a>, <a href="#" id="clothes-details-link">making clothes</a>, <a href="#" id="cooking-details-link">cooking</a>, <a href="#">link shortener</a>
         </div>
       </details>
     </nav>
@@ -317,18 +330,12 @@
   </main>
 
   <div class="popup popframe has-title-bar hidden" id="manifest-popup" role="dialog" aria-label="Manifest details">
-    <div class="popframe-title-bar">
-      <button class="popframe-title-bar-button close-button" type="button" title="Close" aria-label="Close">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6 L18 18 M18 6 L6 18" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
-      </button>
-    </div>
     <div class="popframe-scroll-view">
       <div class="popframe-content-view">
         <div class="popframe-body popup-body">
           <p>Manifest is an annual conference / festival about prediction markets and forecasting, in 2026, I was one of the 2-3 core organizers responsible for making the conference happen.</p>
           <p>Speakers &amp; guests included Owain Evans, Chad Jones, Scott Alexander, Patrick Mckenzie, Robin Hanson, Noam Brown, Danielle Fong, Allison Duettman, David Shor, Emmett Shear, Eliezer Yudkowsky, Kenny Easwaran, and more.</p>
           <p>Some of my favorite sessions included The Train to Crazytown with Richard Chappell; Debate on whether prediction markets are good for anything with Marcus Abramovich and Stephen Grugett; Discussion on Decision Theory with Eliezer Yudkowsky &amp; Kenny Easwaran.</p>
-          <p>See an incomplete write-up of everything I&rsquo;ve learned from running Manifest <a href="manifest.html">here</a>; For references, talk to Austin Chen.</p>
           <div class="carousel">
             <button class="carousel-arrow carousel-prev" type="button" aria-label="Previous image">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 L8.5 12 L14.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -338,17 +345,13 @@
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5 L15.5 12 L9.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
           </div>
+          <p>See an incomplete write-up of everything I&rsquo;ve learned from running Manifest <a href="manifest.html">here</a>; For references, talk to Austin Chen.</p>
         </div>
       </div>
     </div>
   </div>
 
   <div class="popup popframe has-title-bar hidden" id="art-popup" role="dialog" aria-label="Art">
-    <div class="popframe-title-bar">
-      <button class="popframe-title-bar-button close-button" type="button" title="Close" aria-label="Close">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6 L18 18 M18 6 L6 18" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
-      </button>
-    </div>
     <div class="popframe-scroll-view">
       <div class="popframe-content-view">
         <div class="popframe-body popup-body">
@@ -367,14 +370,108 @@
     </div>
   </div>
 
+  <div class="popup popframe has-title-bar hidden" id="design-popup" role="dialog" aria-label="Mini design projects">
+    <div class="popframe-scroll-view">
+      <div class="popframe-content-view">
+        <div class="popframe-body popup-body">
+          <div class="carousel">
+            <button class="carousel-arrow carousel-prev" type="button" aria-label="Previous image">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 L8.5 12 L14.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <img id="design-carousel-img" src="images/design/uchitech-cover.webp" alt="">
+            <button class="carousel-arrow carousel-next" type="button" aria-label="Next image">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5 L15.5 12 L9.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+          <p class="popup-caption"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="popup popframe has-title-bar hidden" id="events-popup" role="dialog" aria-label="Events">
+    <div class="popframe-scroll-view">
+      <div class="popframe-content-view">
+        <div class="popframe-body popup-body">
+          <div class="carousel">
+            <button class="carousel-arrow carousel-prev" type="button" aria-label="Previous image">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 L8.5 12 L14.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <img id="events-carousel-img" src="images/events/event-crowd-mingling.webp" alt="">
+            <button class="carousel-arrow carousel-next" type="button" aria-label="Next image">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5 L15.5 12 L9.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="popup popframe has-title-bar hidden" id="photography-popup" role="dialog" aria-label="Photography">
+    <div class="popframe-scroll-view">
+      <div class="popframe-content-view">
+        <div class="popframe-body popup-body">
+          <div class="carousel">
+            <button class="carousel-arrow carousel-prev" type="button" aria-label="Previous image">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 L8.5 12 L14.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <img id="photography-carousel-img" src="images/photography/chicago-symphony-center-night.webp" alt="">
+            <button class="carousel-arrow carousel-next" type="button" aria-label="Next image">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5 L15.5 12 L9.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="popup popframe has-title-bar hidden" id="clothes-popup" role="dialog" aria-label="Making clothes">
+    <div class="popframe-scroll-view">
+      <div class="popframe-content-view">
+        <div class="popframe-body popup-body">
+          <div class="carousel">
+            <button class="carousel-arrow carousel-prev" type="button" aria-label="Previous image">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 L8.5 12 L14.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <img id="clothes-carousel-img" src="images/clothes/blue-dress-red-house.webp" alt="">
+            <button class="carousel-arrow carousel-next" type="button" aria-label="Next image">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5 L15.5 12 L9.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="popup popframe has-title-bar hidden" id="cooking-popup" role="dialog" aria-label="Cooking">
+    <div class="popframe-scroll-view">
+      <div class="popframe-content-view">
+        <div class="popframe-body popup-body">
+          <div class="photo-grid">
+            <img src="images/cooking/cooking-01.webp" alt="" loading="lazy" decoding="async">
+            <img src="images/cooking/cooking-02.webp" alt="" loading="lazy" decoding="async">
+            <img src="images/cooking/cooking-03.webp" alt="" loading="lazy" decoding="async">
+            <img src="images/cooking/cooking-04.webp" alt="" loading="lazy" decoding="async">
+            <img src="images/cooking/cooking-05.webp" alt="" loading="lazy" decoding="async">
+            <img src="images/cooking/cooking-06.webp" alt="" loading="lazy" decoding="async">
+            <img src="images/cooking/cooking-07.webp" alt="" loading="lazy" decoding="async">
+            <img src="images/cooking/cooking-08.webp" alt="" loading="lazy" decoding="async">
+            <img src="images/cooking/cooking-09.webp" alt="" loading="lazy" decoding="async">
+            <img src="images/cooking/cooking-10.webp" alt="" loading="lazy" decoding="async">
+            <img src="images/cooking/cooking-11.webp" alt="" loading="lazy" decoding="async">
+            <img src="images/cooking/cooking-12.webp" alt="" loading="lazy" decoding="async">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     (function () {
       var GAP = 6;
 
       function wirePopup(link, popup) {
         if (!link || !popup) return;
-        var titleBar = popup.querySelector('.popframe-title-bar');
-        var closeBtn = popup.querySelector('.close-button');
 
         function position() {
           var r = link.getBoundingClientRect();
@@ -400,7 +497,6 @@
 
         function hide() {
           popup.classList.add('hidden');
-          popup.classList.remove('dragging');
         }
 
         link.addEventListener('click', function (e) {
@@ -409,52 +505,35 @@
           else hide();
         });
 
-        closeBtn.addEventListener('click', hide);
-
         document.addEventListener('keydown', function (e) {
           if (e.key === 'Escape' && !popup.classList.contains('hidden')) hide();
         });
 
-        // On touch screens (no Escape key), tapping outside the popup closes it.
+        // Clicking outside the popup (empty space) closes it.
         document.addEventListener('click', function (e) {
           if (popup.classList.contains('hidden')) return;
-          if (!window.matchMedia('(pointer: coarse)').matches) return;
           if (popup.contains(e.target) || link.contains(e.target)) return;
           hide();
-        });
-
-        // Drag by the title bar.
-        var dragging = false, offX = 0, offY = 0;
-        titleBar.addEventListener('mousedown', function (e) {
-          if (e.target.closest('.popframe-title-bar-button')) return;
-          dragging = true;
-          popup.classList.add('dragging');
-          offX = e.clientX - popup.offsetLeft + window.scrollX;
-          offY = e.clientY - popup.offsetTop + window.scrollY;
-          e.preventDefault();
-        });
-        document.addEventListener('mousemove', function (e) {
-          if (!dragging) return;
-          popup.style.left = (e.clientX + window.scrollX - offX) + 'px';
-          popup.style.top = (e.clientY + window.scrollY - offY) + 'px';
-        });
-        document.addEventListener('mouseup', function () {
-          if (!dragging) return;
-          dragging = false;
-          popup.classList.remove('dragging');
         });
       }
 
       wirePopup(document.getElementById('manifest-details-link'), document.getElementById('manifest-popup'));
       wirePopup(document.getElementById('art-details-link'), document.getElementById('art-popup'));
+      wirePopup(document.getElementById('design-details-link'), document.getElementById('design-popup'));
+      wirePopup(document.getElementById('events-details-link'), document.getElementById('events-popup'));
+      wirePopup(document.getElementById('photography-details-link'), document.getElementById('photography-popup'));
+      wirePopup(document.getElementById('clothes-details-link'), document.getElementById('clothes-popup'));
+      wirePopup(document.getElementById('cooking-details-link'), document.getElementById('cooking-popup'));
 
       // Popup carousels: one image at a time.
       function wireCarousel(popup, imgEl, slides) {
         var current = 0;
+        var capEl = popup.querySelector('.popup-caption');
         function show(i) {
           current = (i + slides.length) % slides.length;
           imgEl.src = slides[current].src;
           imgEl.alt = slides[current].alt;
+          if (capEl) capEl.innerHTML = slides[current].cap || '';
         }
         popup.querySelector('.carousel-prev').addEventListener('click', function () { show(current - 1); });
         popup.querySelector('.carousel-next').addEventListener('click', function () { show(current + 1); });
@@ -476,6 +555,8 @@
           var dy = e.changedTouches[0].clientY - touchY;
           if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) show(current + (dx < 0 ? 1 : -1));
         }, { passive: true });
+
+        if (capEl) capEl.innerHTML = slides[0].cap || '';
       }
 
       wireCarousel(
@@ -491,7 +572,16 @@
           { src: 'images/art/popup/overlapping-faces-painting.webp', alt: 'Oil painting of overlapping faces outlined in black' },
           { src: 'images/art/popup/porcelain-tea-set.webp', alt: 'Handmade porcelain tea set with cups, teapots, and marbled glazes' },
           { src: 'images/art/popup/stairwell-mural-birds.webp', alt: 'Stairwell mural featuring large painted birds and a central eye' },
-          { src: 'images/art/popup/stairwell-mural-panels.webp', alt: 'Three panels of a stairwell mural with gardens, a rabbit, and a cosmic oyster' }
+          { src: 'images/art/popup/stairwell-mural-panels.webp', alt: 'Three panels of a stairwell mural with gardens, a rabbit, and a cosmic oyster' },
+          { src: 'images/art/popup/plein-air-street-painting-in-situ.webp', alt: '' },
+          { src: 'images/art/popup/bedroom-interior-sleeping-figure.webp', alt: '' },
+          { src: 'images/art/popup/ceramic-hands-eye-sculpture.webp', alt: '' },
+          { src: 'images/paintings/ink-portrait-glasses-1500.jpg', alt: '' },
+          { src: 'images/paintings/mater-dolorosa-1500.jpg', alt: '' },
+          { src: 'images/paintings/charcoal-seated-figure-1500.jpg', alt: '' },
+          { src: 'images/paintings/portrait-woman-necklace-1500.jpg', alt: '' },
+          { src: 'images/paintings/self-portrait-1500.jpg', alt: '' },
+          { src: 'images/paintings/pencil-still-life-1500.jpg', alt: '' }
         ]
       );
 
@@ -502,6 +592,49 @@
           { src: 'images/manifest/group-photo.webp', alt: 'Group photo of Manifest attendees in a backyard' },
           { src: 'images/manifest/outdoor-talk.webp', alt: 'Audience watching an outdoor talk at Manifest under shade sails' },
           { src: 'images/manifest/reception.webp', alt: 'Evening reception at Manifest with Manifold and Manifund banners under string lights' }
+        ]
+      );
+
+      wireCarousel(
+        document.getElementById('design-popup'),
+        document.getElementById('design-carousel-img'),
+        [
+          { src: 'images/design/uchitech-cover.webp', alt: '', cap: 'Cover design for <a href="https://uchicagotechreview.com/" target="_blank" rel="noreferrer">UChicago Technology Review</a>' },
+          { src: 'images/design/xlab-fellowship-poster.webp', alt: '', cap: 'Poster design for <a href="https://uchicagoaisafety.com/" target="_blank" rel="noreferrer">UChicago AI Safety @ X-Lab</a>' }
+        ]
+      );
+
+      wireCarousel(
+        document.getElementById('events-popup'),
+        document.getElementById('events-carousel-img'),
+        [
+          { src: 'images/events/event-crowd-mingling.webp', alt: '' },
+          { src: 'images/events/event-hot-takes-whiteboards.webp', alt: '' },
+          { src: 'images/events/event-argue-with-authors-sign.webp', alt: '' },
+          { src: 'images/events/event-lounge-conversation.webp', alt: '' }
+        ]
+      );
+
+      wireCarousel(
+        document.getElementById('photography-popup'),
+        document.getElementById('photography-carousel-img'),
+        [
+          { src: 'images/photography/chicago-symphony-center-night.webp', alt: '' },
+          { src: 'images/photography/circus-tent-dusk.webp', alt: '' },
+          { src: 'images/photography/shell-station-dusk-vespa.webp', alt: '' }
+        ]
+      );
+
+      wireCarousel(
+        document.getElementById('clothes-popup'),
+        document.getElementById('clothes-carousel-img'),
+        [
+          { src: 'images/clothes/blue-dress-red-house.webp', alt: '' },
+          { src: 'images/clothes/blue-dress-white-house.webp', alt: '' },
+          { src: 'images/clothes/blue-dress-stone-wall.webp', alt: '' },
+          { src: 'images/clothes/black-dress-back.webp', alt: '' },
+          { src: 'images/clothes/black-dress-profile-left.webp', alt: '' },
+          { src: 'images/clothes/black-dress-profile-right.webp', alt: '' }
         ]
       );
     })();
