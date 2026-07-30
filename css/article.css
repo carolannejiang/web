@@ -188,6 +188,15 @@ input.comment-field { max-width: 240px; }
   .column-list { flex-direction: column; gap: 0; }
 }
 
+/* Touch screens: 16px inputs stop iOS Safari from auto-zooming the page when
+   the comment form is focused; small links get larger tap targets with no
+   visual change (padding cancelled by negative margins). */
+@media (pointer: coarse) {
+  .comment-field { font-size: 16px; }
+  .footer-nav a { padding: 10px 8px; margin: -10px -8px; }
+  .comment-reply, .comment-cancel, .comment-more { padding: 10px; margin: -10px; }
+}
+
 
 /* content images: smaller, centered — not full column width */
 figure.image img { max-width: min(100%, 420px); }
