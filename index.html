@@ -213,10 +213,9 @@
       height: auto;
     }
 
-    .popframe-body video {
+    .carousel video {
       display: block;
-      margin: 10px auto 0;
-      max-width: 100%;
+      max-width: calc(100% - 60px);
       max-height: 440px;
     }
 
@@ -241,9 +240,9 @@
     #manifest-popup .carousel img {
       max-height: 300px;
     }
-    /* Single portrait photo: a narrower, portrait-shaped popup. */
+    /* Single portrait photo: a small, portrait-shaped popup. */
     #portrait-popup {
-      width: 420px;
+      width: 240px;
     }
     .carousel-arrow {
       position: absolute;
@@ -354,7 +353,7 @@
       <div class="popframe-content-view">
         <div class="popframe-body popup-body">
           <p>Manifest is an annual conference / festival about prediction markets and forecasting, in 2026, I was one of the 2-3 core organizers responsible for making the conference happen.</p>
-          <p>Speakers &amp; guests included <a href="https://owainevans.github.io/" target="_blank" rel="noreferrer">Owain Evans</a>, <a href="https://web.stanford.edu/~chadj/" target="_blank" rel="noreferrer">Chad Jones</a>, <a href="https://www.astralcodexten.com/" target="_blank" rel="noreferrer">Scott Alexander</a>, <a href="https://x.com/patio11" target="_blank" rel="noreferrer">Patrick Mckenzie</a>, Robin Hanson, <a href="https://noambrown.com/" target="_blank" rel="noreferrer">Noam Brown</a>, <a href="https://daniellefong.com/about-the-author/" target="_blank" rel="noreferrer">Danielle Fong</a>, <a href="https://foresight.org/people/allison-duettmann/" target="_blank" rel="noreferrer">Allison Duettman</a>, <a href="https://x.com/davidshor?lang=en" target="_blank" rel="noreferrer">David Shor</a>, <a href="https://www.linkedin.com/in/emmettshear/" target="_blank" rel="noreferrer">Emmett Shear</a>, <a href="https://cb.substack.com/" target="_blank" rel="noreferrer">Chris Best</a>, and more.</p>
+          <p>Speakers &amp; guests included <a href="https://foresight.org/people/allison-duettmann/" target="_blank" rel="noreferrer">Allison Duettman</a>, <a href="https://web.stanford.edu/~chadj/" target="_blank" rel="noreferrer">Chad Jones</a>, <a href="https://cb.substack.com/" target="_blank" rel="noreferrer">Chris Best</a>, <a href="https://daniellefong.com/about-the-author/" target="_blank" rel="noreferrer">Danielle Fong</a>, <a href="https://x.com/davidshor?lang=en" target="_blank" rel="noreferrer">David Shor</a>, <a href="https://www.linkedin.com/in/emmettshear/" target="_blank" rel="noreferrer">Emmett Shear</a>, <a href="https://noambrown.com/" target="_blank" rel="noreferrer">Noam Brown</a>, <a href="https://owainevans.github.io/" target="_blank" rel="noreferrer">Owain Evans</a>, <a href="https://x.com/patio11" target="_blank" rel="noreferrer">Patrick Mckenzie</a>, Robin Hanson, <a href="https://www.astralcodexten.com/" target="_blank" rel="noreferrer">Scott Alexander</a>, and more.</p>
           <p>Some of my favorite sessions included The Train to Crazytown with Richard Chappell; Debate on whether prediction markets are good for anything with Marcus Abramovich and Stephen Grugett; Discussion on Decision Theory with Eliezer Yudkowsky &amp; Kenny Easwaran.</p>
           <div class="carousel">
             <button class="carousel-arrow carousel-prev" type="button" aria-label="Previous image">
@@ -399,14 +398,14 @@
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 L8.5 12 L14.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
             <img id="design-carousel-img" src="images/design/xlab-fellowship-poster.webp" alt="">
+            <video id="design-carousel-video" controls muted loop playsinline preload="none" poster="images/design/design-video-poster.webp" style="display:none">
+              <source src="images/design/design-video.mp4" type="video/mp4">
+            </video>
             <button class="carousel-arrow carousel-next" type="button" aria-label="Next image">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5 L15.5 12 L9.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
           </div>
           <p class="popup-caption"></p>
-          <video controls muted loop playsinline preload="none" poster="images/design/design-video-poster.webp">
-            <source src="images/design/design-video.mp4" type="video/mp4">
-          </video>
         </div>
       </div>
     </div>
@@ -583,11 +582,20 @@
       function wireCarousel(popup, imgEl, slides) {
         var current = 0;
         var capEl = popup.querySelector('.popup-caption');
+        var videoEl = popup.querySelector('.carousel video');
         function show(i) {
           current = (i + slides.length) % slides.length;
-          imgEl.src = slides[current].src;
-          imgEl.alt = slides[current].alt;
-          if (capEl) capEl.innerHTML = slides[current].cap || '';
+          var slide = slides[current];
+          if (slide.video && videoEl) {
+            imgEl.style.display = 'none';
+            videoEl.style.display = '';
+          } else {
+            if (videoEl) { videoEl.pause(); videoEl.style.display = 'none'; }
+            imgEl.style.display = '';
+            imgEl.src = slide.src;
+            imgEl.alt = slide.alt;
+          }
+          if (capEl) capEl.innerHTML = slide.cap || '';
         }
         popup.querySelector('.carousel-prev').addEventListener('click', function () { show(current - 1); });
         popup.querySelector('.carousel-next').addEventListener('click', function () { show(current + 1); });
@@ -655,7 +663,8 @@
         document.getElementById('design-popup'),
         document.getElementById('design-carousel-img'),
         [
-          { src: 'images/design/xlab-fellowship-poster.webp', alt: '', cap: 'Poster design for <a href="https://uchicagoaisafety.com/" target="_blank" rel="noreferrer">UChicago AI Safety @ X-Lab</a>' }
+          { src: 'images/design/xlab-fellowship-poster.webp', alt: '', cap: 'Poster design for <a href="https://uchicagoaisafety.com/" target="_blank" rel="noreferrer">UChicago AI Safety @ X-Lab</a>' },
+          { video: true, cap: '' }
         ]
       );
 
