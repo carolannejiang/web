@@ -126,8 +126,8 @@
       max-width: calc(100vw - 24px);
       max-height: min(700px, 88vh);
       background-color: #fff;
-      border: 3px solid #aaa;
-      box-shadow: 0 0 8px #aaa;
+      border: 1px solid #e2e2e2;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
     }
 
     .popup.popframe.hidden {
@@ -211,6 +211,13 @@
       display: block;
       width: 100%;
       height: auto;
+    }
+
+    .popframe-body video {
+      display: block;
+      margin: 10px auto 0;
+      max-width: 100%;
+      max-height: 440px;
     }
 
     .carousel {
@@ -322,7 +329,7 @@
         <div class="nav-content">
           Previously I&rsquo;ve organized Manifest, a conference on prediction markets &amp; forecasting. <a href="#" id="manifest-details-link">See more details here</a>.
           <br><br>In another world I might have been a painter, you can see some of my work <a href="#" id="art-details-link">here</a>.
-          <br><br>Other smaller projects: <a href="https://book.carolanne.link/">automatic typesetter tool</a>, <a href="#" id="design-details-link">mini design projects</a>, <a href="#" id="events-details-link">events</a>, <a href="#" id="photography-details-link">photography</a>, <a href="#" id="clothes-details-link">making clothes</a>, <a href="#" id="cooking-details-link">cooking</a>, <a href="#">link shortener</a>
+          <br><br>Other smaller projects: <a href="https://book.carolanne.link/">automatic typesetter tool</a>, <a href="#" id="design-details-link">mini design projects</a>, <a href="#" id="events-details-link">events</a>, <a href="#" id="photography-details-link">photography</a>, <a href="#" id="clothes-details-link">making clothes</a>, <a href="#" id="cooking-details-link">cooking</a>, <a href="#" id="ceramics-details-link">ceramics</a>, <a href="#">link shortener</a>
         </div>
       </details>
     </nav>
@@ -378,12 +385,15 @@
             <button class="carousel-arrow carousel-prev" type="button" aria-label="Previous image">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 L8.5 12 L14.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
-            <img id="design-carousel-img" src="images/design/uchitech-cover.webp" alt="">
+            <img id="design-carousel-img" src="images/design/xlab-fellowship-poster.webp" alt="">
             <button class="carousel-arrow carousel-next" type="button" aria-label="Next image">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5 L15.5 12 L9.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
           </div>
           <p class="popup-caption"></p>
+          <video controls muted loop playsinline preload="none" poster="images/design/design-video-poster.webp">
+            <source src="images/design/design-video.mp4" type="video/mp4">
+          </video>
         </div>
       </div>
     </div>
@@ -466,6 +476,24 @@
     </div>
   </div>
 
+  <div class="popup popframe has-title-bar hidden" id="ceramics-popup" role="dialog" aria-label="Ceramics">
+    <div class="popframe-scroll-view">
+      <div class="popframe-content-view">
+        <div class="popframe-body popup-body">
+          <div class="carousel">
+            <button class="carousel-arrow carousel-prev" type="button" aria-label="Previous image">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 L8.5 12 L14.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <img id="ceramics-carousel-img" src="images/ceramics/ceramics-01.webp" alt="">
+            <button class="carousel-arrow carousel-next" type="button" aria-label="Next image">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5 L15.5 12 L9.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     (function () {
       var GAP = 6;
@@ -524,6 +552,7 @@
       wirePopup(document.getElementById('photography-details-link'), document.getElementById('photography-popup'));
       wirePopup(document.getElementById('clothes-details-link'), document.getElementById('clothes-popup'));
       wirePopup(document.getElementById('cooking-details-link'), document.getElementById('cooking-popup'));
+      wirePopup(document.getElementById('ceramics-details-link'), document.getElementById('ceramics-popup'));
 
       // Popup carousels: one image at a time.
       function wireCarousel(popup, imgEl, slides) {
@@ -581,7 +610,9 @@
           { src: 'images/paintings/charcoal-seated-figure-1500.jpg', alt: '' },
           { src: 'images/paintings/portrait-woman-necklace-1500.jpg', alt: '' },
           { src: 'images/paintings/self-portrait-1500.jpg', alt: '' },
-          { src: 'images/paintings/pencil-still-life-1500.jpg', alt: '' }
+          { src: 'images/paintings/pencil-still-life-1500.jpg', alt: '' },
+          { src: 'images/paintings/still-life-fruit-red-cloth-1500.jpg', alt: '' },
+          { src: 'images/paintings/portrait-woman-red-flower-1500.jpg', alt: '' }
         ]
       );
 
@@ -599,7 +630,6 @@
         document.getElementById('design-popup'),
         document.getElementById('design-carousel-img'),
         [
-          { src: 'images/design/uchitech-cover.webp', alt: '', cap: 'Cover design for <a href="https://uchicagotechreview.com/" target="_blank" rel="noreferrer">UChicago Technology Review</a>' },
           { src: 'images/design/xlab-fellowship-poster.webp', alt: '', cap: 'Poster design for <a href="https://uchicagoaisafety.com/" target="_blank" rel="noreferrer">UChicago AI Safety @ X-Lab</a>' }
         ]
       );
@@ -621,7 +651,12 @@
         [
           { src: 'images/photography/chicago-symphony-center-night.webp', alt: '' },
           { src: 'images/photography/circus-tent-dusk.webp', alt: '' },
-          { src: 'images/photography/shell-station-dusk-vespa.webp', alt: '' }
+          { src: 'images/photography/shell-station-dusk-vespa.webp', alt: '' },
+          { src: 'images/photography/kimono-garden-kyoto.webp', alt: '' },
+          { src: 'images/photography/kyoto-tower-mountains.webp', alt: '' },
+          { src: 'images/photography/garden-pond-villa.webp', alt: '' },
+          { src: 'images/photography/kamo-river-dusk.webp', alt: '' },
+          { src: 'images/photography/higashi-honganji-temple.webp', alt: '' }
         ]
       );
 
@@ -635,6 +670,20 @@
           { src: 'images/clothes/black-dress-back.webp', alt: '' },
           { src: 'images/clothes/black-dress-profile-left.webp', alt: '' },
           { src: 'images/clothes/black-dress-profile-right.webp', alt: '' }
+        ]
+      );
+
+      wireCarousel(
+        document.getElementById('ceramics-popup'),
+        document.getElementById('ceramics-carousel-img'),
+        [
+          { src: 'images/ceramics/ceramics-01.webp', alt: '' },
+          { src: 'images/ceramics/ceramics-02.webp', alt: '' },
+          { src: 'images/ceramics/ceramics-03.webp', alt: '' },
+          { src: 'images/ceramics/ceramics-04.webp', alt: '' },
+          { src: 'images/ceramics/ceramics-05.webp', alt: '' },
+          { src: 'images/ceramics/ceramics-06.webp', alt: '' },
+          { src: 'images/ceramics/ceramics-07.webp', alt: '' }
         ]
       );
     })();
