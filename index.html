@@ -310,8 +310,15 @@
           <p>Speakers &amp; guests included Owain Evans, Chad Jones, Scott Alexander, Patrick Mckenzie, Robin Hanson, Noam Brown, Danielle Fong, Allison Duettman, David Shor, Emmett Shear, Eliezer Yudkowsky, Kenny Easwaran, and more.</p>
           <p>Some of my favorite sessions included The Train to Crazytown with Richard Chappell; Debate on whether prediction markets are good for anything with Marcus Abramovich and Stephen Grugett; Discussion on Decision Theory with Eliezer Yudkowsky &amp; Kenny Easwaran.</p>
           <p>See an incomplete write-up of everything I&rsquo;ve learned from running Manifest <a href="manifest.html">here</a>; For references, talk to Austin Chen.</p>
-          <p><img src="images/manifest/group-photo.webp" alt="Group photo of Manifest attendees in a backyard" width="1600" height="926" loading="lazy"></p>
-          <p><img src="images/manifest/reception.webp" alt="Evening reception at Manifest with Manifold and Manifund banners under string lights" width="1600" height="1067" loading="lazy"></p>
+          <div class="carousel">
+            <button class="carousel-arrow carousel-prev" type="button" aria-label="Previous image">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 L8.5 12 L14.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <img id="manifest-carousel-img" src="images/manifest/group-photo.webp" alt="Group photo of Manifest attendees in a backyard">
+            <button class="carousel-arrow carousel-next" type="button" aria-label="Next image">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5 L15.5 12 L9.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -414,37 +421,48 @@
       wirePopup(document.getElementById('manifest-details-link'), document.getElementById('manifest-popup'));
       wirePopup(document.getElementById('art-details-link'), document.getElementById('art-popup'));
 
-      // Art popup carousel: one image at a time.
-      var slides = [
-        { src: 'images/art-gallery.jpg', alt: 'Carolanne Jiang with her paintings and sculptures at a gallery exhibition' },
-        { src: 'images/art/popup/still-life-table-sculpture.webp', alt: 'Ceramic sculpture of a still life on a striped table with fruit, a vase, and a teapot' },
-        { src: 'images/art/popup/figures-hand-painting.webp', alt: 'Oil painting of two figures and an outstretched hand in blue and orange tones' },
-        { src: 'images/art/popup/seated-portrait-painting.webp', alt: 'Oil painting of a seated shirtless man' },
-        { src: 'images/art/popup/fractured-portrait-painting.webp', alt: 'Painting of a face fractured into shifting colorful panels' },
-        { src: 'images/art/popup/self-absorbed-family-portrait.webp', alt: 'Painting titled Self Absorbed Family Portrait, a crowd of stylized figures' },
-        { src: 'images/art/popup/overlapping-faces-painting.webp', alt: 'Oil painting of overlapping faces outlined in black' },
-        { src: 'images/art/popup/porcelain-tea-set.webp', alt: 'Handmade porcelain tea set with cups, teapots, and marbled glazes' },
-        { src: 'images/art/popup/stairwell-mural-birds.webp', alt: 'Stairwell mural featuring large painted birds and a central eye' },
-        { src: 'images/art/popup/stairwell-mural-panels.webp', alt: 'Three panels of a stairwell mural with gardens, a rabbit, and a cosmic oyster' }
-      ];
-      var current = 0;
-      var artPopup = document.getElementById('art-popup');
-      var carouselImg = document.getElementById('art-carousel-img');
-
-      function showSlide(i) {
-        current = (i + slides.length) % slides.length;
-        carouselImg.src = slides[current].src;
-        carouselImg.alt = slides[current].alt;
+      // Popup carousels: one image at a time.
+      function wireCarousel(popup, imgEl, slides) {
+        var current = 0;
+        function show(i) {
+          current = (i + slides.length) % slides.length;
+          imgEl.src = slides[current].src;
+          imgEl.alt = slides[current].alt;
+        }
+        popup.querySelector('.carousel-prev').addEventListener('click', function () { show(current - 1); });
+        popup.querySelector('.carousel-next').addEventListener('click', function () { show(current + 1); });
+        document.addEventListener('keydown', function (e) {
+          if (popup.classList.contains('hidden')) return;
+          if (e.key === 'ArrowLeft') show(current - 1);
+          if (e.key === 'ArrowRight') show(current + 1);
+        });
       }
 
-      artPopup.querySelector('.carousel-prev').addEventListener('click', function () { showSlide(current - 1); });
-      artPopup.querySelector('.carousel-next').addEventListener('click', function () { showSlide(current + 1); });
+      wireCarousel(
+        document.getElementById('art-popup'),
+        document.getElementById('art-carousel-img'),
+        [
+          { src: 'images/art-gallery.jpg', alt: 'Carolanne Jiang with her paintings and sculptures at a gallery exhibition' },
+          { src: 'images/art/popup/still-life-table-sculpture.webp', alt: 'Ceramic sculpture of a still life on a striped table with fruit, a vase, and a teapot' },
+          { src: 'images/art/popup/figures-hand-painting.webp', alt: 'Oil painting of two figures and an outstretched hand in blue and orange tones' },
+          { src: 'images/art/popup/seated-portrait-painting.webp', alt: 'Oil painting of a seated shirtless man' },
+          { src: 'images/art/popup/fractured-portrait-painting.webp', alt: 'Painting of a face fractured into shifting colorful panels' },
+          { src: 'images/art/popup/self-absorbed-family-portrait.webp', alt: 'Painting titled Self Absorbed Family Portrait, a crowd of stylized figures' },
+          { src: 'images/art/popup/overlapping-faces-painting.webp', alt: 'Oil painting of overlapping faces outlined in black' },
+          { src: 'images/art/popup/porcelain-tea-set.webp', alt: 'Handmade porcelain tea set with cups, teapots, and marbled glazes' },
+          { src: 'images/art/popup/stairwell-mural-birds.webp', alt: 'Stairwell mural featuring large painted birds and a central eye' },
+          { src: 'images/art/popup/stairwell-mural-panels.webp', alt: 'Three panels of a stairwell mural with gardens, a rabbit, and a cosmic oyster' }
+        ]
+      );
 
-      document.addEventListener('keydown', function (e) {
-        if (artPopup.classList.contains('hidden')) return;
-        if (e.key === 'ArrowLeft') showSlide(current - 1);
-        if (e.key === 'ArrowRight') showSlide(current + 1);
-      });
+      wireCarousel(
+        document.getElementById('manifest-popup'),
+        document.getElementById('manifest-carousel-img'),
+        [
+          { src: 'images/manifest/group-photo.webp', alt: 'Group photo of Manifest attendees in a backyard' },
+          { src: 'images/manifest/reception.webp', alt: 'Evening reception at Manifest with Manifold and Manifund banners under string lights' }
+        ]
+      );
     })();
   </script>
 
