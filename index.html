@@ -252,6 +252,24 @@
     .carousel-prev { left: -4px; }
     .carousel-next { right: -4px; }
 
+    /* Must stay below the base .carousel rules to win the cascade. */
+    @media (max-width: 600px) {
+      /* Hug the image instead of keeping the fixed 440px box, which is
+         mostly empty at phone widths. */
+      .carousel { height: auto; min-height: 180px; }
+      .carousel img { max-height: min(440px, 62vh); }
+    }
+
+    /* Touch screens: larger tap targets on the carousel arrows (hit box
+       only — no visual change). */
+    @media (pointer: coarse) {
+      .carousel-arrow::after {
+        content: '';
+        position: absolute;
+        inset: -8px;
+      }
+    }
+
     .popframe-body a {
       color: #595959;
       text-decoration: underline;
@@ -397,6 +415,14 @@
           if (e.key === 'Escape' && !popup.classList.contains('hidden')) hide();
         });
 
+        // On touch screens (no Escape key), tapping outside the popup closes it.
+        document.addEventListener('click', function (e) {
+          if (popup.classList.contains('hidden')) return;
+          if (!window.matchMedia('(pointer: coarse)').matches) return;
+          if (popup.contains(e.target) || link.contains(e.target)) return;
+          hide();
+        });
+
         // Drag by the title bar.
         var dragging = false, offX = 0, offY = 0;
         titleBar.addEventListener('mousedown', function (e) {
@@ -437,6 +463,19 @@
           if (e.key === 'ArrowLeft') show(current - 1);
           if (e.key === 'ArrowRight') show(current + 1);
         });
+
+        // Swipe to change slides on touch screens.
+        var carousel = popup.querySelector('.carousel');
+        var touchX = 0, touchY = 0;
+        carousel.addEventListener('touchstart', function (e) {
+          touchX = e.touches[0].clientX;
+          touchY = e.touches[0].clientY;
+        }, { passive: true });
+        carousel.addEventListener('touchend', function (e) {
+          var dx = e.changedTouches[0].clientX - touchX;
+          var dy = e.changedTouches[0].clientY - touchY;
+          if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) show(current + (dx < 0 ? 1 : -1));
+        }, { passive: true });
       }
 
       wireCarousel(

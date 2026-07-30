@@ -17,11 +17,16 @@
   box-sizing: border-box;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body.menu-page {
   background-color: #ffffff;
   font-family: 'Libre Baskerville', Georgia, serif;
   color: #1a1a1a;
   min-height: 100vh;
+  min-height: 100dvh; /* fallback above; dvh tracks iOS Safari's collapsing toolbar */
   display: flex;
   flex-direction: column;
 }
@@ -186,5 +191,34 @@ body.gallery-page {
     bottom: 16px;
     left: 16px;
     gap: 14px;
+  }
+}
+
+/* Touch screens: larger tap targets with no visual change — padding is
+   cancelled out by negative margins, and ::after only enlarges the hit box. */
+@media (pointer: coarse) {
+  .menu-page .side-menu a,
+  .gallery-page .site-nav a {
+    padding: 10px 8px;
+    margin: -10px -8px;
+  }
+
+  .menu-page .side-menu .nav-home {
+    margin-right: auto;
+  }
+
+  .social-corner a {
+    padding: 10px;
+    margin: -10px;
+  }
+
+  .popframe-title-bar-button {
+    position: relative;
+  }
+
+  .popframe-title-bar-button::after {
+    content: '';
+    position: absolute;
+    inset: -10px;
   }
 }
