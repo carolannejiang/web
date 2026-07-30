@@ -234,6 +234,17 @@
       width: auto;
       height: auto;
     }
+    /* Manifest popup is text-heavy: hug the photo so everything fits without scrolling. */
+    #manifest-popup .carousel {
+      height: auto;
+    }
+    #manifest-popup .carousel img {
+      max-height: 300px;
+    }
+    /* Single portrait photo: a narrower, portrait-shaped popup. */
+    #portrait-popup {
+      width: 420px;
+    }
     .carousel-arrow {
       position: absolute;
       top: 50%;
@@ -331,6 +342,7 @@
           Previously I&rsquo;ve organized Manifest, a conference on prediction markets &amp; forecasting. <a href="#" id="manifest-details-link">See more details here</a>.
           <br><br>In another world I might have been a painter, you can see some of my work <a href="#" id="art-details-link">here</a>.
           <br><br>Other smaller projects: <a href="https://book.carolanne.link/">automatic typesetter tool</a>, <a href="#" id="design-details-link">mini design projects</a>, <a href="#" id="events-details-link">events</a>, <a href="#" id="photography-details-link">photography</a>, <a href="#" id="clothes-details-link">making clothes</a>, <a href="#" id="cooking-details-link">cooking</a>, <a href="#" id="ceramics-details-link">ceramics</a>, <a href="#">link shortener</a>
+          <br><br>to ensure you&rsquo;ve found the correct person, I look roughly like <a href="#" id="portrait-details-link">this</a>.
         </div>
       </details>
     </nav>
@@ -342,7 +354,7 @@
       <div class="popframe-content-view">
         <div class="popframe-body popup-body">
           <p>Manifest is an annual conference / festival about prediction markets and forecasting, in 2026, I was one of the 2-3 core organizers responsible for making the conference happen.</p>
-          <p>Speakers &amp; guests included Owain Evans, Chad Jones, Scott Alexander, Patrick Mckenzie, Robin Hanson, Noam Brown, Danielle Fong, Allison Duettman, David Shor, Emmett Shear, Eliezer Yudkowsky, Kenny Easwaran, and more.</p>
+          <p>Speakers &amp; guests included <a href="https://owainevans.github.io/" target="_blank" rel="noreferrer">Owain Evans</a>, <a href="https://web.stanford.edu/~chadj/" target="_blank" rel="noreferrer">Chad Jones</a>, <a href="https://www.astralcodexten.com/" target="_blank" rel="noreferrer">Scott Alexander</a>, <a href="https://x.com/patio11" target="_blank" rel="noreferrer">Patrick Mckenzie</a>, Robin Hanson, <a href="https://noambrown.com/" target="_blank" rel="noreferrer">Noam Brown</a>, <a href="https://daniellefong.com/about-the-author/" target="_blank" rel="noreferrer">Danielle Fong</a>, <a href="https://foresight.org/people/allison-duettmann/" target="_blank" rel="noreferrer">Allison Duettman</a>, <a href="https://x.com/davidshor?lang=en" target="_blank" rel="noreferrer">David Shor</a>, <a href="https://www.linkedin.com/in/emmettshear/" target="_blank" rel="noreferrer">Emmett Shear</a>, <a href="https://cb.substack.com/" target="_blank" rel="noreferrer">Chris Best</a>, and more.</p>
           <p>Some of my favorite sessions included The Train to Crazytown with Richard Chappell; Debate on whether prediction markets are good for anything with Marcus Abramovich and Stephen Grugett; Discussion on Decision Theory with Eliezer Yudkowsky &amp; Kenny Easwaran.</p>
           <div class="carousel">
             <button class="carousel-arrow carousel-prev" type="button" aria-label="Previous image">
@@ -353,7 +365,7 @@
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5 L15.5 12 L9.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
           </div>
-          <p>See an incomplete write-up of everything I&rsquo;ve learned from running Manifest <a href="manifest.html">here</a>; For references, talk to Austin Chen.</p>
+          <p><a href="manifest.html">See an incomplete write-up of everything I&rsquo;ve learned from running Manifest here</a>; For references, talk to <a href="https://www.linkedin.com/in/austinch/" target="_blank" rel="noreferrer">Austin Chen</a>.</p>
         </div>
       </div>
     </div>
@@ -372,7 +384,7 @@
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5 L15.5 12 L9.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
           </div>
-          <p>See more: <a href="art.html#paintings">Paintings</a>, <a href="art.html#sculpture">Sculpture</a>, <a href="art.html#ceramics">Ceramics</a>, <a href="art.html#pleinair">Plein Air &amp; Other memories</a>, <a href="art.html#comic">A Comic Project</a>.</p>
+          <p>See more: <a href="art.html#paintings">Paintings</a>, <a href="art.html#sculpture">Sculpture</a>, <a href="art.html#ceramics">Ceramics</a>, <a href="art.html#pleinair">Plein air paintings</a>, <a href="art.html#comic">A Comic Project</a>.</p>
         </div>
       </div>
     </div>
@@ -496,6 +508,16 @@
     </div>
   </div>
 
+  <div class="popup popframe has-title-bar hidden" id="portrait-popup" role="dialog" aria-label="Photo of Carolanne">
+    <div class="popframe-scroll-view">
+      <div class="popframe-content-view">
+        <div class="popframe-body popup-body">
+          <img src="images/me-chicago-night.webp" alt="">
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     (function () {
       var GAP = 6;
@@ -555,6 +577,7 @@
       wirePopup(document.getElementById('clothes-details-link'), document.getElementById('clothes-popup'));
       wirePopup(document.getElementById('cooking-details-link'), document.getElementById('cooking-popup'));
       wirePopup(document.getElementById('ceramics-details-link'), document.getElementById('ceramics-popup'));
+      wirePopup(document.getElementById('portrait-details-link'), document.getElementById('portrait-popup'));
 
       // Popup carousels: one image at a time.
       function wireCarousel(popup, imgEl, slides) {
@@ -640,10 +663,10 @@
         document.getElementById('events-popup'),
         document.getElementById('events-carousel-img'),
         [
-          { src: 'images/events/event-crowd-mingling.webp', alt: '', cap: 'Launch Party for <a href="https://ai-2040.com/" target="_blank" rel="noreferrer">AI2040: Plan A</a>' },
-          { src: 'images/events/event-hot-takes-whiteboards.webp', alt: '', cap: 'Launch Party for <a href="https://ai-2040.com/" target="_blank" rel="noreferrer">AI2040: Plan A</a>' },
-          { src: 'images/events/event-argue-with-authors-sign.webp', alt: '', cap: 'Launch Party for <a href="https://ai-2040.com/" target="_blank" rel="noreferrer">AI2040: Plan A</a>' },
-          { src: 'images/events/event-lounge-conversation.webp', alt: '', cap: 'Launch Party for <a href="https://ai-2040.com/" target="_blank" rel="noreferrer">AI2040: Plan A</a>' }
+          { src: 'images/events/event-crowd-mingling.webp', alt: '', cap: 'Launch Party for <a href="https://ai-2040.com/" target="_blank" rel="noreferrer">AI 2040: Plan A</a>, with <a href="https://www.linkedin.com/in/afitabiyigun/" target="_blank" rel="noreferrer">Afitab Iyigun</a>' },
+          { src: 'images/events/event-hot-takes-whiteboards.webp', alt: '', cap: 'Launch Party for <a href="https://ai-2040.com/" target="_blank" rel="noreferrer">AI 2040: Plan A</a>, with <a href="https://www.linkedin.com/in/afitabiyigun/" target="_blank" rel="noreferrer">Afitab Iyigun</a>' },
+          { src: 'images/events/event-argue-with-authors-sign.webp', alt: '', cap: 'Launch Party for <a href="https://ai-2040.com/" target="_blank" rel="noreferrer">AI 2040: Plan A</a>, with <a href="https://www.linkedin.com/in/afitabiyigun/" target="_blank" rel="noreferrer">Afitab Iyigun</a>' },
+          { src: 'images/events/event-lounge-conversation.webp', alt: '', cap: 'Launch Party for <a href="https://ai-2040.com/" target="_blank" rel="noreferrer">AI 2040: Plan A</a>, with <a href="https://www.linkedin.com/in/afitabiyigun/" target="_blank" rel="noreferrer">Afitab Iyigun</a>' }
         ]
       );
 
