@@ -501,32 +501,24 @@
       function wirePopup(link, popup) {
         if (!link || !popup) return;
 
-        // Universal rule: a popup must never cover the text column. Open it
-        // beside the content (to the right, else the left); only if neither
-        // side has room, drop it below the content.
+        // Universal rule: the popup opens at the link, below it when there is
+        // room, otherwise above it. It may cover other text, but never the
+        // link itself.
         function position() {
           var r = link.getBoundingClientRect();
-          var colEl = document.querySelector('nav') || link;
-          var col = colEl.getBoundingClientRect();
           var w = popup.offsetWidth;
           var h = popup.offsetHeight;
           var vw = document.documentElement.clientWidth;
-          var gap = 16, margin = 8;
-          var left, top = window.scrollY + r.top, below = false;
-          if (col.right + gap + w <= vw - margin) {
-            left = window.scrollX + col.right + gap;          // right of the text
-          } else if (col.left - gap - w >= margin) {
-            left = window.scrollX + col.left - gap - w;        // left of the text
+          var vh = window.innerHeight;
+          var gap = 6, margin = 8;
+          // align the popup's left edge with the link, clamped to the viewport
+          var left = window.scrollX + Math.min(Math.max(r.left, margin), Math.max(margin, vw - w - margin));
+          // below the link if it fits on screen, else above it
+          var top;
+          if (r.bottom + gap + h <= vh - margin || r.top - gap - h < margin) {
+            top = window.scrollY + r.bottom + gap;
           } else {
-            below = true;                                      // no room beside
-            left = window.scrollX + Math.max(margin, (vw - w) / 2);
-            top = window.scrollY + col.bottom + gap;           // below the text
-          }
-          if (!below) {
-            // Keep a side-placed popup on screen (still clear of the text).
-            var maxTop = window.scrollY + window.innerHeight - h - 12;
-            if (top > maxTop) top = Math.max(window.scrollY + 12, maxTop);
-            if (top < window.scrollY + 12) top = window.scrollY + 12;
+            top = window.scrollY + r.top - gap - h;
           }
           popup.style.left = left + 'px';
           popup.style.top = top + 'px';
