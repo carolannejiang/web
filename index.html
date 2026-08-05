@@ -226,6 +226,11 @@
     #portrait-popup {
       width: 240px;
     }
+    /* Text-only project popups read better in a narrower column. */
+    #typesetter-popup,
+    #shortener-popup {
+      width: 380px;
+    }
     .carousel-arrow {
       position: absolute;
       top: 50%;
@@ -321,7 +326,7 @@
         <div class="nav-content">
           Previously I&rsquo;ve organized Manifest, a conference on prediction markets &amp; forecasting. <a href="#" id="manifest-details-link">See more details here</a>.
           <br><br>In another world I might have been a painter, you can see some of my work <a href="#" id="art-details-link">here</a>.
-          <br><br>Other smaller projects: <a href="#" id="typesetter-details-link">automatic typesetter tool</a>, <a href="#" id="design-details-link">mini design projects</a>, <a href="#" id="events-details-link">events</a>, <a href="#" id="photography-details-link">photography</a>, <a href="#" id="clothes-details-link">making clothes</a>, <a href="#" id="cooking-details-link">cooking</a>, <a href="#" id="ceramics-details-link">ceramics</a>, <a href="#">link shortener</a>
+          <br><br>Other smaller projects: <a href="#" id="typesetter-details-link">automatic typesetter tool</a>, <a href="#" id="design-details-link">mini design projects</a>, <a href="#" id="events-details-link">events</a>, <a href="#" id="photography-details-link">photography</a>, <a href="#" id="clothes-details-link">making clothes</a>, <a href="#" id="cooking-details-link">cooking</a>, <a href="#" id="ceramics-details-link">ceramics</a>, <a href="#" id="shortener-details-link">link shortener</a>
           <br><br>to ensure you&rsquo;ve found the correct person, I look roughly like <a href="#" id="portrait-details-link">this</a>.
           <br><br>I enjoy reading, writing, arguing with friends, and meeting new people. Feel free to reach out / book a meeting <a href="https://carolanne.chat" target="_blank" rel="noreferrer">here</a>.
         </div>
@@ -499,6 +504,16 @@
     </div>
   </div>
 
+  <div class="popup popframe has-title-bar hidden" id="shortener-popup" role="dialog" aria-label="Link shortener">
+    <div class="popframe-scroll-view">
+      <div class="popframe-content-view">
+        <div class="popframe-body popup-body">
+          <p>Sometimes I want to direct people to links without having to open my phone, so I made a tiny Next.js app that turns long URLs into short ones under your own domain (e.g. carolanne.link/career) with a slug I can memorize. It has a locked admin page that lets you add links from any browser; &amp; new links work the instant you save them. <a href="https://github.com/carolannejiang/link-shortener" target="_blank" rel="noreferrer">Check it out here</a>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="popup popframe has-title-bar hidden" id="portrait-popup" role="dialog" aria-label="Photo of Carolanne">
     <div class="popframe-scroll-view">
       <div class="popframe-content-view">
@@ -574,6 +589,7 @@
       wirePopup(document.getElementById('cooking-details-link'), document.getElementById('cooking-popup'));
       wirePopup(document.getElementById('ceramics-details-link'), document.getElementById('ceramics-popup'));
       wirePopup(document.getElementById('typesetter-details-link'), document.getElementById('typesetter-popup'));
+      wirePopup(document.getElementById('shortener-details-link'), document.getElementById('shortener-popup'));
       wirePopup(document.getElementById('portrait-details-link'), document.getElementById('portrait-popup'));
 
       // Popup carousels: one image at a time.
