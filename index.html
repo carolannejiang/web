@@ -321,7 +321,7 @@
         <div class="nav-content">
           Previously I&rsquo;ve organized Manifest, a conference on prediction markets &amp; forecasting. <a href="#" id="manifest-details-link">See more details here</a>.
           <br><br>In another world I might have been a painter, you can see some of my work <a href="#" id="art-details-link">here</a>.
-          <br><br>Other smaller projects: <a href="https://book.carolanne.link/">automatic typesetter tool</a>, <a href="#" id="design-details-link">mini design projects</a>, <a href="#" id="events-details-link">events</a>, <a href="#" id="photography-details-link">photography</a>, <a href="#" id="clothes-details-link">making clothes</a>, <a href="#" id="cooking-details-link">cooking</a>, <a href="#" id="ceramics-details-link">ceramics</a>, <a href="#">link shortener</a>
+          <br><br>Other smaller projects: <a href="#" id="typesetter-details-link">automatic typesetter tool</a>, <a href="#" id="design-details-link">mini design projects</a>, <a href="#" id="events-details-link">events</a>, <a href="#" id="photography-details-link">photography</a>, <a href="#" id="clothes-details-link">making clothes</a>, <a href="#" id="cooking-details-link">cooking</a>, <a href="#" id="ceramics-details-link">ceramics</a>, <a href="#">link shortener</a>
           <br><br>to ensure you&rsquo;ve found the correct person, I look roughly like <a href="#" id="portrait-details-link">this</a>.
           <br><br>I enjoy reading, writing, arguing with friends, and meeting new people. Feel free to reach out / book a meeting <a href="https://carolanne.chat" target="_blank" rel="noreferrer">here</a>.
         </div>
@@ -489,6 +489,16 @@
     </div>
   </div>
 
+  <div class="popup popframe has-title-bar hidden" id="typesetter-popup" role="dialog" aria-label="Automatic typesetter tool">
+    <div class="popframe-scroll-view">
+      <div class="popframe-content-view">
+        <div class="popframe-body popup-body">
+          <p>A lot of great writing are only published on the internet, but I really like physical books. To this end, I made a (work in progress) automatic typesetting tool, where you can input blog posts / website links / rss feeds and get a type-setted output file ready to print. <a href="https://book.carolanne.link/" target="_blank" rel="noreferrer">Try it out here!</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="popup popframe has-title-bar hidden" id="portrait-popup" role="dialog" aria-label="Photo of Carolanne">
     <div class="popframe-scroll-view">
       <div class="popframe-content-view">
@@ -563,6 +573,7 @@
       wirePopup(document.getElementById('clothes-details-link'), document.getElementById('clothes-popup'));
       wirePopup(document.getElementById('cooking-details-link'), document.getElementById('cooking-popup'));
       wirePopup(document.getElementById('ceramics-details-link'), document.getElementById('ceramics-popup'));
+      wirePopup(document.getElementById('typesetter-details-link'), document.getElementById('typesetter-popup'));
       wirePopup(document.getElementById('portrait-details-link'), document.getElementById('portrait-popup'));
 
       // Popup carousels: one image at a time.
