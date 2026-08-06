@@ -263,10 +263,14 @@
 
     /* Must stay below the base .carousel rules to win the cascade. */
     @media (max-width: 600px) {
-      /* Hug the image instead of keeping the fixed 440px box, which is
-         mostly empty at phone widths. */
-      .carousel { height: auto; min-height: 180px; }
-      .carousel img { max-height: min(440px, 62vh); }
+      /* Keep the popup frame a constant size: give the carousel a fixed
+         box so flipping between differently-shaped images doesn't resize
+         the frame. Images are contained within the box. */
+      .carousel { height: min(440px, 62vh); min-height: 180px; }
+      .carousel img { max-height: 100%; }
+      /* Manifest keeps its shorter, text-hugging box — but fixed too. */
+      #manifest-popup .carousel { height: min(300px, 44vh); }
+      #manifest-popup .carousel img { max-height: 100%; }
     }
 
     /* Touch screens: larger tap targets on the carousel arrows (hit box
