@@ -326,7 +326,7 @@
         <div class="nav-content">
           Previously I&rsquo;ve organized Manifest, a conference on prediction markets &amp; forecasting. <a href="#" id="manifest-details-link">See more details here</a>.
           <br><br>In another world I might have been a painter, you can see some of my work <a href="#" id="art-details-link">here</a>.
-          <br><br>Other smaller projects: <a href="#" id="typesetter-details-link">automatic typesetter tool</a>, <a href="#" id="design-details-link">mini design projects</a>, <a href="#" id="events-details-link">events</a>, <a href="#" id="photography-details-link">photography</a>, <a href="#" id="clothes-details-link">making clothes</a>, <a href="#" id="cooking-details-link">cooking</a>, <a href="#" id="ceramics-details-link">ceramics</a>, <a href="#" id="shortener-details-link">link shortener</a>
+          <br><br>Other smaller projects: <a href="#" id="typesetter-details-link">automatic typesetter tool</a>, <a href="#" id="design-details-link">mini design projects</a>, <a href="#" id="photography-details-link">photography</a>, <a href="#" id="clothes-details-link">making clothes</a>, <a href="#" id="cooking-details-link">cooking</a>, <a href="#" id="shortener-details-link">link shortener</a>
         </div>
       </details>
     </nav>
@@ -396,25 +396,6 @@
     </div>
   </div>
 
-  <div class="popup popframe has-title-bar hidden" id="events-popup" role="dialog" aria-label="Events">
-    <div class="popframe-scroll-view">
-      <div class="popframe-content-view">
-        <div class="popframe-body popup-body">
-          <div class="carousel">
-            <button class="carousel-arrow carousel-prev" type="button" aria-label="Previous image">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 L8.5 12 L14.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-            <img id="events-carousel-img" src="images/events/event-crowd-mingling.webp" alt="">
-            <button class="carousel-arrow carousel-next" type="button" aria-label="Next image">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5 L15.5 12 L9.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-          </div>
-          <p class="popup-caption"></p>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="popup popframe has-title-bar hidden" id="photography-popup" role="dialog" aria-label="Photography">
     <div class="popframe-scroll-view">
       <div class="popframe-content-view">
@@ -468,24 +449,6 @@
             <img src="images/cooking/cooking-10.webp" alt="" loading="lazy" decoding="async">
             <img src="images/cooking/cooking-11.webp" alt="" loading="lazy" decoding="async">
             <img src="images/cooking/cooking-12.webp" alt="" loading="lazy" decoding="async">
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="popup popframe has-title-bar hidden" id="ceramics-popup" role="dialog" aria-label="Ceramics">
-    <div class="popframe-scroll-view">
-      <div class="popframe-content-view">
-        <div class="popframe-body popup-body">
-          <div class="carousel">
-            <button class="carousel-arrow carousel-prev" type="button" aria-label="Previous image">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 L8.5 12 L14.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-            <img id="ceramics-carousel-img" src="images/ceramics/ceramics-01.webp" alt="">
-            <button class="carousel-arrow carousel-next" type="button" aria-label="Next image">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5 L15.5 12 L9.5 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
           </div>
         </div>
       </div>
@@ -581,11 +544,9 @@
       wirePopup(document.getElementById('manifest-details-link'), document.getElementById('manifest-popup'));
       wirePopup(document.getElementById('art-details-link'), document.getElementById('art-popup'));
       wirePopup(document.getElementById('design-details-link'), document.getElementById('design-popup'));
-      wirePopup(document.getElementById('events-details-link'), document.getElementById('events-popup'));
       wirePopup(document.getElementById('photography-details-link'), document.getElementById('photography-popup'));
       wirePopup(document.getElementById('clothes-details-link'), document.getElementById('clothes-popup'));
       wirePopup(document.getElementById('cooking-details-link'), document.getElementById('cooking-popup'));
-      wirePopup(document.getElementById('ceramics-details-link'), document.getElementById('ceramics-popup'));
       wirePopup(document.getElementById('typesetter-details-link'), document.getElementById('typesetter-popup'));
       wirePopup(document.getElementById('shortener-details-link'), document.getElementById('shortener-popup'));
       wirePopup(document.getElementById('portrait-details-link'), document.getElementById('portrait-popup'));
@@ -681,17 +642,6 @@
       );
 
       wireCarousel(
-        document.getElementById('events-popup'),
-        document.getElementById('events-carousel-img'),
-        [
-          { src: 'images/events/event-crowd-mingling.webp', alt: '', cap: 'Launch Party for <a href="https://ai-2040.com/" target="_blank" rel="noreferrer">AI 2040: Plan A</a>, with <a href="https://www.linkedin.com/in/afitabiyigun/" target="_blank" rel="noreferrer">Afitab Iyigun</a>' },
-          { src: 'images/events/event-hot-takes-whiteboards.webp', alt: '', cap: 'Launch Party for <a href="https://ai-2040.com/" target="_blank" rel="noreferrer">AI 2040: Plan A</a>, with <a href="https://www.linkedin.com/in/afitabiyigun/" target="_blank" rel="noreferrer">Afitab Iyigun</a>' },
-          { src: 'images/events/event-argue-with-authors-sign.webp', alt: '', cap: 'Launch Party for <a href="https://ai-2040.com/" target="_blank" rel="noreferrer">AI 2040: Plan A</a>, with <a href="https://www.linkedin.com/in/afitabiyigun/" target="_blank" rel="noreferrer">Afitab Iyigun</a>' },
-          { src: 'images/events/event-lounge-conversation.webp', alt: '', cap: 'Launch Party for <a href="https://ai-2040.com/" target="_blank" rel="noreferrer">AI 2040: Plan A</a>, with <a href="https://www.linkedin.com/in/afitabiyigun/" target="_blank" rel="noreferrer">Afitab Iyigun</a>' }
-        ]
-      );
-
-      wireCarousel(
         document.getElementById('photography-popup'),
         document.getElementById('photography-carousel-img'),
         [
@@ -719,19 +669,6 @@
         ]
       );
 
-      wireCarousel(
-        document.getElementById('ceramics-popup'),
-        document.getElementById('ceramics-carousel-img'),
-        [
-          { src: 'images/ceramics/ceramics-01.webp', alt: '' },
-          { src: 'images/ceramics/ceramics-02.webp', alt: '' },
-          { src: 'images/ceramics/ceramics-03.webp', alt: '' },
-          { src: 'images/ceramics/ceramics-04.webp', alt: '' },
-          { src: 'images/ceramics/ceramics-05.webp', alt: '' },
-          { src: 'images/ceramics/ceramics-06.webp', alt: '' },
-          { src: 'images/ceramics/ceramics-07.webp', alt: '' }
-        ]
-      );
     })();
   </script>
 
