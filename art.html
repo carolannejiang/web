@@ -524,6 +524,20 @@
       </div>
     </section>
 
+    <form class="subscribe"
+          action="https://buttondown.com/api/emails/embed-subscribe/carolanne"
+          method="post"
+          target="popupwindow"
+          onsubmit="window.open('https://buttondown.com/carolanne', 'popupwindow')">
+      <label class="subscribe-label" for="bd-email">New work by email</label>
+      <div class="subscribe-row">
+        <input class="subscribe-input" type="email" name="email" id="bd-email"
+               placeholder="you@example.com" required>
+        <input type="hidden" value="1" name="embed">
+        <button class="subscribe-button" type="submit">Subscribe</button>
+      </div>
+    </form>
+
   </main>
 
   <div class="popup popframe hidden" id="piece-popup" role="dialog" aria-label="Artwork">
