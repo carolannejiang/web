@@ -40,7 +40,11 @@ if (!NOTION_TOKEN || !PARENT_PAGE_ID) {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "..", "..");
 const INDEX_FILE = path.join(REPO_ROOT, "writing.html");
+const FEED_FILE = path.join(REPO_ROOT, "feed.xml");
 const STATE_FILE = path.join(__dirname, ".generated.json");
+
+// Canonical site origin, used to build absolute links in the RSS feed.
+const SITE_URL = "https://www.carolannejiang.com";
 
 // Cusdis comments (https://cusdis.com). Paste the "App ID" from your Cusdis
 // dashboard between the quotes to show a comment box at the bottom of every
@@ -942,6 +946,7 @@ ${GENERATED_MARKER}
   <meta property="og:url" content="${url}">${ogImageTag}
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Carolanne Jiang — Writing" href="feed.xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap">
@@ -1022,6 +1027,59 @@ async function updateIndex(entries) {
   }
 
   await fs.writeFile(INDEX_FILE, html);
+}
+
+// ---------- RSS feed (feed.xml) ----------
+
+// RFC-822 date (e.g. "Wed, 02 Jul 2026 00:00:00 GMT") for RSS <pubDate>.
+function rssDate(iso) {
+  const d = iso ? new Date(iso) : null;
+  return d && !Number.isNaN(d.getTime()) ? d.toUTCString() : "";
+}
+
+// Build an RSS 2.0 feed from the same entries used for writing.html. The feed
+// is deterministic — <lastBuildDate> is the newest post's date, not "now" — so
+// it only changes (and only produces a commit) when the posts themselves change.
+async function writeFeed(entries) {
+  const items = entries
+    .map((e) => {
+      const link = `${SITE_URL}/${e.slug}.html`;
+      const pub = rssDate(e.dateISO);
+      return [
+        "    <item>",
+        `      <title>${escapeHtml(e.title)}</title>`,
+        `      <link>${escapeHtml(link)}</link>`,
+        `      <guid isPermaLink="true">${escapeHtml(link)}</guid>`,
+        e.description ? `      <description>${escapeHtml(e.description)}</description>` : "",
+        pub ? `      <pubDate>${pub}</pubDate>` : "",
+        "    </item>",
+      ]
+        .filter(Boolean)
+        .join("\n");
+    })
+    .join("\n");
+
+  const newest = entries
+    .map((e) => e.dateISO)
+    .filter(Boolean)
+    .sort()
+    .pop();
+  const lastBuild = rssDate(newest);
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Carolanne Jiang — Writing</title>
+    <link>${SITE_URL}/writing.html</link>
+    <atom:link href="${SITE_URL}/feed.xml" rel="self" type="application/rss+xml" />
+    <description>Essays and notes by Carolanne Jiang.</description>
+    <language>en</language>${lastBuild ? `\n    <lastBuildDate>${lastBuild}</lastBuildDate>` : ""}
+${items}
+  </channel>
+</rss>
+`;
+
+  await fs.writeFile(FEED_FILE, xml);
 }
 
 // ---------- generated-file bookkeeping ----------
@@ -1168,11 +1226,14 @@ async function main() {
     await fs.writeFile(outFile, pageHtml);
     console.log(`Wrote ${slug}.html  ("${title}")`);
 
-    entries.push({ title, slug, description, year: yearOf(dateISO) });
+    entries.push({ title, slug, description, year: yearOf(dateISO), dateISO });
   }
 
   // Keep the order you arranged the sub-pages in Notion.
   await updateIndex(entries);
+
+  // Refresh the RSS feed so readers / RSS-to-email services see new posts.
+  await writeFeed(entries);
 
   // Remove pages that were generated before but are no longer published.
   const current = new Set(entries.map((e) => e.slug));
