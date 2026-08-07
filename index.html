@@ -14,9 +14,9 @@
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap">
-  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></noscript>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Roboto:ital,wght@0,300;1,300&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Roboto:ital,wght@0,300;1,300&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Roboto:ital,wght@0,300;1,300&display=swap" rel="stylesheet"></noscript>
   <link rel="stylesheet" href="site.css">
   <style>
     .intro {
@@ -95,9 +95,50 @@
       color: #2a2a2a;
     }
 
+    /* Pinned to the bottom-right corner, mirroring the social icons on the
+       left and vertically centered on the same horizon (matching height +
+       bottom offset). */
+    .site-footer {
+      position: fixed;
+      right: 24px;
+      bottom: 20px;
+      z-index: 10;
+      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      font-weight: 300;
+      font-size: 0.72rem;
+      line-height: 18px;
+      color: #8a8a8a;
+      white-space: nowrap;
+    }
+
+    .site-footer em {
+      font-style: italic;
+    }
+
+    .site-footer a {
+      color: #8a8a8a;
+      text-decoration: underline;
+      text-decoration-color: #d6d6d6;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    .site-footer a:hover {
+      color: #2a2a2a;
+    }
+
     @media (max-width: 600px) {
       .intro { margin-top: 32px; }
       nav { margin-top: 40px; }
+      /* Too narrow for the corner on phones — return it to the flow, centered,
+         and let it wrap. */
+      .site-footer {
+        position: static;
+        margin-top: 60px;
+        line-height: 1.7;
+        white-space: normal;
+        text-align: center;
+      }
     }
 
     /* Gwern-style popup ("popframe") */
@@ -231,6 +272,21 @@
     #portrait-popup {
       width: 240px;
     }
+    /* Full-piece view of the favicon artwork: a mid-sized square popup,
+       centered on screen (see the centered branch in the popup script). */
+    #favicon-popup {
+      width: 460px;
+    }
+    /* Dim the page behind the centered favicon popup. */
+    .popup-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: rgba(0, 0, 0, 0.5);
+    }
+    .popup-backdrop.hidden {
+      display: none;
+    }
     /* Text-only project popups read better in a narrower column. */
     #typesetter-popup,
     #shortener-popup {
@@ -341,6 +397,10 @@
         </div>
       </details>
     </nav>
+
+    <footer class="site-footer">
+      The favicon of my site is Agnes Martin&rsquo;s <em>Summer</em> (1964). The full piece looks like <a href="#" id="favicon-details-link">this</a>.
+    </footer>
 
   </main>
 
@@ -496,15 +556,36 @@
     </div>
   </div>
 
+  <div class="popup-backdrop hidden" id="favicon-backdrop"></div>
+
+  <div class="popup popframe has-title-bar hidden" id="favicon-popup" role="dialog" aria-label="Agnes Martin, Summer (1964)">
+    <div class="popframe-scroll-view">
+      <div class="popframe-content-view">
+        <div class="popframe-body popup-body">
+          <img src="images/agnes-martin-summer-1964.webp" alt="Agnes Martin, Summer (1964): a hand-ruled grid painted in blue on a pale square canvas">
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     (function () {
-      function wirePopup(link, popup) {
+      function wirePopup(link, popup, opts) {
         if (!link || !popup) return;
+        opts = opts || {};
 
         // Universal rule: the popup opens at the link, below it when there is
         // room, otherwise above it. It may cover other text, but never the
-        // link itself.
+        // link itself. When `centered` is set, it instead pins to the middle
+        // of the viewport (used for the full-piece artwork view).
         function position() {
+          if (opts.centered) {
+            popup.style.position = 'fixed';
+            popup.style.left = '50%';
+            popup.style.top = '50%';
+            popup.style.transform = 'translate(-50%, -50%)';
+            return;
+          }
           var r = link.getBoundingClientRect();
           var w = popup.offsetWidth;
           var h = popup.offsetHeight;
@@ -526,12 +607,14 @@
 
         function show() {
           if (!popup.classList.contains('hidden')) return;
+          if (opts.backdrop) opts.backdrop.classList.remove('hidden');
           popup.classList.remove('hidden');
           position();
         }
 
         function hide() {
           popup.classList.add('hidden');
+          if (opts.backdrop) opts.backdrop.classList.add('hidden');
         }
 
         link.addEventListener('click', function (e) {
@@ -561,6 +644,7 @@
       wirePopup(document.getElementById('typesetter-details-link'), document.getElementById('typesetter-popup'));
       wirePopup(document.getElementById('shortener-details-link'), document.getElementById('shortener-popup'));
       wirePopup(document.getElementById('portrait-details-link'), document.getElementById('portrait-popup'));
+      wirePopup(document.getElementById('favicon-details-link'), document.getElementById('favicon-popup'), { centered: true, backdrop: document.getElementById('favicon-backdrop') });
 
       // Popup carousels: one image at a time.
       function wireCarousel(popup, imgEl, slides) {
