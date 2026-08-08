@@ -26,14 +26,34 @@
       padding: 20px 24px 80px;
     }
     .art-hero {
-      max-width: 700px;
-      margin: 20px auto 70px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      margin: 20px 0 70px;
     }
     .art-hero img {
-      width: 100%;
+      flex: 0 0 auto;
+      width: 360px;
+      max-width: 50%;
       height: auto;
       display: block;
       border-radius: 4px;
+    }
+    .art-hero .art-hero-text {
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: #444;
+    }
+    .art-hero .art-hero-text p + p {
+      margin-top: 1em;
+    }
+    @media (max-width: 600px) {
+      .art-hero {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+      }
+      .art-hero img { max-width: 70%; }
     }
     .section {
       margin-bottom: 100px;
@@ -51,33 +71,29 @@
       max-width: 620px;
       margin-bottom: 24px;
     }
-    /* Paintings heading with the subscribe form beside it */
-    .section-head {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 32px;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
-    }
-    .section-head > h2 {
-      margin-bottom: 0;
-    }
-    .subscribe-inline {
-      margin: 0;
+    /* Subscribe form beneath the hero text */
+    .subscribe-hero {
+      margin: 22px 0 0;
       padding-top: 0;
       border-top: none;
-      width: 340px;
-      max-width: 340px;
+      max-width: 100%;
     }
-    @media (max-width: 600px) {
-      .subscribe-inline { width: 100%; }
+    .subscribe-hero .subscribe-label {
+      font-size: 0.92rem;
+      letter-spacing: 0;
+      text-transform: none;
+      color: #444;
+      margin-bottom: 10px;
     }
     .grid3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 44px 28px;
       margin-top: 28px;
+    }
+    .grid3 > .piece {
+      width: calc((100% - 2 * 28px) / 3);
     }
     .piece .mat {
       background: #ececec;
@@ -90,7 +106,8 @@
     }
     #pleinair .piece .mat,
     #sculpture .piece .mat,
-    #ceramics .piece .mat {
+    #ceramics .piece .mat,
+    #comic .piece .mat {
       background: none;
     }
     .piece .mat img {
@@ -127,6 +144,9 @@
       margin-top: 0;
       gap: 28px;
     }
+    .group .grid3 + .grid3 {
+      margin-top: 28px;
+    }
     .group-cap {
       padding-top: 14px;
     }
@@ -141,13 +161,82 @@
       color: #555;
     }
     @media (max-width: 900px) {
-      .grid3 { grid-template-columns: repeat(2, 1fr); }
+      .grid3 > .piece { width: calc((100% - 28px) / 2); }
     }
     @media (max-width: 600px) {
       .gallery { padding: 12px 16px 60px; }
       .art-hero { margin-bottom: 48px; }
       .section { margin-bottom: 64px; }
-      .grid3 { grid-template-columns: 1fr; gap: 32px; }
+      .grid3 { gap: 32px; }
+      .grid3 > .piece { width: 100%; }
+    }
+
+    /* Single-work image carousel */
+    .carousel {
+      position: relative;
+      max-width: 460px;
+      margin: 0 auto;
+    }
+    .carousel-viewport {
+      overflow: hidden;
+    }
+    .carousel-track {
+      display: flex;
+    }
+    .carousel-track > .piece {
+      flex: 0 0 100%;
+      width: 100%;
+    }
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      line-height: 1;
+      color: #999;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: color 0.15s ease;
+    }
+    .carousel-btn:hover {
+      color: #333;
+    }
+    .carousel-prev {
+      left: -6px;
+    }
+    .carousel-next {
+      right: -6px;
+    }
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .carousel-dot {
+      width: 8px;
+      height: 8px;
+      padding: 0;
+      background: #ccc;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .carousel-dot.active {
+      background: #555;
+    }
+    .carousel + .group-cap {
+      text-align: center;
+    }
+    .carousel .piece .cap {
+      text-align: center;
     }
 
     /* Click-to-open piece popup */
@@ -247,18 +336,16 @@
   <main class="gallery">
 
     <figure class="art-hero">
-      <img src="images/art-gallery.jpg" alt="Carolanne Jiang with her paintings and sculptures at a gallery exhibition">
-    </figure>
-
-    <section class="section" id="paintings">
-      <div class="section-head">
-        <h2>Paintings</h2>
-        <form class="subscribe subscribe-inline"
+      <img src="images/art-gallery.jpg" alt="Carolanne Jiang at her high school senior art exhibition">
+      <figcaption class="art-hero-text">
+        <p>Here are some of my art work, including paintings, sculptures, ceramics, plein air, and some pieces from students I've taught in the past.</p>
+        <p>Here is a picture of me at my high school senior art exhibition.</p>
+        <form class="subscribe subscribe-hero"
               action="https://buttondown.com/api/emails/embed-subscribe/carolanne"
               method="post"
               target="popupwindow"
               onsubmit="window.open('https://buttondown.com/carolanne', 'popupwindow')">
-          <label class="subscribe-label" for="bd-email">New work by email</label>
+          <label class="subscribe-label" for="bd-email">If you like my work, have new ones emailed to you here.</label>
           <div class="subscribe-row">
             <input class="subscribe-input" type="email" name="email" id="bd-email"
                    placeholder="you@example.com" required>
@@ -266,7 +353,11 @@
             <button class="subscribe-button" type="submit">Subscribe</button>
           </div>
         </form>
-      </div>
+      </figcaption>
+    </figure>
+
+    <section class="section" id="paintings">
+      <h2>Paintings</h2>
       <div class="grid3">
         <div class="piece">
           <div class="mat"><img src="images/paintings/5cccde27903c0273c3964426d292449e-750.jpg" srcset="images/paintings/5cccde27903c0273c3964426d292449e-750.jpg 750w, images/paintings/5cccde27903c0273c3964426d292449e-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="264" alt="Self Absorbed Family Portrait" decoding="async"></div>
@@ -279,14 +370,6 @@
         <div class="piece">
           <div class="mat"><img src="images/paintings/christmas-750.jpg" srcset="images/paintings/christmas-750.jpg 750w, images/paintings/christmas-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="360" alt="Christmas" loading="lazy" decoding="async"></div>
           <div class="cap"><h3>Christmas</h3><p>Oil and acrylic on canvas, 2024</p></div>
-        </div>
-        <div class="piece">
-          <div class="mat"><img src="images/paintings/1s-750.jpg" srcset="images/paintings/1s-750.jpg 750w, images/paintings/1s-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="141" alt="Mural — panoramic view across the hallway" loading="lazy" decoding="async"></div>
-          <div class="cap"><h3>Mural</h3><p>Panoramic view across the hallway</p></div>
-        </div>
-        <div class="piece">
-          <div class="mat"><img src="images/paintings/maybe-in-another-world-750.jpg" srcset="images/paintings/maybe-in-another-world-750.jpg 750w, images/paintings/maybe-in-another-world-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="386" alt="Mural" loading="lazy" decoding="async"></div>
-          <div class="cap"><h3>Mural</h3><p>Oil Paint, 2023</p></div>
         </div>
         <div class="piece">
           <div class="mat"><img src="images/paintings/img-2625-2-750.jpg" srcset="images/paintings/img-2625-2-750.jpg 750w, images/paintings/img-2625-2-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="239" alt="Untitled (Kate showed us tomatoes)" loading="lazy" decoding="async"></div>
@@ -363,22 +446,45 @@
       </div>
     </section>
 
+    <section class="section" id="murals">
+      <h2>Murals</h2>
+      <div class="grid3">
+        <div class="piece">
+          <div class="mat"><img src="images/paintings/1s-750.jpg" srcset="images/paintings/1s-750.jpg 750w, images/paintings/1s-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="141" alt="Mural — panoramic view across the hallway" loading="lazy" decoding="async"></div>
+          <div class="cap"><h3>Mural</h3><p>Panoramic view across the hallway</p></div>
+        </div>
+        <div class="piece">
+          <div class="mat"><img src="images/paintings/maybe-in-another-world-750.jpg" srcset="images/paintings/maybe-in-another-world-750.jpg 750w, images/paintings/maybe-in-another-world-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="386" alt="Mural" loading="lazy" decoding="async"></div>
+          <div class="cap"><h3>Mural</h3><p>Oil Paint, 2023</p></div>
+        </div>
+      </div>
+    </section>
+
     <section class="section" id="sculpture">
       <h2>Sculpture</h2>
 
       <div class="group">
-        <div class="grid3">
-          <div class="piece"><div class="mat"><img src="images/3d/img-3229-750.jpg" srcset="images/3d/img-3229-750.jpg 750w, images/3d/img-3229-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="200" alt="Cake in Two Parts" loading="lazy" decoding="async"></div></div>
-          <div class="piece"><div class="mat"><img src="images/3d/img-3228-750.jpg" srcset="images/3d/img-3228-750.jpg 750w, images/3d/img-3228-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="200" alt="Cake in Two Parts" loading="lazy" decoding="async"></div></div>
-          <div class="piece"><div class="mat"><img src="images/3d/img-3221-3-750.jpg" srcset="images/3d/img-3221-3-750.jpg 750w, images/3d/img-3221-3-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Cake in Two Parts" loading="lazy" decoding="async"></div></div>
-          <div class="piece"><div class="mat"><img src="images/3d/img-3222-2-750.jpg" srcset="images/3d/img-3222-2-750.jpg 750w, images/3d/img-3222-2-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Cake in Two Parts" loading="lazy" decoding="async"></div></div>
+        <div class="carousel">
+          <div class="carousel-viewport">
+            <div class="carousel-track">
+              <div class="piece"><div class="mat"><img src="images/3d/img-3229-750.jpg" srcset="images/3d/img-3229-750.jpg 750w, images/3d/img-3229-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, 460px" width="300" height="200" alt="Cake in Two Parts" loading="lazy" decoding="async"></div></div>
+              <div class="piece"><div class="mat"><img src="images/3d/img-3228-750.jpg" srcset="images/3d/img-3228-750.jpg 750w, images/3d/img-3228-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, 460px" width="300" height="200" alt="Cake in Two Parts" loading="lazy" decoding="async"></div></div>
+              <div class="piece"><div class="mat"><img src="images/3d/img-3221-3-750.jpg" srcset="images/3d/img-3221-3-750.jpg 750w, images/3d/img-3221-3-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, 460px" width="300" height="450" alt="Cake in Two Parts" loading="lazy" decoding="async"></div></div>
+              <div class="piece"><div class="mat"><img src="images/3d/img-3222-2-750.jpg" srcset="images/3d/img-3222-2-750.jpg 750w, images/3d/img-3222-2-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, 460px" width="300" height="450" alt="Cake in Two Parts" loading="lazy" decoding="async"></div></div>
+            </div>
+          </div>
+          <button class="carousel-btn carousel-prev" type="button" aria-label="Previous image">‹</button>
+          <button class="carousel-btn carousel-next" type="button" aria-label="Next image">›</button>
+          <div class="carousel-dots"></div>
         </div>
         <div class="group-cap"><h3>Cake in Two Parts</h3><p>Stoneware, 2024</p></div>
       </div>
 
       <div class="group">
-        <div class="grid3">
-          <div class="piece"><div class="mat"><img src="images/3d/img-3237-750.jpg" srcset="images/3d/img-3237-750.jpg 750w, images/3d/img-3237-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sculpture, stoneware and porcelain" loading="lazy" decoding="async"></div></div>
+        <div class="carousel">
+          <div class="carousel-viewport">
+            <div class="carousel-track">
+          <div class="piece"><div class="mat"><img src="images/3d/img-3237-750.jpg" srcset="images/3d/img-3237-750.jpg 750w, images/3d/img-3237-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, 460px" width="300" height="450" alt="Sculpture, stoneware and porcelain" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/3d/img-3238-750.jpg" srcset="images/3d/img-3238-750.jpg 750w, images/3d/img-3238-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sculpture, stoneware and porcelain" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/3d/img-3236-750.jpg" srcset="images/3d/img-3236-750.jpg 750w, images/3d/img-3236-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sculpture, stoneware and porcelain" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/3d/img-3234-750.jpg" srcset="images/3d/img-3234-750.jpg 750w, images/3d/img-3234-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sculpture, stoneware and porcelain" loading="lazy" decoding="async"></div></div>
@@ -392,25 +498,44 @@
           <div class="piece"><div class="mat"><img src="images/3d/img-1535-750.jpg" srcset="images/3d/img-1535-750.jpg 750w, images/3d/img-1535-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sculpture, stoneware and porcelain" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/3d/img-3241-750.jpg" srcset="images/3d/img-3241-750.jpg 750w, images/3d/img-3241-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sculpture, stoneware and porcelain" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/3d/img-3242-750.jpg" srcset="images/3d/img-3242-750.jpg 750w, images/3d/img-3242-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sculpture, stoneware and porcelain" loading="lazy" decoding="async"></div></div>
+            </div>
+          </div>
+          <button class="carousel-btn carousel-prev" type="button" aria-label="Previous image">‹</button>
+          <button class="carousel-btn carousel-next" type="button" aria-label="Next image">›</button>
+          <div class="carousel-dots"></div>
         </div>
         <div class="group-cap"><h3>Sculptures</h3><p>Stoneware and Porcelain, 2023–2024</p></div>
       </div>
 
       <div class="group">
-        <div class="grid3">
-          <div class="piece"><div class="mat"><img src="images/3d/img-3259-750.jpg" srcset="images/3d/img-3259-750.jpg 750w, images/3d/img-3259-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="200" alt="Hands, porcelain" loading="lazy" decoding="async"></div></div>
-          <div class="piece"><div class="mat"><img src="images/3d/img-3260-750.jpg" srcset="images/3d/img-3260-750.jpg 750w, images/3d/img-3260-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="200" alt="Hands, porcelain" loading="lazy" decoding="async"></div></div>
-          <div class="piece"><div class="mat"><img src="images/3d/img-3258-750.jpg" srcset="images/3d/img-3258-750.jpg 750w, images/3d/img-3258-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Hands, porcelain" loading="lazy" decoding="async"></div></div>
-          <div class="piece"><div class="mat"><img src="images/3d/img-3257-750.jpg" srcset="images/3d/img-3257-750.jpg 750w, images/3d/img-3257-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Hands, porcelain" loading="lazy" decoding="async"></div></div>
+        <div class="carousel">
+          <div class="carousel-viewport">
+            <div class="carousel-track">
+              <div class="piece"><div class="mat"><img src="images/3d/img-3259-750.jpg" srcset="images/3d/img-3259-750.jpg 750w, images/3d/img-3259-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, 460px" width="300" height="200" alt="Hands, porcelain" loading="lazy" decoding="async"></div></div>
+              <div class="piece"><div class="mat"><img src="images/3d/img-3260-750.jpg" srcset="images/3d/img-3260-750.jpg 750w, images/3d/img-3260-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, 460px" width="300" height="200" alt="Hands, porcelain" loading="lazy" decoding="async"></div></div>
+              <div class="piece"><div class="mat"><img src="images/3d/img-3258-750.jpg" srcset="images/3d/img-3258-750.jpg 750w, images/3d/img-3258-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, 460px" width="300" height="450" alt="Hands, porcelain" loading="lazy" decoding="async"></div></div>
+              <div class="piece"><div class="mat"><img src="images/3d/img-3257-750.jpg" srcset="images/3d/img-3257-750.jpg 750w, images/3d/img-3257-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, 460px" width="300" height="450" alt="Hands, porcelain" loading="lazy" decoding="async"></div></div>
+            </div>
+          </div>
+          <button class="carousel-btn carousel-prev" type="button" aria-label="Previous image">‹</button>
+          <button class="carousel-btn carousel-next" type="button" aria-label="Next image">›</button>
+          <div class="carousel-dots"></div>
         </div>
         <div class="group-cap"><h3>Hands</h3><p>Porcelain, 2023</p></div>
       </div>
 
       <div class="group">
-        <div class="grid3">
-          <div class="piece"><div class="mat"><img src="images/3d/img-3250-3-2-750.jpg" srcset="images/3d/img-3250-3-2-750.jpg 750w, images/3d/img-3250-3-2-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Table With Still Life" loading="lazy" decoding="async"></div></div>
+        <div class="carousel">
+          <div class="carousel-viewport">
+            <div class="carousel-track">
+          <div class="piece"><div class="mat"><img src="images/3d/img-3250-3-2-750.jpg" srcset="images/3d/img-3250-3-2-750.jpg 750w, images/3d/img-3250-3-2-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, 460px" width="300" height="450" alt="Table With Still Life" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/3d/26x18-2-750.jpg" srcset="images/3d/26x18-2-750.jpg 750w, images/3d/26x18-2-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Table With Still Life" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/3d/img-3251-3-750.jpg" srcset="images/3d/img-3251-3-750.jpg 750w, images/3d/img-3251-3-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Table With Still Life" loading="lazy" decoding="async"></div></div>
+            </div>
+          </div>
+          <button class="carousel-btn carousel-prev" type="button" aria-label="Previous image">‹</button>
+          <button class="carousel-btn carousel-next" type="button" aria-label="Next image">›</button>
+          <div class="carousel-dots"></div>
         </div>
         <div class="group-cap"><h3>Table With Still Life, David Schab study</h3><p>Stoneware, 2023</p></div>
       </div>
@@ -432,8 +557,10 @@
       </div>
 
       <div class="group">
-        <div class="grid3">
-          <div class="piece"><div class="mat"><img src="images/3d/img-3256-750.jpg" srcset="images/3d/img-3256-750.jpg 750w, images/3d/img-3256-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="200" alt="Sushi, porcelain" loading="lazy" decoding="async"></div></div>
+        <div class="carousel">
+          <div class="carousel-viewport">
+            <div class="carousel-track">
+          <div class="piece"><div class="mat"><img src="images/3d/img-3256-750.jpg" srcset="images/3d/img-3256-750.jpg 750w, images/3d/img-3256-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, 460px" width="300" height="200" alt="Sushi, porcelain" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/3d/img-3255-750.jpg" srcset="images/3d/img-3255-750.jpg 750w, images/3d/img-3255-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="200" alt="Sushi, porcelain" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/3d/img-3253-750.jpg" srcset="images/3d/img-3253-750.jpg 750w, images/3d/img-3253-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="200" alt="Sushi, porcelain" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/3d/img-3219-750.jpg" srcset="images/3d/img-3219-750.jpg 750w, images/3d/img-3219-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="300" alt="Sushi, porcelain" loading="lazy" decoding="async"></div></div>
@@ -442,6 +569,11 @@
           <div class="piece"><div class="mat"><img src="images/3d/img-3220-750.jpg" srcset="images/3d/img-3220-750.jpg 750w, images/3d/img-3220-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="200" alt="Sushi, porcelain" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/3d/img-3218-750.jpg" srcset="images/3d/img-3218-750.jpg 750w, images/3d/img-3218-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="200" alt="Sushi, porcelain" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/3d/img-3214-750.jpg" srcset="images/3d/img-3214-750.jpg 750w, images/3d/img-3214-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Sushi, porcelain" loading="lazy" decoding="async"></div></div>
+            </div>
+          </div>
+          <button class="carousel-btn carousel-prev" type="button" aria-label="Previous image">‹</button>
+          <button class="carousel-btn carousel-next" type="button" aria-label="Next image">›</button>
+          <div class="carousel-dots"></div>
         </div>
         <div class="group-cap"><h3>Sushi</h3><p>Porcelain</p></div>
       </div>
@@ -508,21 +640,23 @@
           <div class="piece"><div class="mat"><img src="images/students/s03.jpg" srcset="images/students/s03-750.jpg 750w, images/students/s03.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1173" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/students/s04.jpg" srcset="images/students/s04-750.jpg 750w, images/students/s04.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1159" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/students/s05.jpg" srcset="images/students/s05-750.jpg 750w, images/students/s05.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1117" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
-          <div class="piece"><div class="mat"><img src="images/students/s06.jpg" srcset="images/students/s06-750.jpg 750w, images/students/s06.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1986" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/students/s07.jpg" srcset="images/students/s07-750.jpg 750w, images/students/s07.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1157" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/students/s08.jpg" srcset="images/students/s08-750.jpg 750w, images/students/s08.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1172" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/students/s09.jpg" srcset="images/students/s09-750.jpg 750w, images/students/s09.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1163" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/students/s10.jpg" srcset="images/students/s10-750.jpg 750w, images/students/s10.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1206" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/students/s11.jpg" srcset="images/students/s11-750.jpg 750w, images/students/s11.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1200" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
-          <div class="piece"><div class="mat"><img src="images/students/s12.jpg" srcset="images/students/s12-750.jpg 750w, images/students/s12.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1908" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/students/s13.jpg" srcset="images/students/s13-750.jpg 750w, images/students/s13.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1186" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/students/s14.jpg" srcset="images/students/s14-750.jpg 750w, images/students/s14.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1184" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/students/s15.jpg" srcset="images/students/s15-750.jpg 750w, images/students/s15.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1185" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/students/s16.jpg" srcset="images/students/s16-750.jpg 750w, images/students/s16.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1178" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/students/s17.jpg" srcset="images/students/s17-750.jpg 750w, images/students/s17.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1179" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
-          <div class="piece"><div class="mat"><img src="images/students/s18.jpg" srcset="images/students/s18-750.jpg 750w, images/students/s18.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1932" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/students/s19.jpg" srcset="images/students/s19-750.jpg 750w, images/students/s19.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1080" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/students/s20.jpg" srcset="images/students/s20-750.jpg 750w, images/students/s20.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1128" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+        </div>
+        <div class="grid3">
+          <div class="piece"><div class="mat"><img src="images/students/s06.jpg" srcset="images/students/s06-750.jpg 750w, images/students/s06.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1986" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/students/s12.jpg" srcset="images/students/s12-750.jpg 750w, images/students/s12.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1908" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
+          <div class="piece"><div class="mat"><img src="images/students/s18.jpg" srcset="images/students/s18-750.jpg 750w, images/students/s18.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1932" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
           <div class="piece"><div class="mat"><img src="images/students/s21.jpg" srcset="images/students/s21-750.jpg 750w, images/students/s21.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="1500" height="1866" alt="Painting by a student" loading="lazy" decoding="async"></div></div>
         </div>
         <div class="group-cap"><p>Paintings by my students, 2023–2025</p></div>
@@ -531,35 +665,30 @@
 
     <section class="section" id="comic">
       <h2>A Comic Project</h2>
-      <div class="grid3">
-        <div class="piece">
-          <div class="mat"><img src="images/comic/finding-1-copy-750.jpg" srcset="images/comic/finding-1-copy-750.jpg 750w, images/comic/finding-1-copy-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="451" alt="Finding page 1" loading="lazy" decoding="async"></div>
-          <div class="cap"><h3>Finding</h3><p>Page 1</p></div>
+      <div class="carousel">
+        <div class="carousel-viewport">
+          <div class="carousel-track">
+            <div class="piece">
+              <div class="mat"><img src="images/comic/finding-1-copy-750.jpg" srcset="images/comic/finding-1-copy-750.jpg 750w, images/comic/finding-1-copy-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, 460px" width="300" height="451" alt="Finding page 1" loading="lazy" decoding="async"></div>
+              <div class="cap"><h3>Finding</h3></div>
+            </div>
+            <div class="piece">
+              <div class="mat"><img src="images/comic/finding-2-copy-750.jpg" srcset="images/comic/finding-2-copy-750.jpg 750w, images/comic/finding-2-copy-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, 460px" width="300" height="450" alt="Finding page 2" loading="lazy" decoding="async"></div>            </div>
+            <div class="piece">
+              <div class="mat"><img src="images/comic/finding-3-copy-750.jpg" srcset="images/comic/finding-3-copy-750.jpg 750w, images/comic/finding-3-copy-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, 460px" width="300" height="457" alt="Finding page 3" loading="lazy" decoding="async"></div>            </div>
+            <div class="piece">
+              <div class="mat"><img src="images/comic/finding-4-copy-750.jpg" srcset="images/comic/finding-4-copy-750.jpg 750w, images/comic/finding-4-copy-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, 460px" width="300" height="455" alt="Finding page 4" loading="lazy" decoding="async"></div>            </div>
+            <div class="piece">
+              <div class="mat"><img src="images/comic/finding-5-copy-750.jpg" srcset="images/comic/finding-5-copy-750.jpg 750w, images/comic/finding-5-copy-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, 460px" width="300" height="453" alt="Finding page 5" loading="lazy" decoding="async"></div>            </div>
+            <div class="piece">
+              <div class="mat"><img src="images/comic/finding-6-copy-750.jpg" srcset="images/comic/finding-6-copy-750.jpg 750w, images/comic/finding-6-copy-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, 460px" width="300" height="452" alt="Finding page 6" loading="lazy" decoding="async"></div>            </div>
+            <div class="piece">
+              <div class="mat"><img src="images/comic/finding-7-copy-750.jpg" srcset="images/comic/finding-7-copy-750.jpg 750w, images/comic/finding-7-copy-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, 460px" width="300" height="451" alt="Finding page 7" loading="lazy" decoding="async"></div>            </div>
+          </div>
         </div>
-        <div class="piece">
-          <div class="mat"><img src="images/comic/finding-2-copy-750.jpg" srcset="images/comic/finding-2-copy-750.jpg 750w, images/comic/finding-2-copy-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="450" alt="Finding page 2" loading="lazy" decoding="async"></div>
-          <div class="cap"><p>Page 2</p></div>
-        </div>
-        <div class="piece">
-          <div class="mat"><img src="images/comic/finding-3-copy-750.jpg" srcset="images/comic/finding-3-copy-750.jpg 750w, images/comic/finding-3-copy-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="457" alt="Finding page 3" loading="lazy" decoding="async"></div>
-          <div class="cap"><p>Page 3</p></div>
-        </div>
-        <div class="piece">
-          <div class="mat"><img src="images/comic/finding-4-copy-750.jpg" srcset="images/comic/finding-4-copy-750.jpg 750w, images/comic/finding-4-copy-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="455" alt="Finding page 4" loading="lazy" decoding="async"></div>
-          <div class="cap"><p>Page 4</p></div>
-        </div>
-        <div class="piece">
-          <div class="mat"><img src="images/comic/finding-5-copy-750.jpg" srcset="images/comic/finding-5-copy-750.jpg 750w, images/comic/finding-5-copy-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="453" alt="Finding page 5" loading="lazy" decoding="async"></div>
-          <div class="cap"><p>Page 5</p></div>
-        </div>
-        <div class="piece">
-          <div class="mat"><img src="images/comic/finding-6-copy-750.jpg" srcset="images/comic/finding-6-copy-750.jpg 750w, images/comic/finding-6-copy-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="452" alt="Finding page 6" loading="lazy" decoding="async"></div>
-          <div class="cap"><p>Page 6</p></div>
-        </div>
-        <div class="piece">
-          <div class="mat"><img src="images/comic/finding-7-copy-750.jpg" srcset="images/comic/finding-7-copy-750.jpg 750w, images/comic/finding-7-copy-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="451" alt="Finding page 7" loading="lazy" decoding="async"></div>
-          <div class="cap"><p>Page 7</p></div>
-        </div>
+        <button class="carousel-btn carousel-prev" type="button" aria-label="Previous image">‹</button>
+        <button class="carousel-btn carousel-next" type="button" aria-label="Next image">›</button>
+        <div class="carousel-dots"></div>
       </div>
     </section>
 
@@ -630,6 +759,42 @@
       document.addEventListener('click', function (e) {
         if (popup.classList.contains('hidden')) return;
         if (!popup.contains(e.target) && !e.target.closest('.piece .mat')) close();
+      });
+    })();
+  </script>
+
+  <script>
+    (function () {
+      document.querySelectorAll('.carousel').forEach(function (carousel) {
+        var track = carousel.querySelector('.carousel-track');
+        var slides = track.children;
+        var count = slides.length;
+        var dotsWrap = carousel.querySelector('.carousel-dots');
+        var index = 0;
+        var dots = [];
+
+        for (var i = 0; i < count; i++) {
+          var dot = document.createElement('button');
+          dot.type = 'button';
+          dot.className = 'carousel-dot';
+          dot.setAttribute('aria-label', 'Go to image ' + (i + 1));
+          (function (n) {
+            dot.addEventListener('click', function () { go(n); });
+          })(i);
+          dotsWrap.appendChild(dot);
+          dots.push(dot);
+        }
+
+        function go(i) {
+          index = (i + count) % count;
+          track.style.transform = 'translateX(' + (-index * 100) + '%)';
+          dots.forEach(function (d, di) { d.classList.toggle('active', di === index); });
+        }
+
+        carousel.querySelector('.carousel-prev').addEventListener('click', function () { go(index - 1); });
+        carousel.querySelector('.carousel-next').addEventListener('click', function () { go(index + 1); });
+
+        go(0);
       });
     })();
   </script>
