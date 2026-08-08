@@ -13,6 +13,7 @@
   <meta property="og:url" content="https://www.carolannejiang.com/website-setup.html">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Carolanne Jiang — Writing" href="feed.xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap">
@@ -28,7 +29,7 @@
 <header><h1 class="page-title" dir="auto">How to automatically update your website from notion</h1><p class="page-description" dir="auto"></p></header>
 <div class="page-body">
 <p class="last-updated">Last updated 2026-07-08 </p>
-<p>I love notion. This page and all of my other essaysare updated from my Notion database automatically. You can link your notion &amp; website in a way such that your website can use notion as a backend &amp; auto sync updates you make ona notion database. (GitHub Action polls Notion every hour (/other increment of time), pulls every row/page, and publishes each one as its own page on the site plus updates the menu list.)</p>
+<p>I love notion. This page and all of my other essays are updated from my Notion database automatically. You can link your notion &amp; website in a way such that new writings you create in Notion (eg. on a dedicated database) appear on your website automatically. (GitHub Action polls Notion every hour ( / other increment of time), pulls every row/page, and publishes each one as its own page on the site plus updates the menu list.)</p>
 <details><summary>My setup (text written by claude)</summary>
 <p>A <strong>GitHub Action</strong> (<code>.github/workflows/notion-sync.yml</code>) runs <strong>once an hour</strong> (and you can trigger it on-demand from the repo’s Actions tab). Each run:</p>
 <ol class="numbered-list">
@@ -45,6 +46,7 @@
 </li>
 </ol>
 <p>So edits show up within the hour, or instantly if you hit “Run workflow.”</p>
+<p><a href="https://github.com/carolannejiang/notion-site-sync">GitHub - carolannejiang/notion-site-sync: Write in Notion, publish to your static website automatically — hourly GitHub Action, drop-in template.</a></p>
 <details><summary>extended version </summary>
 <h1>Auto-publishing writings from Notion</h1>
 <p>New writings you create in Notion appear on <a href="http://carolannejiang.com/">carolannejiang.com</a> automatically, styled to match the rest of the site. </p>
