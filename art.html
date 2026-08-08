@@ -53,7 +53,7 @@
         align-items: flex-start;
         gap: 20px;
       }
-      .art-hero img { max-width: 70%; }
+      .art-hero img { max-width: 100%; }
     }
     .section {
       margin-bottom: 100px;
@@ -746,8 +746,13 @@
         popupImg.src = '';
       }
 
+      var mobileQuery = window.matchMedia('(max-width: 600px)');
+
       document.querySelectorAll('.piece').forEach(function (piece) {
-        piece.querySelector('.mat').addEventListener('click', function () { open(piece); });
+        piece.querySelector('.mat').addEventListener('click', function () {
+          if (mobileQuery.matches) return;
+          open(piece);
+        });
       });
 
       closeBtn.addEventListener('click', close);
