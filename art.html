@@ -51,6 +51,28 @@
       max-width: 620px;
       margin-bottom: 24px;
     }
+    /* Paintings heading with the subscribe form beside it */
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 32px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .section-head > h2 {
+      margin-bottom: 0;
+    }
+    .subscribe-inline {
+      margin: 0;
+      padding-top: 0;
+      border-top: none;
+      width: 340px;
+      max-width: 340px;
+    }
+    @media (max-width: 600px) {
+      .subscribe-inline { width: 100%; }
+    }
     .grid3 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -229,7 +251,22 @@
     </figure>
 
     <section class="section" id="paintings">
-      <h2>Paintings</h2>
+      <div class="section-head">
+        <h2>Paintings</h2>
+        <form class="subscribe subscribe-inline"
+              action="https://buttondown.com/api/emails/embed-subscribe/carolanne"
+              method="post"
+              target="popupwindow"
+              onsubmit="window.open('https://buttondown.com/carolanne', 'popupwindow')">
+          <label class="subscribe-label" for="bd-email">New work by email</label>
+          <div class="subscribe-row">
+            <input class="subscribe-input" type="email" name="email" id="bd-email"
+                   placeholder="you@example.com" required>
+            <input type="hidden" value="1" name="embed">
+            <button class="subscribe-button" type="submit">Subscribe</button>
+          </div>
+        </form>
+      </div>
       <div class="grid3">
         <div class="piece">
           <div class="mat"><img src="images/paintings/5cccde27903c0273c3964426d292449e-750.jpg" srcset="images/paintings/5cccde27903c0273c3964426d292449e-750.jpg 750w, images/paintings/5cccde27903c0273c3964426d292449e-1500.jpg 1500w" sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" width="300" height="264" alt="Self Absorbed Family Portrait" decoding="async"></div>

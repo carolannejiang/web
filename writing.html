@@ -12,6 +12,7 @@
   <meta property="og:url" content="https://www.carolannejiang.com/writing.html">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Carolanne Jiang — Writing" href="feed.xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap">
@@ -93,6 +94,20 @@
         <div class="entry-desc">…</div>
       </div>
       <!-- NOTION:END -->
+
+      <form class="subscribe"
+            action="https://buttondown.com/api/emails/embed-subscribe/carolanne"
+            method="post"
+            target="popupwindow"
+            onsubmit="window.open('https://buttondown.com/carolanne', 'popupwindow')">
+        <label class="subscribe-label" for="bd-email">New writing by email</label>
+        <div class="subscribe-row">
+          <input class="subscribe-input" type="email" name="email" id="bd-email"
+                 placeholder="you@example.com" required>
+          <input type="hidden" value="1" name="embed">
+          <button class="subscribe-button" type="submit">Subscribe</button>
+        </div>
+      </form>
 
     </div>
 
